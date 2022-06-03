@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    networks:
+      main:
+        aliases:
+          - frontend
+    ports:
+      - 127.0.0.1:80:80
+  db:
+    image: mysql:8
+    restart: always
+    volumes:
+      - my-db:/var/lib/mysql
+    networks:
+      main:
+        aliases:
+          - db
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      main:
+    profiles:
+      - tools
+
+networks:
+  main:
+    driver: bridge
+
+volumes:
+  my-db:

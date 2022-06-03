@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  frontend:
+    volumes:
+      - .:/app
+      - frontend.node_modules:/app/frontend/node_modules
+      - frontend.dist:/app/frontend/.next
+    env_file:
+      - .env.frontend.dev
+      - .env.common.dev
+  db:
+    environment:
+      MYSQL_DATABASE: 'ng'
+      MYSQL_USER: 'ng_user'
+      MYSQL_PASSWORD: 'ng_user_passwort'
+      MYSQL_ROOT_PASSWORD: 'root_passwort'
+
+volumes:
+  frontend.node_modules:
+  frontend.dist:

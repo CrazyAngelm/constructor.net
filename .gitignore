@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.in
+!.env.*.in
+
+docker-compose.override.yml
+docker-compose.*.override.yml
+
+*.bat
+
+jwt.*.key
+jwt.*.key.pub
+session.*.secret
