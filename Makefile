@@ -42,7 +42,7 @@ check-overrides: $(override_yml) $(stage_override_yml)
 	touch $@
 
 .PHONY: dev-envs
-dev-envs: .env.common.dev .env.backend.dev .env.frontend.dev
+dev-envs: .env.common.dev .env.frontend.dev
 
 .PHONE: check
 check: check-overrides check-stage dev-envs
