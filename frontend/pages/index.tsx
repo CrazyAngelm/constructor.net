@@ -1,10 +1,11 @@
+import Layout from "@/components/Layout";
 import { NextPage } from "next";
 
-const Index:NextPage = () => {
+const Index: NextPage = () => {
 	return (
-		<article>
-			Home
-		</article>
+		<Layout header="">
+
+		</Layout>
 	)
 }
 
