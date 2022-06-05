@@ -5,6 +5,7 @@ import styles from '@/styles/Layout.module.scss'
 
 import logo from '@/assets/logo.png'
 import Link from 'next/link'
+import Head from 'next/head'
 
 
 export interface Props {
@@ -15,10 +16,10 @@ export interface Props {
 const Layout = ({ children, title }: Props) => {
 	return (
 		<div className={styles.root}>
-			<head>
+			<Head>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<title>Neurography{title && ` | ${title}`}</title>
-			</head>
+			</Head>
 			<nav>
 				<Link href={'/'}>
 					<section className={styles.about}>
