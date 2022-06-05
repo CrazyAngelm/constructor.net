@@ -1,28 +1,21 @@
-.root {
-	> nav {
-		padding: 2vh;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: start;
+@import "./lib/bulma.scss";
 
-		width: 100%;
-		gap: 3vh;
-		> .about {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			gap: 1vh;
-			> div {
-				height: 5vh;
-				width: 5vh;
-				position: relative;
-			}
-			> span {
-				font-size: 3vh;
-				font-family: cursive;
-				font-weight: 700;
-			}
-		}
+.root {
+	//Тут будут перечисления всех стилей стандартных
+
+	.content {
+		padding-top: $navbar-height;
+	}
+	input {
+		@extend .input;
+	}
+	button {
+		@extend .button;
+	}
+	label {
+		@extend .label;
+	}
+	table {
+		@extend .table;
 	}
 }

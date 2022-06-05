@@ -1,0 +1,59 @@
+@import "./lib/bulma.scss";
+
+.navbar {
+	@extend .navbar;
+	&.fixed{
+		@extend .is-fixed-top;
+	}
+	padding: 1vh;
+
+	> .brand {
+		@extend .navbar-brand;
+		> div {
+			@extend .navbar-item;
+		}
+		.about {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 1vh;
+			> div {
+				height: 5vh;
+				width: 5vh;
+				position: relative;
+			}
+			> span {
+				font-size: 3vh;
+				font-family: cursive;
+				font-weight: 700;
+			}
+		}
+	}
+
+	> .menu {
+		@extend .navbar-menu;
+
+		.buttons {
+			@extend .buttons;
+			.log {
+				@extend .is-light;
+			}
+			.sign {
+				@extend .is-link;
+			}
+		}
+
+		> section {
+			> a,
+			div {
+				@extend .navbar-item;
+			}
+		}
+		> .start {
+			@extend .navbar-start;
+		}
+		> .end {
+			@extend .navbar-end;
+		}
+	}
+}
