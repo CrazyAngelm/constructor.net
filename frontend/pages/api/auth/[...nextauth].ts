@@ -2,6 +2,10 @@ import NextAuth from 'next-auth'
 import YandexProvider from 'next-auth/providers/yandex'
 import CredentialsProvider from "next-auth/providers/credentials"
 import { Session } from '@/lib/session'
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import { PrismaClient } from "@prisma/client"
+
+const prisma = new PrismaClient()
 
 export default NextAuth({
 	providers: [
@@ -39,5 +43,6 @@ export default NextAuth({
 			_session.socpes = [ 'admin' ]
 			return _session
 		}
-	}
+	},
+	adapter: PrismaAdapter(prisma)
 })
