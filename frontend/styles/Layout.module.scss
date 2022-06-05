@@ -4,7 +4,8 @@
 	//Тут будут перечисления всех стилей стандартных
 
 	.content {
-		padding-top: $navbar-height;
+		margin-top: $navbar-height;
+		padding-top: 3vh;
 	}
 	input {
 		@extend .input;

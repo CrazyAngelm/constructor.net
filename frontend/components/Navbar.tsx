@@ -4,9 +4,12 @@ import Image from 'next/image'
 import styles from '@/styles/Navbar.module.scss'
 
 import logo from '@/assets/logo.png'
+import { useSession } from '@/lib/session/hooks'
 
 
 const Navbar = () => {
+	const session = useSession()
+
 	return (
 		<nav className={`${styles.navbar} ${styles.fixed}`} role="navigation" aria-label="main navigation">
 			<section className={styles.brand}>
@@ -29,20 +32,33 @@ const Navbar = () => {
 				</section>
 
 				<section className={styles.end}>
-					<div>
-						<div className={styles.buttons}>
-							<Link href={'/auth'}>
-								<button className={`${styles.sign} ${styles.button}`}>
-									Регистрация
-								</button>
-							</Link>
-							<Link href={'/auth'}>
-								<button className={`${styles.log} ${styles.button}`}>
-									Войти
-								</button>
-							</Link>
+					{!(session && session != 'loading')
+						? <div>
+							<div className={styles.buttons}>
+								<Link href={'/auth'}>
+									<button className={`${styles.sign} ${styles.button}`}>
+										Регистрация
+									</button>
+								</Link>
+								<Link href={'/auth'}>
+									<button className={`${styles.log} ${styles.button}`}>
+										Войти
+									</button>
+								</Link>
+							</div>
 						</div>
-					</div>
+						: <div className={styles.lk}>
+							<span>{session.user?.name ? session.user.name : 'unknow'}</span>
+							{session.user?.image
+								? <img src={session.user?.image} className={styles.rounded} />
+								: <div className={styles.avatar}>
+									<span>
+										{session.user?.name ? session.user.name[ 0 ] : 'U'}
+									</span>
+								</div>
+							}
+						</div>
+					}
 				</section>
 			</section>
 		</nav>

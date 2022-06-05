@@ -2,7 +2,7 @@
 
 .navbar {
 	@extend .navbar;
-	&.fixed{
+	&.fixed {
 		@extend .is-fixed-top;
 	}
 	padding: 1vh;
@@ -47,6 +47,26 @@
 			> a,
 			div {
 				@extend .navbar-item;
+			}
+			.lk {
+				gap: 1vh;
+				cursor: pointer;
+				img {
+					max-height: 10vh;
+				}
+
+				.rounded {
+					border-radius: 100%;
+				}
+				.avatar {
+					@extend .rounded;
+					@extend .has-background-primary;
+					@extend .has-text-white;
+					justify-content: center;
+					width: 2rem;
+					height: 2rem;
+					padding: 0;
+				}
 			}
 		}
 		> .start {
