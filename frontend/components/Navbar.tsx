@@ -1,9 +1,9 @@
-import styles from '@/styles/Navbar.module.scss'
 import Link from 'next/link'
 import Image from 'next/image'
 
+import styles from '@/styles/Navbar.module.scss'
+
 import logo from '@/assets/logo.png'
-import 'bulma/css/bulma.css'
 
 
 const Navbar = () => {
@@ -31,8 +31,16 @@ const Navbar = () => {
 				<section className={styles.end}>
 					<div>
 						<div className={styles.buttons}>
-							<button className={`${styles.sign} ${styles.button}`}>Регистрация</button>
-							<button className={`${styles.log} ${styles.button}`}>Войти</button>
+							<Link href={'/auth'}>
+								<button className={`${styles.sign} ${styles.button}`}>
+									Регистрация
+								</button>
+							</Link>
+							<Link href={'/auth'}>
+								<button className={`${styles.log} ${styles.button}`}>
+									Войти
+								</button>
+							</Link>
 						</div>
 					</div>
 				</section>
