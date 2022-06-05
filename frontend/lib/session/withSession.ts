@@ -31,7 +31,7 @@ export const withAdminSession = <T>(
 	target: (session: Session, context: GetServerSidePropsContext) => Promise<T> | T
 ) => {
 	return withSession((session, context) => {
-		if (session.socpes.indexOf('admin') === -1) return {
+		if (session.scopes.indexOf('admin') === -1) return {
 			redirect: {
 				destination: REDIRECT_ACCES_DENIED ?? '/',
 				permanent: false,

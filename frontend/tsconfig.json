@@ -22,7 +22,7 @@
       "@/assets/*": [
         "./assets/*"
       ],
-      "@common/*": [
+      "@/common/*": [
         "../common/src/*"
       ],
       "@/components/*": [

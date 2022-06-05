@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { Session } from '@/lib/session'
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
+import { ScopeJoin } from '@/lib/prismaTypes'
 
 const prisma = new PrismaClient()
 
@@ -40,7 +41,15 @@ export default NextAuth({
 	callbacks: {
 		async session({ session, user, token }) {
 			const _session = session as Session
-			_session.socpes = [ 'admin' ]
+			const scopes = await prisma.scopeJoin.findMany({
+				where: {
+					userId: user.id
+				},
+				include: {
+					scope: true
+				}
+			}) as ScopeJoin[]
+			_session.scopes = scopes.map(p => p.scope.value)
 			return _session
 		}
 	},
