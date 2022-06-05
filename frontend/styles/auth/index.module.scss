@@ -1,0 +1,58 @@
+@import "bulma/sass/utilities/_all.sass";
+@import "~bulma/sass/elements/_all", "~bulma/sass/form/_all";
+@import "../lib/hr.scss";
+
+.auth {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	margin-top: 10vh;
+
+	.notification{
+		@extend .notification;
+		@extend .title;
+		text-align: center;
+
+		>section{
+			margin-top: 5vh;
+			@extend .buttons;
+		}
+	}
+
+	button {
+		width: 100%;
+		&.button{
+			@extend .button;
+		}
+		&.primary{
+			@extend .is-primary;
+		}
+	}
+	> section {
+		@extend .box;
+		padding: 2vh 5vh;
+
+		> header {
+			@extend .title;
+			text-align: center;
+		}
+		> div {
+			@extend .field;
+
+			> label {
+				@extend .label;
+			}
+			> div {
+				@extend .control;
+				> input {
+					@extend .input;
+				}
+			}
+		}
+		> hr {
+			@extend .hr;
+			@include content('или');
+		}
+	}
+}
