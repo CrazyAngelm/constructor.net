@@ -1,28 +1,26 @@
 import { ReactNode } from 'react'
-import Image from 'next/image'
+import Head from 'next/head'
 
 import styles from '@/styles/Layout.module.scss'
 
-import logo from '@/assets/logo.png'
-import Link from 'next/link'
-import Head from 'next/head'
 import Navbar from './Navbar'
 
 
 export interface Props {
 	children?: ReactNode
 	title?: string
+	navbar?: boolean
 }
 //Переделать на номральный навбар
-const Layout = ({ children, title }: Props) => {
+const Layout = ({ children, title, navbar = true }: Props) => {
 	return (
 		<div className={styles.root}>
 			<Head>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<title>Neurography{title && ` | ${title}`}</title>
 			</Head>
-			<Navbar />
-			<article className={styles.content}>
+			{navbar && <Navbar />}
+			<article className={`${styles.content} ${styles.isNavbarContent}`}>
 				{children}
 			</article>
 		</div>
