@@ -1,0 +1,58 @@
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/components/_all", "../lib/variables.scss", "bulma/sass/helpers/_all";
+
+.menu {
+	@extend .menu;
+	position: absolute;
+	width: fit-content;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	margin: 0;
+	padding: 1vh 0;
+	@extend .has-background-light;
+	> section {
+		transition: max-width 0.5s linear;
+	}
+
+	&:hover {
+		> .content {
+			max-width: 50vw;
+		}
+	}
+	> .content {
+		overflow: hidden;
+		max-width: 0;
+		padding: 3vh 0 0 3vh;
+		> div {
+			> header {
+				@extend .menu-label;
+			}
+			ul {
+				@extend .menu-list;
+				padding: 0;
+				margin: 0;
+				li {
+					display: block;
+					> a {
+						&:hover {
+							@extend .has-background-grey-lighter;
+						}
+					}
+				}
+			}
+		}
+	}
+	> .hidden {
+		width: 4vw;
+	}
+}
+.avatar {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	.img {
+		width: 3vw;
+		height: 3vw;
+	}
+}

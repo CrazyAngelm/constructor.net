@@ -1,11 +1,39 @@
-import Layout from "@/components/Layout";
-import { withAdminSession } from "@/lib/session/withSession";
-import { NextPage } from "next";
+import { NextPage } from 'next';
+
+import { withAdminSession } from '@/lib/session/withSession';
+
+import styles from '@/styles/adm/index.module.scss'
+
+import Menu, { Categories } from '@/components/adm/Menu';
+import Layout from '@/components/Layout';
+
+
+const categories = [
+	{
+		label: 'Сайт',
+		items: [ {
+			label: 'Пользователи',
+		}, ]
+	}, {
+		label: 'Контент',
+		items: [ {
+			label: 'Задания',
+			items: [ {
+				label: 'Категории'
+			}, {
+				label: 'Задания'
+			} ]
+		} ]
+	}
+] as Categories[]
+
 
 const Adm: NextPage = () => {
 	return (
-		<Layout>
-			adminka
+		<Layout navbar={false}>
+			<article className={styles.adm}>
+				<Menu categories={categories} />
+			</article>
 		</Layout>
 	)
 }
@@ -18,3 +46,22 @@ export const getServerSideProps = withAdminSession(session => {
 		props: {}
 	}
 })
+
+
+/*
+-Content
+	смысл такой, выбираем в меню ссылку и по каллбеку открывается
+	контент собственно с нужной штукой (можно даже енумом)
+	Далее уже идет запрос (либо там же, либо отправляем запросы в лист и едитор
+		Лучше туда отправить, чтоб сразу и редактичровать и получать и обновлять по тем запросам)
+
+	-List
+		Список каких то данных
+		Передавать внутрь массив и каллбеки
+	-Editor
+		окно редактора какой то инфы
+		-IndividulaEditor
+			Для каждого типа инфы свой редактор
+
+
+*/
