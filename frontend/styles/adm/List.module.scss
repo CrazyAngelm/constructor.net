@@ -1,10 +1,13 @@
 @import "bulma/sass/utilities/_all.sass";
 @import "bulma/sass/elements/_all.sass";
 @import "bulma/sass/helpers/_all.sass";
+@import "../lib/variables.scss";
 
 .list {
 	width: fit-content;
 	height: 100%;
+	display: flex;
+	flex-direction: column;
 
 	@extend .box;
 	> header {
@@ -12,8 +15,21 @@
 	}
 	.table {
 		@extend .table;
-		&:not(:last-child){
+		&:not(:last-child) {
 			margin-bottom: 0;
+		}
+		tr{
+			div{
+				max-width: 10vw;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+		thead {
+			position: sticky;
+			top: 0;
+			background-color: $background-color;
 		}
 		tbody {
 			tr {
@@ -24,7 +40,7 @@
 		}
 	}
 	.content {
-		height: 87%;
+		flex: 1 1 auto;
 		overflow-y: scroll;
 		&::-webkit-scrollbar {
 			display: none;
