@@ -4,7 +4,6 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { Session } from '@/lib/session'
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
-import { ScopeJoin } from '@/lib/prismaTypes'
 
 const prisma = new PrismaClient()
 
@@ -48,7 +47,7 @@ export default NextAuth({
 				include: {
 					scope: true
 				}
-			}) as ScopeJoin[]
+			})
 			_session.scopes = scopes.map(p => p.scope.value)
 			return _session
 		}
