@@ -1,0 +1,33 @@
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/elements/_all.sass";
+@import "bulma/sass/helpers/_all.sass";
+
+.list {
+	width: fit-content;
+	height: 100%;
+
+	@extend .box;
+	> header {
+		@extend .title;
+	}
+	.table {
+		@extend .table;
+		&:not(:last-child){
+			margin-bottom: 0;
+		}
+		tbody {
+			tr {
+				&:hover {
+					@extend .has-background-light;
+				}
+			}
+		}
+	}
+	.content {
+		height: 87%;
+		overflow-y: scroll;
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+}
