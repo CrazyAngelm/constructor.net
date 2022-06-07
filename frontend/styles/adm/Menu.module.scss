@@ -3,7 +3,8 @@
 
 .menu {
 	@extend .menu;
-	position: absolute;
+	position: fixed;
+	z-index: 999999;
 	width: fit-content;
 	top: 0;
 	bottom: 0;
