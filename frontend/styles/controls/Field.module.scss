@@ -1,0 +1,30 @@
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/form/_all.sass";
+
+.classField {
+	@extend .field;
+	&.isHorizontal {
+		@extend .is-horizontal;
+	}
+
+	align-items: center;
+	.fieldLabel {
+		@extend .field-label;
+		> label {
+			@extend .label;
+		}
+	}
+	.fieldBody {
+		@extend .field-body;
+		> div {
+			@extend .field;
+			@extend .control;
+			> input {
+				@extend .input;
+			}
+			.static {
+				@extend .is-static;
+			}
+		}
+	}
+}

@@ -1,0 +1,23 @@
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/form/_all.sass";
+
+.checkBox {
+	@extend .checkbox;
+
+	> span {
+		vertical-align: -webkit-baseline-middle;
+	}
+	&:not(:last-child) {
+		margin-bottom: 0;
+	}
+	&.isHorizontal {
+		@extend .is-horizontal;
+	}
+	> input {
+		width: 1.5rem;
+		appearance: auto;
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
