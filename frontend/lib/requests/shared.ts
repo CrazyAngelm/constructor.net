@@ -3,7 +3,7 @@ export interface RequestContext {
 }
 
 export const defaultRequestContext: RequestContext = {
-	apiUrl: '/api/rest',
+	apiUrl: '/api/',
 }
 
 export type Request<Key, Return> = (key: Key) => Promise<Return>

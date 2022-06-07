@@ -1,11 +1,26 @@
 import { NextApiRequest, NextApiResponse } from "next"
 
-export const response = <T>(getResponse: () => Promise<T>)
+export interface Error {
+	code: number
+	msg?: string
+}
+
+export interface Response<T> {
+	response?: T
+	error?: Error
+}
+
+export const response = <T>(getResponse: (req: NextApiRequest, res: NextApiResponse)
+	=> Promise<Response<T>>)
 	: (req: NextApiRequest, res: NextApiResponse) => Promise<void> => {
 	return async (req, res) => {
 		try {
-			const resp = await getResponse()
-			res.status(200).json(resp)
+			const resp = await getResponse(req, res)
+			if (resp.error) {
+				res.status(resp.error.code).end(resp.error.msg)
+				return
+			}
+			res.status(200).json(resp.response)
 		} catch (err) {
 			res.status(502).end(JSON.stringify({
 				code: 502,
