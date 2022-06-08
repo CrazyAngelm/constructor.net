@@ -7,14 +7,15 @@ interface Row {
 }
 
 interface Props {
-	name?:string
+	name?: string
 	rows?: Row[]
 	length: number
 	callback?: (id: number) => void
 	maxWidth?: number
+	selected?: number //Сделать возможность выбора нескольких
 }
 
-const List = ({name, rows, callback, length = 0, maxWidth = 20 }: Props) => {
+const List = ({ name, rows, callback, length = 0, maxWidth = 20, selected }: Props) => {
 
 	const styleMaxWidth = {
 		maxWidth: maxWidth / (rows ? rows.length : 1) + 'vw'
@@ -32,13 +33,14 @@ const List = ({name, rows, callback, length = 0, maxWidth = 20 }: Props) => {
 					</thead>
 					<tbody>
 						{Array.from({ length }).map((u, i) =>
-							<tr onClick={() => callback && callback(i)} key={i}>{
-								rows?.map((p, pi) =>
-									p.key
-										? <th key={pi}><div style={styleMaxWidth}>{i}</div></th>
-										: <td key={pi}><div style={styleMaxWidth} >{p.value(i)}</div></td>
-								)
-							}</tr>
+							<tr className={selected === i ? styles.selected : ''}
+								onClick={() => callback && callback(i)} key={i}>{
+									rows?.map((p, pi) =>
+										p.key
+											? <th key={pi}><div style={styleMaxWidth}>{i}</div></th>
+											: <td key={pi}><div style={styleMaxWidth} >{p.value(i)}</div></td>
+									)
+								}</tr>
 						)}
 					</tbody>
 				</table>

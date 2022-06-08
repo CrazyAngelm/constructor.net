@@ -6,33 +6,38 @@ import styles from '@/styles/adm/index.module.scss'
 
 import Menu, { Categories } from '@/components/adm/Menu';
 import Layout from '@/components/Layout';
-
-
-const categories = [
-	{
-		label: 'Сайт',
-		items: [ {
-			label: 'Пользователи',
-		}, ]
-	}, {
-		label: 'Контент',
-		items: [ {
-			label: 'Задания',
-			items: [ {
-				label: 'Категории'
-			}, {
-				label: 'Задания'
-			} ]
-		} ]
-	}
-] as Categories[]
+import Content from '@/components/adm/Content';
 
 
 const Adm: NextPage = () => {
+
+
+	const categories = [
+		{
+			label: 'Сайт',
+			items: [ {
+				label: 'Пользователи',
+			}, ]
+		}, {
+			label: 'Контент',
+			items: [ {
+				label: 'Задания',
+				items: [ {
+					label: 'Категории'
+				}, {
+					label: 'Задания'
+				} ]
+			} ]
+		}
+	] as Categories[]
+
 	return (
 		<Layout navbar={false}>
 			<article className={styles.adm}>
 				<Menu categories={categories} />
+				<div className={styles.content}>
+					<Content />
+				</div>
 			</article>
 		</Layout>
 	)

@@ -17,6 +17,9 @@
 	}
 	label {
 		@extend .label;
+		&:not(:last-child){
+			margin-bottom: 0;
+		}
 	}
 	table {
 		@extend .table;
