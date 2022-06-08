@@ -22,6 +22,7 @@ export const response = <T>(getResponse: (req: NextApiRequest, res: NextApiRespo
 			}
 			res.status(200).json(resp.response)
 		} catch (err) {
+			console.log(err)
 			res.status(502).end(JSON.stringify({
 				code: 502,
 				url: req.url,
