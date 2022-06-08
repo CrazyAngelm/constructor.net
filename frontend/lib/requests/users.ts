@@ -25,3 +25,21 @@ export const getUserById: RequestWithContext<string, UserDto> = async (
 
 	return json
 }
+
+export const updateUser = async (
+	id: string,
+	dto: UserDto,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<UserDto> => {
+	const res = await fetch(apiUrl + `/users/${encodeURIComponent(id)}`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(dto),
+	})
+
+	await handleNonOk(res)
+
+	return await res.json()
+}

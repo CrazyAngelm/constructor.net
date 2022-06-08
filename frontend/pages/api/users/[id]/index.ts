@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 
-import { UserDto } from "@/common/users";
+import { UserDto } from "@/lib/dto/users";
 
 import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { Error, response } from "@/lib/api/response";
@@ -31,5 +31,22 @@ handler.get(response(async (req, res) => {
 	return { response: user };
 }
 ))
+
+handler.post(response(async (req, res) => {
+	const { id } = req.query as Query
+	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+
+	const user = req.body as UserDto
+
+	await prisma.user.update({
+		where: { id },
+		data: {
+			name: user.name,
+			email: user.email
+		}
+	})
+
+	return { response: { user } }
+}))
 
 export default handler

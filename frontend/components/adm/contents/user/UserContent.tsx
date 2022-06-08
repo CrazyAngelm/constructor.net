@@ -1,8 +1,9 @@
-import { makeFetcher } from '@/lib/fetchers'
-import { getUsers } from '@/lib/requests/users'
-import styles from '@/styles/adm/Content.module.scss'
 import { useState } from 'react'
-import useSWR from 'swr'
+
+import { useFetchData } from '@/lib/hooks/useFetchData'
+import { getUsers } from '@/lib/requests/users'
+
+import styles from '@/styles/adm/Content.module.scss'
 
 import List from '../../List'
 import ButtonsList from '../ButtonsList'
@@ -11,7 +12,7 @@ import UserEditor from './UserEditor'
 const UserContent = () => {
 	const [ userId, setUserId ] = useState<string | null | undefined>(null)
 
-	const { data, error } = useSWR({}, makeFetcher(getUsers))
+	const { data, error, update } = useFetchData({}, getUsers)
 
 	return (
 		<article className={styles.content}>
@@ -32,7 +33,7 @@ const UserContent = () => {
 				<ButtonsList />
 			</section>
 			<section className={styles.editor}>
-				{userId && <UserEditor id={userId} />}
+				{userId && <UserEditor callbackUpdate={update} id={userId} />}
 			</section>
 		</article >
 	)

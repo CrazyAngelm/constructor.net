@@ -2,21 +2,23 @@
 @import "bulma/sass/form/_all.sass";
 
 .editor {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 5vh;
 	padding: 5vh 5vw;
-	> section {
+	> article {
 		display: flex;
-		flex-direction: row;
-		justify-content: center;
+		flex-direction: column;
 		align-items: center;
-		gap: 5vw;
+		justify-content: flex-start;
+		gap: 5vh;
+		> section {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			gap: 5vw;
 
-		.avatar {
-			width: 7vw;
+			.avatar {
+				width: 7vw;
+			}
 		}
 	}
 }

@@ -14,6 +14,6 @@ export interface UserDto {
 	name?: string
 	email?: string
 	image?: string
-	scopes: string[]
+	scopes?: string[]
 }
 
