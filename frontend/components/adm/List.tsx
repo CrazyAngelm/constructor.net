@@ -7,13 +7,14 @@ interface Row {
 }
 
 interface Props {
+	name?:string
 	rows?: Row[]
 	length: number
 	callback?: (id: number) => void
 	maxWidth?: number
 }
 
-const List = ({ rows, callback, length = 0, maxWidth = 20 }: Props) => {
+const List = ({name, rows, callback, length = 0, maxWidth = 20 }: Props) => {
 
 	const styleMaxWidth = {
 		maxWidth: maxWidth / (rows ? rows.length : 1) + 'vw'
@@ -21,7 +22,7 @@ const List = ({ rows, callback, length = 0, maxWidth = 20 }: Props) => {
 
 	return (
 		<article className={styles.list}>
-			<header>Задания</header>
+			<header>{name}</header>
 			<section className={styles.content}>
 				<table className={styles.table}>
 					<thead>
