@@ -1,10 +1,30 @@
 import styles from '@/styles/adm/Content.module.scss'
+import { ReactNode } from 'react'
 import UserContent from './contents/user/UserContent'
 
-const Content = () => {
+export enum TypeContent {
+	Users,
+	Categories,
+	Tasks
+}
+
+export interface Props {
+	type?: TypeContent
+}
+
+const getContent = (type?: TypeContent): ReactNode => {
+	switch (type) {
+		case TypeContent.Users: return <UserContent />
+		case TypeContent.Categories: return null
+		case TypeContent.Tasks: return null
+		default: return null
+	}
+}
+
+const Content = ({ type }: Props) => {
 	return (
 		<article className={styles.content}>
-			<UserContent />
+			{getContent(type)}
 		</article>
 	)
 }

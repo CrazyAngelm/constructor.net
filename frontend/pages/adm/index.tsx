@@ -6,26 +6,30 @@ import styles from '@/styles/adm/index.module.scss'
 
 import Menu, { Categories } from '@/components/adm/Menu';
 import Layout from '@/components/Layout';
-import Content from '@/components/adm/Content';
+import Content, { TypeContent } from '@/components/adm/Content';
+import { useState } from 'react';
 
 
 const Adm: NextPage = () => {
-
+	const [ typeContent, setType ] = useState<TypeContent>()
 
 	const categories = [
 		{
 			label: 'Сайт',
 			items: [ {
 				label: 'Пользователи',
+				callback: () => setType(TypeContent.Users)
 			}, ]
 		}, {
 			label: 'Контент',
 			items: [ {
 				label: 'Задания',
 				items: [ {
-					label: 'Категории'
+					label: 'Категории',
+					callback: () => setType(TypeContent.Categories)
 				}, {
-					label: 'Задания'
+					label: 'Задания',
+					callback: () => setType(TypeContent.Tasks)
 				} ]
 			} ]
 		}
@@ -36,7 +40,7 @@ const Adm: NextPage = () => {
 			<article className={styles.adm}>
 				<Menu categories={categories} />
 				<div className={styles.content}>
-					<Content />
+					<Content type={typeContent} />
 				</div>
 			</article>
 		</Layout>
