@@ -42,7 +42,10 @@ handler.post(response(async (req, res) => {
 
 	const upset = await prisma.taskCategory.upsert({
 		where: { id },
-		update: true,
+		update: {
+			name:data.name,
+			description:data.description
+		},
 		create: {
 			id,
 			name: data.name ? data.name : 'Без названия',

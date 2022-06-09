@@ -61,6 +61,20 @@ export const getTasks: RequestWithContext<unknown, TaskDto[]> = async (
 	return json
 }
 
+
+export const getTasksByIdCategory: RequestWithContext<number, TaskDto[]> = async (
+	id: number,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<TaskDto[]> => {
+	const res = await fetch(apiUrl + '/task-category/' + encodeURIComponent(id) + '/tasks')
+
+	await handleNonOk(res)
+
+	const json = await res.json()
+
+	return json
+}
+
 export const getTaskById: RequestWithContext<number, TaskDto> = async (
 	id: number,
 	{ apiUrl }: RequestContext = defaultRequestContext,

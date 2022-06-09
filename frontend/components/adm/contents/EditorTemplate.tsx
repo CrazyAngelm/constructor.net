@@ -7,13 +7,17 @@ export interface Props {
 	error?: string
 	callbackSave?: () => void
 	callbackUpdate?: () => void
+	sucess?:boolean
 }
 
-const EditorTemplate = ({ children, error, ...callbacks }: Props) => {
+const EditorTemplate = ({ children, error, sucess, ...callbacks }: Props) => {
 	return (
 		<article className={styles.editor}>
 			<section className={styles.individualEditor}>
 				{children}
+			</section>
+			<section className={styles.notification}>
+				<span className={styles.sucess}>{sucess && 'Сохранено'}</span>
 			</section>
 			{error &&
 				<section className={styles.error}>

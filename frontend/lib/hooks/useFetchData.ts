@@ -12,7 +12,7 @@ export interface Response<T> {
 }
 
 export const useFetchData = <T, R>(key: R,
-	req: RequestWithContext<R, T>)
+	req: RequestWithContext<R, T>, setDefault?: T)
 	: Response<T> => {
 	const [ data, setData ] = useState<T>()
 	const [ error, setError ] = useState<string | undefined>(undefined)
@@ -21,12 +21,16 @@ export const useFetchData = <T, R>(key: R,
 
 	const update = () => {
 		setError(() => undefined)
-		makeFetcher(req)(key).then(p => setData(() => p))
-			.catch(err => {
-				console.log(err)
-				if (err instanceof ApiError) setError(() => err.message)
-				else setError(JSON.stringify(err))
-			})
+		makeFetcher(req)(key).then(p => {
+			setData(() => p)
+		}).catch(err => {
+			if (setDefault) {
+				setData(() => setDefault)
+				return
+			}
+			if (err instanceof ApiError) setError(() => err.message)
+			else setError(JSON.stringify(err))
+		})
 	}
 
 	return {

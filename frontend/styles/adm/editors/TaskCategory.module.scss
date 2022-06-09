@@ -1,0 +1,16 @@
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/elements/_all.sass";
+
+.editor {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	gap: 2vw;
+	height: 100%;
+
+	.list {
+		@extend .box;
+		height: 100%;
+		display: flex;
+    flex-direction: column;
+	}
+}

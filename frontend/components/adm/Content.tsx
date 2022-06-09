@@ -1,5 +1,6 @@
 import styles from '@/styles/adm/Content.module.scss'
 import { ReactNode } from 'react'
+import TaskCategoriesContent from './contents/taskCategories/TaskCategoriesContent'
 import UserContent from './contents/user/UserContent'
 
 export enum TypeContent {
@@ -15,7 +16,7 @@ export interface Props {
 const getContent = (type?: TypeContent): ReactNode => {
 	switch (type) {
 		case TypeContent.Users: return <UserContent />
-		case TypeContent.Categories: return null
+		case TypeContent.Categories: return <TaskCategoriesContent />
 		case TypeContent.Tasks: return null
 		default: return null
 	}

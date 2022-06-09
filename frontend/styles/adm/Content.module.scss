@@ -17,6 +17,19 @@
 	}
 	> .editor {
 		flex: 1 1 auto;
+		.back {
+			position: relative;
+			top: 4vh;
+			left: 2vw;
+			height: 3vh;
+			width: 3vh;
+			border-width: 1vh;
+			cursor: pointer;
+			pointer-events: all;
+		}
+		.hide{
+			display: none;
+		}
 	}
 }
 
@@ -26,7 +39,6 @@
 	justify-content: space-between;
 
 	button {
-
 		&.primary {
 			@extend .is-primary;
 		}

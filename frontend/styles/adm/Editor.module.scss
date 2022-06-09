@@ -12,6 +12,12 @@
 	.individualEditor {
 		flex: 1 1 auto;
 	}
+	.notification{
+		height: 2em;
+		.sucess{
+			@extend .has-text-success;
+		}
+	}
 	.error{
 		>span{
 			font-weight: 900;

@@ -20,6 +20,8 @@ handler.get(response(async (req, res) => {
 		where: { id }
 	})
 
+	if (!task) return { error: { code: 400, msg: 'Записи не существует' } }
+
 	return { response: task }
 })
 )
@@ -30,19 +32,22 @@ handler.post(response(async (req, res) => {
 
 	const data = req.body as TaskDto
 
+	console.log(id,data)
+
 	const upset = await prisma.task.upsert({
 		where: { id },
-		update: {},
+		update: {
+			name:data.name,
+			description:data.description,
+			taskCategoryId:data.taskCategoryId
+		},
 		create: {
-			id,
 			name: data.name ? data.name : 'Без названия',
 			description: data.description ? data.description : '',
-			image: data.image ? data.image : '',
+			image: '',
 			taskCategoryId: data.taskCategoryId ? data.taskCategoryId : -1
 		}
 	})
-
-	console.log(upset)
 
 	return { response: { upset } }
 }))
