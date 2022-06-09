@@ -30,8 +30,8 @@ export default NextAuth({
 			}
 		}),
 		YandexProvider({
-			clientId: process.env.YANDEX_ID,
-			clientSecret: process.env.YANDEX_SECRET,
+			clientId: '07c7c53baec648f7a76588fbea8d265a',
+			clientSecret: 'd07ed54a3f3b41efadd05ca7baa6f4c6',
 		}),
 	],
 	theme: {
