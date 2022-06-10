@@ -10,11 +10,11 @@ const ButtonsList = ({ ...callbacks }: Props) => {
 		<section className={styles.buttonsList}>
 			{callbacks.callbackCreate &&
 				<button onClick={callbacks.callbackCreate}
-					className={`${styles.primary} ${styles.button}`}>Create</button>
+					className={`${styles.primary} ${styles.button}`}>Создать</button>
 			}
 			{callbacks.callbackDelete &&
 				<button onClick={callbacks.callbackDelete}
-					className={`${styles.danger} ${styles.button}`}>Delete</button>
+					className={`${styles.danger} ${styles.button}`}>Удалить</button>
 			}
 		</section>
 	)
