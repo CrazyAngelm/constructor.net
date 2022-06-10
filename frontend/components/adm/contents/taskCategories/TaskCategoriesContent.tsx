@@ -37,7 +37,7 @@ const TaskCategoriesContent = () => {
 						callback={i => setCategoryId(data[ i ]?.id)}
 						selected={data.findIndex(p => p.id == categoryId)} />
 				}
-				<ButtonsList />
+				<ButtonsList callbackCreate={() => setCategoryId(-1)} />
 			</section>
 			<section className={styles.editor}>
 				<div onClick={() => setTaskId(undefined)} className={`${taskId ? styles.back : styles.hide}`}>

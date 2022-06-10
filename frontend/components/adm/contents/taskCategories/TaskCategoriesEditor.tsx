@@ -19,7 +19,8 @@ export interface Props {
 const TaskCategoriesEditor = ({ id, callbackUpdate, callbackSelectTask }: Props) => {
 	const [ errorMsg, setError ] = useState<string | undefined>('')
 
-	const { data, update, setData, error } = useFetchData(id, getTaskCategoryById)
+	const { data, update, setData, error } = useFetchData(id, getTaskCategoryById,
+		id === -1 ? { id: -1 } : undefined)
 
 	const { data: tasks, error: errorTask } = useFetchData(id, getTasksByIdCategory)
 
@@ -57,9 +58,9 @@ const TaskCategoriesEditor = ({ id, callbackUpdate, callbackSelectTask }: Props)
 				<section className={styles.props}>
 					<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
 					<Field onChange={changeHander('name')}
-					isHorizontal label='Название' type='text' value={data.name} />
+						isHorizontal label='Название' type='text' value={data.name} />
 					<TextArea onChange={changeHander('description')}
-					isFixedSize label='Описание' value={data.description} />
+						isFixedSize label='Описание' value={data.description} />
 				</section>
 				<section className={styles.list}>
 					{tasks
@@ -75,7 +76,7 @@ const TaskCategoriesEditor = ({ id, callbackUpdate, callbackSelectTask }: Props)
 							callback={i => callbackSelectTask && callbackSelectTask(tasks[ i ]?.id)} />
 						: errorTask
 					}
-					<ButtonsList callbackCreate={() => callbackSelectTask && callbackSelectTask(-1)}/>
+					<ButtonsList callbackCreate={() => callbackSelectTask && callbackSelectTask(-1)} />
 				</section>
 			</article>
 		</EditorTemplate>
