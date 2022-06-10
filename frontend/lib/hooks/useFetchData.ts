@@ -17,7 +17,7 @@ export const useFetchData = <T, R>(key: R,
 	const [ data, setData ] = useState<T>()
 	const [ error, setError ] = useState<string | undefined>(undefined)
 
-	useEffect(() => update(), [])
+	useEffect(() => update(), [key])
 
 	const update = () => {
 		setError(() => undefined)

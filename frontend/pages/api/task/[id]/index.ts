@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { TaskDto } from "@/lib/dto/tasks";
+import { TaskCategoryDto, TaskDto } from "@/lib/dto/tasks";
 
 
 const prisma = new PrismaClient()
@@ -32,14 +32,14 @@ handler.post(response(async (req, res) => {
 
 	const data = req.body as TaskDto
 
-	console.log(id,data)
+	console.log(id, data)
 
 	const upset = await prisma.task.upsert({
 		where: { id },
 		update: {
-			name:data.name,
-			description:data.description,
-			taskCategoryId:data.taskCategoryId
+			name: data.name,
+			description: data.description,
+			taskCategoryId: data.taskCategoryId
 		},
 		create: {
 			name: data.name ? data.name : 'Без названия',
@@ -49,7 +49,20 @@ handler.post(response(async (req, res) => {
 		}
 	})
 
-	return { response: { upset } }
+	return { response: upset as TaskDto }
+}))
+
+
+handler.put(response(async (req, res) => {
+	const id = Number.parseInt((req.query as Query).id as string)
+	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+
+	await prisma.task.delete({
+		where: { id }
+	})
+
+	return { response: { status: 'Ok' } }
+
 }))
 
 export default handler

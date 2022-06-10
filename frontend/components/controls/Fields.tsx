@@ -19,7 +19,7 @@ const Field = ({ label, value, type, placeholder, isReadonly, onChange, isHorizo
 			<div>
 				<input className={isReadonly ? styles.static : ''}
 					type={type}
-					value={value}
+					value={value?value:''}
 					readOnly={isReadonly}
 					placeholder={placeholder}
 					onChange={v => onChange && onChange(v.target.value)} />

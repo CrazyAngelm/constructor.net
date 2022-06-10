@@ -2,20 +2,21 @@ import Field from '@/components/controls/Fields'
 import TextArea from '@/components/controls/TextArea'
 import { useFetchData } from '@/lib/hooks/useFetchData'
 import { ApiError } from '@/lib/requests'
-import { getTaskById, updateTask } from '@/lib/requests/tasks'
+import { getTaskById, removeTask, updateTask } from '@/lib/requests/tasks'
 import styles from '@/styles/adm/editors/Task.module.scss'
 import { useEffect, useState } from 'react'
-import EditorTemplate from '../EditorTemplate'
+import EditorTemplate, { Notification } from '../EditorTemplate'
 
 export interface Props {
 	id: number
 	categoryId?: number
 	callbackUpdate?: () => void
+	callbackBack?: () => void
 }
 
-const TaskEditor = ({ id, categoryId, callbackUpdate }: Props) => {
+const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => {
 	const [ errorMsg, setError ] = useState<string | undefined>('')
-	const [ sucess, setSucess ] = useState(false)
+	const [ notification, setNotification ] = useState<Notification>()
 	const { data, update, setData, error } = useFetchData(id, getTaskById,
 		id === -1 ? { id: -1 } : undefined)
 
@@ -37,7 +38,7 @@ const TaskEditor = ({ id, categoryId, callbackUpdate }: Props) => {
 		data.taskCategoryId = categoryId ? categoryId : -1
 		updateTask(id, data)
 			.then(() => {
-				setSucess(true)
+				setNotification(() => { return { color: 'sucess', msg: 'Сохранено' } as Notification })
 				callbackUpdate && callbackUpdate()
 			})
 			.catch(err => {
@@ -47,7 +48,24 @@ const TaskEditor = ({ id, categoryId, callbackUpdate }: Props) => {
 			})
 	}
 
-	return <EditorTemplate sucess={sucess}
+	const remove = () => {
+		if (!id) {
+			setError('Error: id == undefined')
+			return
+		}
+
+		removeTask(id)
+			.then(() =>
+				callbackBack && callbackBack())
+			.catch(err => {
+				console.log(err)
+				if (err instanceof ApiError) setError(() => err.message)
+				else setError(JSON.stringify(err))
+			})
+	}
+
+
+	return <EditorTemplate callbackRemove={remove} notification={notification}
 		callbackSave={save} callbackUpdate={update} error={error}>
 		{data
 			? <article className={styles.editor}>

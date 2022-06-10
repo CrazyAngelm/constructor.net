@@ -34,19 +34,19 @@ const TaskCategoriesContent = () => {
 							header: 'Название',
 							value: i => data[ i ]?.name as string
 						} ]}
-						callback={i => setCategoryId(data[ i ]?.id)}
+						callback={i => setCategoryId(() => data[ i ]?.id)}
 						selected={data.findIndex(p => p.id == categoryId)} />
 				}
-				<ButtonsList callbackCreate={() => setCategoryId(-1)} />
+				<ButtonsList callbackCreate={() => setCategoryId(() => -1)} />
 			</section>
 			<section className={styles.editor}>
 				<div onClick={() => setTaskId(undefined)} className={`${taskId ? styles.back : styles.hide}`}>
 					<Image src={back} layout='fill' objectFit='contain' />
 				</div>
 				{taskId
-					? <TaskEditor categoryId={categoryId} id={taskId} />
+					? <TaskEditor callbackBack={() => setTaskId(undefined)} categoryId={categoryId} id={taskId} />
 					: categoryId &&
-					<TaskCategoriesEditor callbackUpdate={update} callbackSelectTask={id => setTaskId(id)} id={categoryId} />}
+					<TaskCategoriesEditor callbackBack={() => setCategoryId(undefined)} callbackUpdate={update} callbackSelectTask={id => setTaskId(id)} id={categoryId} />}
 			</section>
 		</article >
 	)

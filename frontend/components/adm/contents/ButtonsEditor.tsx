@@ -3,7 +3,7 @@ import styles from '@/styles/adm/Content.module.scss'
 export interface Props {
 	callbackSave?: () => void
 	callbackUpdate?: () => void
-	callbackDelete?: () => void
+	callbackRemove?: () => void
 }
 
 const ButtonsEditor = ({ ...callbacks }: Props) => {
@@ -20,8 +20,8 @@ const ButtonsEditor = ({ ...callbacks }: Props) => {
 				}
 			</section>
 			<section className={styles.right}>
-				{callbacks.callbackDelete &&
-					<button onClick={callbacks.callbackDelete}
+				{callbacks.callbackRemove &&
+					<button onClick={callbacks.callbackRemove}
 						className={`${styles.danger} ${styles.button}`}>
 						Удалить
 					</button>

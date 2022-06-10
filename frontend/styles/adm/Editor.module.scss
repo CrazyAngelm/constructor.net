@@ -1,6 +1,6 @@
 @import "bulma/sass/utilities/_all.sass";
-@import "bulma/sass/helpers/_all.sass";
-
+@import "bulma/sass/helpers/_all.sass", "bulma/sass/components/_all.sass";
+@import "bulma/sass/elements/_all.sass";
 .editor {
 	height: 100%;
 	width: 100%;
@@ -12,18 +12,53 @@
 	.individualEditor {
 		flex: 1 1 auto;
 	}
-	.notification{
+	.status {
 		height: 2em;
-		.sucess{
+		.sucess {
 			@extend .has-text-success;
 		}
+		.danger {
+			@extend .has-text-danger;
+		}
 	}
-	.error{
-		>span{
+	.error {
+		> span {
 			font-weight: 900;
 		}
 		text-align: center;
 		@extend .has-text-danger;
 		padding: 2vh;
+	}
+}
+
+.modalWindow {
+	z-index: 9999999;
+
+	@extend .modal;
+
+	&.isActive {
+		@extend .is-active;
+	}
+	.modalBackground {
+		@extend .modal-background;
+	}
+	.modalContent {
+		display: flex;
+	justify-content: center;
+		@extend .modal-content;
+	}
+
+	.window {
+		@extend .notification;
+		width: 30vw;
+		.buttons {
+			margin-top: 2em;
+			display: flex;
+			justify-content: space-around;
+		}
+		.danger {
+			@extend .has-background-danger;
+			@extend .has-text-white;
+		}
 	}
 }

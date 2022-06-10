@@ -1,7 +1,7 @@
 import { useFetchData } from '@/lib/hooks/useFetchData'
-import { getTaskCategoryById, getTasksByIdCategory, updateTaskCategory } from '@/lib/requests/tasks'
-import { useState } from 'react'
-import EditorTemplate from '../EditorTemplate'
+import { getTaskCategoryById, getTasksByIdCategory, removeTaskCategory, updateTaskCategory } from '@/lib/requests/tasks'
+import { useEffect, useState } from 'react'
+import EditorTemplate, { Notification } from '../EditorTemplate'
 import styles from '@/styles/adm/editors/TaskCategory.module.scss'
 import Field from '@/components/controls/Fields'
 import TextArea from '@/components/controls/TextArea'
@@ -14,10 +14,15 @@ export interface Props {
 	id: number
 	callbackUpdate?: () => void
 	callbackSelectTask?: (id?: number) => void
+	callbackBack?: () => void
 }
 
-const TaskCategoriesEditor = ({ id, callbackUpdate, callbackSelectTask }: Props) => {
+//Сделать нормально с удалением и сменой ид
+//Например сделать подтвержение удаления и сразу выход из редактора
+
+const TaskCategoriesEditor = ({ id, callbackUpdate, callbackSelectTask, callbackBack }: Props) => {
 	const [ errorMsg, setError ] = useState<string | undefined>('')
+	const [ notification, setNotification ] = useState<Notification>()
 
 	const { data, update, setData, error } = useFetchData(id, getTaskCategoryById,
 		id === -1 ? { id: -1 } : undefined)
@@ -40,7 +45,10 @@ const TaskCategoriesEditor = ({ id, callbackUpdate, callbackSelectTask }: Props)
 			return
 		}
 		updateTaskCategory(id, data)
-			.then(() => callbackUpdate && callbackUpdate())
+			.then((p) => {
+				setNotification(() => { return { color: 'sucess', msg: 'Сохранено' } as Notification })
+				callbackUpdate && callbackUpdate()
+			})
 			.catch(err => {
 				console.log(err)
 				if (err instanceof ApiError) setError(() => err.message)
@@ -48,12 +56,24 @@ const TaskCategoriesEditor = ({ id, callbackUpdate, callbackSelectTask }: Props)
 			})
 	}
 
-	const createTask = () => {
-		callbackSelectTask && callbackSelectTask(0)
+	const remove = () => {
+		if (!id) {
+			setError('Error: id == undefined')
+			return
+		}
+
+		removeTaskCategory(id)
+			.then(() =>
+				callbackBack && callbackBack())
+			.catch(err => {
+				console.log(err)
+				if (err instanceof ApiError) setError(() => err.message)
+				else setError(JSON.stringify(err))
+			})
 	}
 
 	return data ?
-		<EditorTemplate callbackUpdate={update} callbackSave={save}>
+		<EditorTemplate notification={notification} callbackUpdate={update} callbackSave={save} callbackRemove={remove}>
 			<article className={styles.editor}>
 				<section className={styles.props}>
 					<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />

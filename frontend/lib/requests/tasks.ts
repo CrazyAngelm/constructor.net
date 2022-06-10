@@ -44,6 +44,19 @@ export const updateTaskCategory = async (
 	return await res.json()
 }
 
+export const removeTaskCategory = async (
+	id: number,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<{}> => {
+	const res = await fetch(apiUrl + `/task-category/${encodeURIComponent(id)}`, {
+		method: 'PUT',
+	})
+
+	await handleNonOk(res)
+
+	return await res.json()
+}
+
 
 
 
@@ -99,6 +112,19 @@ export const updateTask = async (
 			'Content-Type': 'application/json',
 		},
 		body: JSON.stringify(dto),
+	})
+
+	await handleNonOk(res)
+
+	return await res.json()
+}
+
+export const removeTask = async (
+	id: number,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<{}> => {
+	const res = await fetch(apiUrl + `/task/${encodeURIComponent(id)}`, {
+		method: 'PUT',
 	})
 
 	await handleNonOk(res)

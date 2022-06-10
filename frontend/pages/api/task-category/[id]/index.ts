@@ -43,8 +43,8 @@ handler.post(response(async (req, res) => {
 	const upset = await prisma.taskCategory.upsert({
 		where: { id },
 		update: {
-			name:data.name,
-			description:data.description
+			name: data.name,
+			description: data.description
 		},
 		create: {
 			name: data.name ? data.name : 'Без названия',
@@ -54,7 +54,19 @@ handler.post(response(async (req, res) => {
 
 	console.log(upset)
 
-	return { response: { upset } }
+	return { response: upset as TaskCategoryDto }
+}))
+
+handler.put(response(async (req, res) => {
+	const id = Number.parseInt((req.query as Query).id as string)
+	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+
+	await prisma.taskCategory.delete({
+		where: { id }
+	})
+
+	return { response: { status: 'Ok' } }
+
 }))
 
 export default handler
