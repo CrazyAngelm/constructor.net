@@ -17,3 +17,8 @@ export interface UserDto {
 	scopes?: string[]
 }
 
+export interface UpdaetScopeDto{
+	scope:string
+	active:boolean
+}
+

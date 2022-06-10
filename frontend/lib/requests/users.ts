@@ -1,4 +1,4 @@
-import { UserDto } from '@/lib/dto/users';
+import { UpdaetScopeDto, UserDto } from '@/lib/dto/users';
 
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
 
@@ -32,6 +32,25 @@ export const updateUser = async (
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<UserDto> => {
 	const res = await fetch(apiUrl + `/users/${encodeURIComponent(id)}`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(dto),
+	})
+
+	await handleNonOk(res)
+
+	return await res.json()
+}
+
+
+export const updateScope = async (
+	id: string,
+	dto: UpdaetScopeDto,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<UpdaetScopeDto> => {
+	const res = await fetch(apiUrl + `/users/${encodeURIComponent(id)}/scope`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

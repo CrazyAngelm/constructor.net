@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { getUserById, updateUser } from '@/lib/requests/users'
+import { getUserById, updateScope, updateUser } from '@/lib/requests/users'
 import { ApiError } from '@/lib/requests'
 import { useFetchData } from '@/lib/hooks/useFetchData'
 import { ScopeEnum } from '@/lib/dto/users'
@@ -36,6 +36,14 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 				if (err instanceof ApiError) setError(() => err.message)
 				else setError(JSON.stringify(err))
 			})
+		updateScope(id, {
+			scope: ScopeEnum.admin,
+			active: ScopeEnum.Contains(ScopeEnum.admin,user.scopes)
+		})
+		updateScope(id, {
+			scope: ScopeEnum.editor,
+			active: ScopeEnum.Contains(ScopeEnum.editor, user.scopes)
+		})
 	}
 
 	const onChangeScope = (scope: string): ((value: boolean) => void) => {
