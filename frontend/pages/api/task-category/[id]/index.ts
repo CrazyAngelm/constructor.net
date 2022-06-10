@@ -47,7 +47,6 @@ handler.post(response(async (req, res) => {
 			description:data.description
 		},
 		create: {
-			id,
 			name: data.name ? data.name : 'Без названия',
 			description: data.description ? data.description : ''
 		}
