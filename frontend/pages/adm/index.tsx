@@ -23,7 +23,8 @@ const Adm: NextPage = () => {
 		}, {
 			label: 'Контент',
 			items: [ {
-				label: 'Задания',
+				label: 'Курсы',
+				callback: () => setType(TypeContent.Course),
 				items: [ {
 					label: 'Категории',
 					callback: () => setType(TypeContent.Categories)

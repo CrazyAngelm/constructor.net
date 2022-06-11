@@ -1,12 +1,82 @@
-import { TaskCategoryDto, TaskDto } from '../dto/tasks'
+import { CourseDto, TaskCategoryDto, TaskDto } from '../dto/tasks'
 
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
+
+export const getCourses: RequestWithContext<unknown, CourseDto[]> = async (
+	_?: unknown,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<CourseDto[]> => {
+	const res = await fetch(apiUrl + 'course')
+	handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
+
+export const getCourseById: RequestWithContext<number, CourseDto> = async (
+	id: number,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<CourseDto> => {
+	const res = await fetch(apiUrl + '/course/' + encodeURIComponent(id))
+
+	await handleNonOk(res)
+
+	const json = await res.json()
+
+	return json
+}
+
+export const updateCourse = async (
+	id: number,
+	dto: CourseDto,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<CourseDto> => {
+	const res = await fetch(apiUrl + `/course/${encodeURIComponent(id)}`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(dto),
+	})
+
+	await handleNonOk(res)
+
+	return await res.json()
+}
+
+export const removeCourse = async (
+	id: number,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<{}> => {
+	const res = await fetch(apiUrl + `/course/${encodeURIComponent(id)}`, {
+		method: 'PUT',
+	})
+
+	await handleNonOk(res)
+
+	return await res.json()
+}
+
+
+
+
 
 export const getTaskCategories: RequestWithContext<unknown, TaskCategoryDto[]> = async (
 	_?: unknown,
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<TaskCategoryDto[]> => {
 	const res = await fetch(apiUrl + '/task-category')
+	handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
+
+export const getTaskCategoriesByIdCourse: RequestWithContext<number, TaskCategoryDto[]> = async (
+	id: number,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<TaskCategoryDto[]> => {
+	const res = await fetch(apiUrl + `/course/${encodeURIComponent(id)}/categories`)
 	handleNonOk(res)
 	const json = await res.json()
 

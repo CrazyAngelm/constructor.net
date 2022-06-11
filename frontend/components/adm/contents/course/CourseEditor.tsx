@@ -1,5 +1,5 @@
 import { useFetchData } from '@/lib/hooks/useFetchData'
-import { getTaskCategoryById, getTasksByIdCategory, removeTaskCategory, updateTaskCategory } from '@/lib/requests/tasks'
+import { getCourseById, getTaskCategoriesByIdCourse, getTaskCategoryById, getTasksByIdCategory, removeCourse, removeTaskCategory, updateCourse, updateTaskCategory } from '@/lib/requests/tasks'
 import { useEffect, useState } from 'react'
 import EditorTemplate, { Notification } from '../EditorTemplate'
 import styles from '@/styles/adm/editors/TaskCategory.module.scss'
@@ -10,33 +10,32 @@ import { ApiError, handleErrorTsx } from '@/lib/requests'
 import ButtonsList from '../ButtonsList'
 import { changeHanderDtoString as changeHanderDto } from '@/lib/changeHandler'
 import TaskEditor from '../task/TaskEditor'
+import { CourseDto } from '@/lib/dto/tasks'
+import TaskCategoriesEditor from '../taskCategories/TaskCategoriesEditor'
 
 
 export interface Props {
 	id: number
-	courseId?: number
 	callbackUpdate?: () => void
 	callbackBack?: () => void
 }
 
-const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Props) => {
+const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 	const [ errorMsg, setError ] = useState<string | undefined>('')
 	const [ notification, setNotification ] = useState<Notification>()
-	const [ taskId, setTaskId ] = useState<number>()
+	const [ categoryId, setCategoryId ] = useState<number>()
 
-	const { data, update, setData, error } = useFetchData(id, getTaskCategoryById,
-		id === -1 ? { id: -1, name: 'Без названия', description: '' } : undefined)
+	const { data, update, setData, error } = useFetchData(id, getCourseById,
+		id === -1 ? { id: -1, name: 'Без названия', description: '' } as CourseDto : undefined)
 
-	const { data: tasks, update: updateTasks, error: errorTask } = useFetchData(id, getTasksByIdCategory)
+	const { data: tasks, update: updateCat, error: errorTask } = useFetchData(id, getTaskCategoriesByIdCourse)
 
 	const save = () => {
 		if (!data) {
 			setError('Error: id == undefined || user == undefined')
 			return
 		}
-		if (!data.courseId)
-			data.courseId = courseId ? courseId : 0
-		updateTaskCategory(id, data)
+		updateCourse(id, data)
 			.then((p) => {
 				setNotification(() => { return { color: 'sucess', msg: 'Сохранено' } as Notification })
 				callbackUpdate && callbackUpdate()
@@ -45,7 +44,7 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 	}
 
 	const remove = () => {
-		removeTaskCategory(id)
+		removeCourse(id)
 			.then(() =>
 				callbackBack && callbackBack())
 			.catch(err => handleErrorTsx(err, setError))
@@ -53,16 +52,17 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 
 	const updateAll = () => {
 		update()
-		updateTasks()
+		updateCat()
 	}
 
-	return (taskId ? <TaskEditor callbackBack={() => {
-		setTaskId(undefined)
+	return (categoryId ? <TaskCategoriesEditor callbackBack={() => {
+		setCategoryId(undefined)
 		updateAll()
-	}} categoryId={data?.id} id={taskId} />
+	}}
+		courseId={data?.id} id={categoryId} />
 		: data ?
 			<EditorTemplate notification={notification} callbackUpdate={updateAll} error={errorMsg}
-				callbackBack={callbackBack} callbackSave={save} callbackRemove={remove} >
+				callbackSave={save} callbackRemove={remove} >
 				<article className={styles.editor}>
 					<section className={styles.props}>
 						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
@@ -73,7 +73,7 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 					</section>
 					<section className={styles.list}>
 						{tasks
-							? <List name='Задания'
+							? <List name='Категории'
 								length={tasks.length}
 								rows={[ {
 									header: 'id',
@@ -82,10 +82,10 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 									header: 'Название',
 									value: i => tasks[ i ]?.name as string
 								} ]}
-								callback={i => setTaskId(tasks[ i ]?.id)} />
+								callback={i => setCategoryId(tasks[ i ]?.id)} />
 							: errorTask
 						}
-						<ButtonsList callbackCreate={() => setTaskId(-1)} />
+						<ButtonsList callbackCreate={() => setCategoryId(-1)} />
 					</section>
 				</article>
 			</EditorTemplate >
@@ -93,4 +93,4 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 	)
 }
 
-export default TaskCategoriesEditor
+export default CourseEditor

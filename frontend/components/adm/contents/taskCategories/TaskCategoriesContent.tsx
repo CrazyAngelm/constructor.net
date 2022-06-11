@@ -1,12 +1,9 @@
 import { useState } from 'react'
-import Image from 'next/image'
 
 import { useFetchData } from '@/lib/hooks/useFetchData'
 import { getTaskCategories } from '@/lib/requests/tasks'
 
 import styles from '@/styles/adm/Content.module.scss'
-
-import back from '@/assets/back.svg'
 
 import List from '../../List'
 import ButtonsList from '../ButtonsList'
@@ -17,7 +14,6 @@ import TaskEditor from '../task/TaskEditor'
 
 const TaskCategoriesContent = () => {
 	const [ categoryId, setCategoryId ] = useState<number | undefined>(undefined)
-	const [ taskId, setTaskId ] = useState<number | undefined>(undefined)
 
 	const { data, error, update } = useFetchData({}, getTaskCategories)
 
@@ -40,13 +36,9 @@ const TaskCategoriesContent = () => {
 				<ButtonsList callbackCreate={() => setCategoryId(() => -1)} />
 			</section>
 			<section className={styles.editor}>
-				<div onClick={() => setTaskId(undefined)} className={`${taskId ? styles.back : styles.hide}`}>
-					<Image src={back} layout='fill' objectFit='contain' />
-				</div>
-				{taskId
-					? <TaskEditor callbackBack={() => setTaskId(undefined)} categoryId={categoryId} id={taskId} />
-					: categoryId &&
-					<TaskCategoriesEditor callbackBack={() => setCategoryId(undefined)} callbackUpdate={update} callbackSelectTask={id => setTaskId(id)} id={categoryId} />}
+				{categoryId &&
+					<TaskCategoriesEditor callbackBack={() => setCategoryId(undefined)}
+						callbackUpdate={update} id={categoryId} />}
 			</section>
 		</article >
 	)

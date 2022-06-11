@@ -8,6 +8,19 @@
 
 	display: flex;
 	flex-direction: column;
+	.back {
+		position: relative;
+		top: 4vh;
+		left: 2vw;
+		height: 3vh;
+		width: 3vh;
+		border-width: 1vh;
+		cursor: pointer;
+		pointer-events: all;
+	}
+	.hide {
+		display: none;
+	}
 
 	.individualEditor {
 		flex: 1 1 auto;
@@ -44,7 +57,7 @@
 	}
 	.modalContent {
 		display: flex;
-	justify-content: center;
+		justify-content: center;
 		@extend .modal-content;
 	}
 

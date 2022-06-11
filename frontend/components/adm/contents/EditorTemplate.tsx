@@ -1,5 +1,10 @@
-import styles from '@/styles/adm/Editor.module.scss'
 import { ReactNode, useState } from 'react'
+import Image from 'next/image'
+
+import styles from '@/styles/adm/Editor.module.scss'
+
+import back from '@/assets/back.svg'
+
 import ButtonsEditor from './ButtonsEditor'
 
 export interface Notification {
@@ -13,6 +18,7 @@ export interface Props {
 	callbackSave?: () => void
 	callbackUpdate?: () => void
 	callbackRemove?: () => void
+	callbackBack?:() => void
 	notification?: Notification
 }
 
@@ -21,6 +27,9 @@ const EditorTemplate = ({ children, error, notification, ...callbacks }: Props) 
 
 	return (
 		<article className={styles.editor}>
+			<div onClick={callbacks.callbackBack} className={`${callbacks.callbackBack ? styles.back : styles.hide}`}>
+				<Image src={back} layout='fill' objectFit='contain' />
+			</div>
 			<div className={`${styles.modalWindow} ${modal && styles.isActive}`}>
 				<div className={styles.modalBackground}></div>
 				<div className={styles.modalContent}>

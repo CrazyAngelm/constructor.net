@@ -69,11 +69,20 @@ model ScopeJoin {
 
 //Tasks
 
+model Course {
+    id             Int            @id @default(autoincrement())
+    name           String
+    description    String
+    taskCategories TaskCategory[]
+}
+
 model TaskCategory {
-    id          Int    @id @default(autoincrement())
+    id          Int     @id @default(autoincrement())
     name        String
     description String
+    courseId    Int?
     tasks       Task[]
+    Course      Course? @relation(fields: [courseId], references: [id])
 }
 
 model Task {

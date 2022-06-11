@@ -19,14 +19,15 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 	const [ errorMsg, setError ] = useState<string | undefined>('')
 	const [ notification, setNotification ] = useState<Notification>()
 	const { data, update, setData, error } = useFetchData(id, getTaskById,
-		id === -1 ? { id: -1 } : undefined)
+		id === -1 ? { id: -1, name: 'Без названия', description: '' } : undefined)
 
 	const save = () => {
 		if (!data) {
 			setError('Error: id == undefined || user == undefined')
 			return
 		}
-		data.taskCategoryId = categoryId ? categoryId : -1
+		if (!data.taskCategoryId)
+			data.taskCategoryId = categoryId ? categoryId : -1
 		updateTask(data.id, data)
 			.then(() => {
 				setNotification(() => { return { color: 'sucess', msg: 'Сохранено' } as Notification })
@@ -43,7 +44,7 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 	}
 
 
-	return <EditorTemplate callbackRemove={remove} notification={notification}
+	return <EditorTemplate callbackBack={callbackBack} callbackRemove={remove} notification={notification}
 		callbackSave={save} callbackUpdate={update} error={errorMsg}>
 		{data
 			? <article className={styles.editor}>

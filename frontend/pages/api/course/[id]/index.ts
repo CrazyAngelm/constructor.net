@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { Course, PrismaClient } from "@prisma/client";
 
-import { TaskCategoryDto } from "@/lib/dto/tasks";
+import { CourseDto } from "@/lib/dto/tasks";
 
 import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
@@ -17,18 +17,18 @@ interface Query extends NextParsedUrlQuery {
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
-	const category = await prisma.taskCategory.findUnique({
+	const category = await prisma.course.findUnique({
 		where: { id },
 		include: {
-			tasks: {
+			taskCategories: {
 				select: { id: true }
 			}
 		}
 	})
 	if (!category) return { error: { code: 400, msg: 'Записи не существует' } }
-	const { tasks, ...props } = category
-	const dto = props as TaskCategoryDto
-	dto.tasksId = tasks.map(t => t.id)
+	const { taskCategories, ...props } = category
+	const dto = props as CourseDto
+	dto.taskCategoriesId = taskCategories.map(t => t.id)
 
 	return { response: dto }
 })
@@ -38,17 +38,15 @@ handler.post(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
 
-	const data = req.body as TaskCategoryDto
+	const data = req.body as CourseDto
 
-	const upset = await prisma.taskCategory.upsert({
+	const upset = await prisma.course.upsert({
 		where: { id },
 		update: {
-			courseId: data.courseId,
 			name: data.name,
 			description: data.description
 		},
 		create: {
-			courseId: data.courseId,
 			name: data.name ? data.name : 'Без названия',
 			description: data.description ? data.description : ''
 		}
@@ -56,14 +54,14 @@ handler.post(response(async (req, res) => {
 
 	console.log(upset)
 
-	return { response: upset as TaskCategoryDto }
+	return { response: upset as CourseDto }
 }))
 
 handler.put(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
 
-	await prisma.taskCategory.delete({
+	await prisma.course.delete({
 		where: { id }
 	})
 
