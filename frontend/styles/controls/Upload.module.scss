@@ -1,0 +1,25 @@
+@import "bulma/sass/utilities/_all.sass";
+
+.upload{
+	display: flex;
+	flex-direction: column;
+	img{
+		max-height: 80vh;
+		width: fit-content;
+	}
+	input{
+		position: absolute;
+	}
+	label{
+		display: flex;
+		flex-direction: row;
+		width: 100%;
+	}
+	.name{
+		max-width: 100%;
+		width: 100%;
+	}
+	.loader{
+		width:48px;
+	}
+}
