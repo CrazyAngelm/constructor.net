@@ -1,18 +1,31 @@
 import styles from '@/styles/controls/Upload.module.scss'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import Loader from './Loader'
 
 export interface Props {
-	onChange?: (file: File | undefined) => void
+	onChange?: (file: FormData | undefined) => void
 	preview?: boolean
+	value?: string
+	keyChange?: string
 }
 
 
-const Upload = ({ onChange }: Props) => {
+const Upload = ({ onChange, value, preview, keyChange }: Props) => {
 	const [ file, setFile ] = useState<File>()
 	const [ imgPreview, setImgPreview ] = useState<string | undefined>()
+	const [ lastKeyChange, setLastKeyChange ] = useState<string | undefined>('key')
 
+	useEffect(() => {
+		if (lastKeyChange != keyChange) {
+			setImgPreview(value)
+			setLastKeyChange(keyChange)
+		}
+	}, [ value ])
 
+	useEffect(() => {
+		setFile(undefined)
+		setImgPreview(undefined)
+	}, [ keyChange ])
 
 
 	const changeHandler = (v: ChangeEvent<HTMLInputElement>) => {
@@ -25,12 +38,14 @@ const Upload = ({ onChange }: Props) => {
 		reader.onload = ev => {
 			setImgPreview(ev.target?.result as string | undefined)
 		}
-		onChange && onChange(f)
+		const formData = new FormData()
+		formData.append('file', f as Blob)
+		onChange && onChange(formData)
 	}
 
 	return (
 		<section className={styles.upload}>
-			{file &&
+			{(preview && imgPreview) &&
 				<img src={imgPreview} />}
 			<div className="file has-name">
 				<label className="file-label">
