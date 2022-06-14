@@ -233,4 +233,19 @@ export const getTaskCategoriesByIdTask: RequestWithContext<number, TaskCategoryD
 	return json
 }
 
+export const uploadTaskImage = async (
+	id: number,
+	data: FormData,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<Status> => {
+	const res = await fetch(apiUrl + `/task/${encodeURIComponent(id)}/image`, {
+		method: 'POST',
+		body: data,
+	})
+
+	await handleNonOk(res)
+
+	return await res.json()
+}
+
 //#endregion

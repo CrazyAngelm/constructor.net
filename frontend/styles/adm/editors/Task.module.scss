@@ -9,5 +9,14 @@
 		display: flex;
 		flex-direction: row;
 		align-items: flex-start;
+		gap: 4%;
+		>section{
+			width: 48%;
+		}
+		>.image{
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+		}
 	}
 }
