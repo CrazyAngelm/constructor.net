@@ -17,7 +17,7 @@ export const response = <T>(getResponse: (req: NextApiRequest, res: NextApiRespo
 		try {
 			const resp = await getResponse(req, res)
 			if (resp.error) {
-				res.status(resp.error.code).end(resp.error.msg)
+				res.status(resp.error.code).end(JSON.stringify(resp.error))
 				return
 			}
 			res.status(200).json(resp.response)

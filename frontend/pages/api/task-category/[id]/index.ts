@@ -17,18 +17,20 @@ interface Query extends NextParsedUrlQuery {
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
-	const category = await prisma.taskCategory.findUnique({
+	const data = await prisma.taskCategory.findUnique({
 		where: { id },
 		include: {
-			tasks: {
-				select: { id: true }
+			CourseToCategory: {
+				include: {
+					course: true
+				}
 			}
 		}
 	})
-	if (!category) return { error: { code: 400, msg: 'Записи не существует' } }
-	const { tasks, ...props } = category
-	const dto = props as TaskCategoryDto
-	dto.tasksId = tasks.map(t => t.id)
+	if (!data) return { error: { code: 400, msg: 'Записи не существует' } }
+
+	const dto = data as TaskCategoryDto
+	dto.courses = data.CourseToCategory.map(p => p.course.id)
 
 	return { response: dto }
 })
@@ -43,18 +45,28 @@ handler.post(response(async (req, res) => {
 	const upset = await prisma.taskCategory.upsert({
 		where: { id },
 		update: {
-			courseId: data.courseId,
 			name: data.name,
 			description: data.description
 		},
 		create: {
-			courseId: data.courseId,
 			name: data.name ? data.name : 'Без названия',
 			description: data.description ? data.description : ''
 		}
 	})
 
-	console.log(upset)
+	if (data.courses) {
+		await prisma.courseToCategory.deleteMany({
+			where: {
+				categoryId: upset.id
+			}
+		})
+		const a = await prisma.courseToCategory.createMany({
+			data: data.courses.map(p => {
+				return { categoryId: upset.id, courseId: p }
+			})
+		})
+		console.log(a)
+	}
 
 	return { response: upset as TaskCategoryDto }
 }))

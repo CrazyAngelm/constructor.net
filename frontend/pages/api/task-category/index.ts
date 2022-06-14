@@ -10,21 +10,9 @@ const prisma = new PrismaClient()
 const handler = getDefaultHandler()
 
 handler.get(response(async () => {
-	const categories = await prisma.taskCategory.findMany({
-		include: {
-			tasks: {
-				select: { id: true }
-			}
-		}
-	})
-	const resp = categories.map(c => {
-		const { tasks, ...props } = c
-		const dto = props as TaskCategoryDto
-		dto.tasksId = tasks.map(t => t.id)
-		return dto
-	})
+	const data = await prisma.taskCategory.findMany()
 
-	return { response: resp }
+	return { response: data }
 })
 )
 

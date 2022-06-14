@@ -18,13 +18,18 @@ handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
 
-	const tasks = await prisma.task.findMany({
-		where: {
-			taskCategoryId: id
+	const data = await prisma.taskCategory.findUnique({
+		where: { id },
+		include: {
+			CategoryToTask: {
+				include: {
+					task: true
+				}
+			}
 		}
 	})
 
-	return { response: tasks }
+	return { response: data?.CategoryToTask.map(p => p.task) }
 })
 )
 

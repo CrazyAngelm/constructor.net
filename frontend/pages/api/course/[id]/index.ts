@@ -17,20 +17,12 @@ interface Query extends NextParsedUrlQuery {
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
-	const category = await prisma.course.findUnique({
-		where: { id },
-		include: {
-			taskCategories: {
-				select: { id: true }
-			}
-		}
+	const data = await prisma.course.findUnique({
+		where: { id }
 	})
-	if (!category) return { error: { code: 400, msg: 'Записи не существует' } }
-	const { taskCategories, ...props } = category
-	const dto = props as CourseDto
-	dto.taskCategoriesId = taskCategories.map(t => t.id)
+	if (!data) return { error: { code: 400, msg: 'Записи не существует' } }
 
-	return { response: dto }
+	return { response: data }
 })
 )
 
@@ -51,8 +43,6 @@ handler.post(response(async (req, res) => {
 			description: data.description ? data.description : ''
 		}
 	})
-
-	console.log(upset)
 
 	return { response: upset as CourseDto }
 }))
