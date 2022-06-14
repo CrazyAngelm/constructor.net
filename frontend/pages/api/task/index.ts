@@ -2,9 +2,10 @@ import { PrismaClient } from "@prisma/client";
 
 import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
+import { usePrisma } from "@/lib/api/database";
 
 
-const prisma = new PrismaClient()
+const prisma = usePrisma()
 const handler = getDefaultHandler()
 
 handler.get(response(async () => {

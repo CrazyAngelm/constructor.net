@@ -4,9 +4,10 @@ import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { RequestIds, TaskCategoryDto, TaskDto } from "@/lib/dto/tasks";
+import { usePrisma } from "@/lib/api/database";
 
 
-const prisma = new PrismaClient()
+const prisma = usePrisma()
 const handler = getDefaultHandler()
 
 interface Query extends NextParsedUrlQuery {
