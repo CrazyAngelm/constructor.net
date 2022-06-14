@@ -1,8 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { UserDto } from '../dto/users'
 import { makeFetcher } from '../fetchers'
 import { ApiError, RequestWithContext } from '../requests'
-import { getUserById } from '../requests/users'
 
 export interface Response<T> {
 	data?: T
@@ -14,10 +12,13 @@ export interface Response<T> {
 export const useFetchData = <T, R>(key: R,
 	req: RequestWithContext<R, T>, setDefault?: T)
 	: Response<T> => {
-	const [ data, setData ] = useState<T>()
+	const [ data, setData ] = useState<T | undefined>(setDefault)
 	const [ error, setError ] = useState<string | undefined>(undefined)
 
-	useEffect(() => update(), [key])
+	useEffect(() => {
+		if (!data)
+			update()
+	}, [ key ])
 
 	const update = () => {
 		setError(() => undefined)
@@ -28,8 +29,14 @@ export const useFetchData = <T, R>(key: R,
 				setData(() => setDefault)
 				return
 			}
-			if (err instanceof ApiError) setError(() => err.message)
-			else setError(JSON.stringify(err))
+			if (err instanceof ApiError) {
+				console.error(`ApiError: method: ${req.name}, msg: ${err.message}`)
+				setError(() => err.message)
+			}
+			else {
+				console.error(`OtherError: method: ${req.name}, err: ${err}`)
+				setError(JSON.stringify(err))
+			}
 		})
 	}
 
