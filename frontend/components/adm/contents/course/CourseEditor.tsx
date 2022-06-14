@@ -30,6 +30,10 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 
 	const { data: tasks, update: updateCat, error: errorTask } = useFetchData(id, getTaskCategoriesByIdCourse)
 
+	useEffect(() => {
+		setCategoryId(() => undefined)
+	},[id])
+
 	const save = () => {
 		if (!data) {
 			setError('Error: id == undefined || user == undefined')

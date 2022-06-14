@@ -34,8 +34,11 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 
 	const { data: courses } = useFetchData({}, getCourses)
 
+	useEffect(() => {
+		setTaskId(() => undefined)
+	}, [ id ])
 
-	const choiseCourses = (values:boolean[]) => {
+	const choiseCourses = (values: boolean[]) => {
 		setData(data => {
 			if (!data) return data
 			data.courses = courses?.filter((p, i) => values[ i ]).map(p => p.id)
