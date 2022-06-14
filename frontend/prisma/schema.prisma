@@ -70,26 +70,48 @@ model ScopeJoin {
 //Tasks
 
 model Course {
-    id             Int            @id @default(autoincrement())
-    name           String
-    description    String
-    taskCategories TaskCategory[]
+    id               Int                @id @default(autoincrement())
+    name             String
+    description      String
+    taskCategories   TaskCategory[]
+    CourseToCategory CourseToCategory[]
 }
 
 model TaskCategory {
-    id          Int     @id @default(autoincrement())
-    name        String
-    description String
-    courseId    Int?
-    tasks       Task[]
-    Course      Course? @relation(fields: [courseId], references: [id])
+    id               Int                @id @default(autoincrement())
+    name             String
+    description      String
+    tasks            Task[]
+    Course           Course[]
+    CourseToCategory CourseToCategory[]
+    CategoryToTask   CategoryToTask[]
+}
+
+model CourseToCategory {
+    categoryId Int
+    courseId   Int
+    category   TaskCategory @relation(fields: [categoryId], references: [id])
+    course     Course       @relation(fields: [courseId], references: [id])
+
+    @@id([courseId, categoryId])
 }
 
 model Task {
-    id             Int           @id @default(autoincrement())
+    id             Int              @id @default(autoincrement())
     name           String
     description    String
+    instruction    String
     image          String
-    taskCategoryId Int?
-    TaskCategory   TaskCategory? @relation(fields: [taskCategoryId], references: [id])
+    TaskCategory   TaskCategory[]
+    CategoryToTask CategoryToTask[]
+}
+
+model CategoryToTask {
+    taskId     Int
+    categoryId Int
+    task       Task         @relation(fields: [taskId], references: [id])
+    category   TaskCategory @relation(fields: [categoryId], references: [id])
+
+
+    @@id([taskId, categoryId])
 }
