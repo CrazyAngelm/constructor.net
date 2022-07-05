@@ -9,6 +9,9 @@ services:
     env_file:
       - .env.frontend.dev
       - .env.common.dev
+    environment:
+      NEXT_WATCH_POLL: 300
+      NEXT_WATCH_AGGREGATE_TIMEOUT: 800
   db:
     environment:
       MYSQL_ROOT_HOST: '172.21.0.4'
