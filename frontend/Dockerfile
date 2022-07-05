@@ -11,7 +11,7 @@ VOLUME /app/
 
 ENV NODE_ENV=development
 
-COPY frontend/package*.json .
+COPY frontend/package*.json ./
 
 RUN npm ci
 

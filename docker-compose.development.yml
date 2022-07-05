@@ -11,6 +11,7 @@ services:
       - .env.common.dev
   db:
     environment:
+      MYSQL_ROOT_HOST: '172.21.0.4'
       MYSQL_DATABASE: 'ng'
       MYSQL_USER: 'ng_user'
       MYSQL_PASSWORD: 'ng_user_passwort'
