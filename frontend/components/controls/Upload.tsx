@@ -17,8 +17,9 @@ const Upload = ({ onChange, value, preview, keyChange }: Props) => {
 
 	useEffect(() => {
 		if (lastKeyChange != keyChange) {
-			setImgPreview(value)
+			setImgPreview(() => undefined)
 			setLastKeyChange(keyChange)
+			setTimeout(() => setImgPreview(() => value), 10)
 		}
 	}, [ value ])
 
