@@ -18,6 +18,7 @@ export const useFetchData = <T, R>(key: R,
 	useEffect(() => {
 		if (!setDefault)
 			update()
+		else setData(() => setDefault)
 	}, [ key ])
 
 	const update = () => {
