@@ -48,13 +48,15 @@ handler.post(response(async (req, res) => {
 		update: {
 			name: data.name,
 			description: data.description,
-			instruction: data.instruction
+			instruction: data.instruction,
+			date: new Date().toISOString()
 		},
 		create: {
 			name: data.name ? data.name : 'Без названия',
 			description: data.description ? data.description : '',
 			instruction: data.instruction ? data.instruction : '',
-			image: ''
+			image: '',
+			date: new Date().toISOString()
 		}
 	})
 	if (data.categpries) {
@@ -68,7 +70,6 @@ handler.post(response(async (req, res) => {
 				return { taskId: upset.id, categoryId: p }
 			})
 		})
-		console.log(a)
 	}
 
 	return { response: upset as TaskDto }

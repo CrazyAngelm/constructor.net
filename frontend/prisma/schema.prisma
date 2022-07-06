@@ -73,6 +73,7 @@ model Course {
     id               Int                @id @default(autoincrement())
     name             String
     description      String
+    date             DateTime?
     taskCategories   TaskCategory[]
     CourseToCategory CourseToCategory[]
 }
@@ -81,6 +82,7 @@ model TaskCategory {
     id               Int                @id @default(autoincrement())
     name             String
     description      String
+    date             DateTime?
     tasks            Task[]
     Course           Course[]
     CourseToCategory CourseToCategory[]
@@ -102,6 +104,7 @@ model Task {
     description    String
     instruction    String
     image          String
+    date           DateTime?
     TaskCategory   TaskCategory[]
     CategoryToTask CategoryToTask[]
 }

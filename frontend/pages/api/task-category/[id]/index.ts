@@ -47,11 +47,13 @@ handler.post(response(async (req, res) => {
 		where: { id },
 		update: {
 			name: data.name,
-			description: data.description
+			description: data.description,
+			date: new Date().toISOString()
 		},
 		create: {
 			name: data.name ? data.name : 'Без названия',
-			description: data.description ? data.description : ''
+			description: data.description ? data.description : '',
+			date: new Date().toISOString()
 		}
 	})
 
