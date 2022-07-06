@@ -65,7 +65,7 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 	}}
 		courseId={data?.id} id={categoryId} />
 		: data ?
-			<EditorTemplate notification={notification} callbackUpdate={updateAll} error={errorMsg}
+			<EditorTemplate callbackBack={callbackBack} notification={notification} callbackUpdate={updateAll} error={errorMsg}
 				callbackSave={save} callbackRemove={remove} >
 				<article className={styles.editor}>
 					<section className={styles.props}>
