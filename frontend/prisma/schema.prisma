@@ -90,8 +90,8 @@ model TaskCategory {
 model CourseToCategory {
     categoryId Int
     courseId   Int
-    category   TaskCategory @relation(fields: [categoryId], references: [id])
-    course     Course       @relation(fields: [courseId], references: [id])
+    category   TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    course     Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
     @@id([courseId, categoryId])
 }
@@ -109,8 +109,8 @@ model Task {
 model CategoryToTask {
     taskId     Int
     categoryId Int
-    task       Task         @relation(fields: [taskId], references: [id])
-    category   TaskCategory @relation(fields: [categoryId], references: [id])
+    task       Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+    category   TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
 
     @@id([taskId, categoryId])
