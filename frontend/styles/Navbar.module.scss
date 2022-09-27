@@ -2,10 +2,10 @@
 
 .navbar {
 	@extend .navbar;
+	max-height: $navbar-height;
 	&.fixed {
 		@extend .is-fixed-top;
 	}
-	padding: 1vh;
 
 	> .brand {
 		@extend .navbar-brand;

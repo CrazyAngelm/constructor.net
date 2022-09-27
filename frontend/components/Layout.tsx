@@ -20,7 +20,7 @@ const Layout = ({ children, title, navbar = true }: Props) => {
 				<title>Neurography{title && ` | ${title}`}</title>
 			</Head>
 			{navbar && <Navbar />}
-			<article className={`${styles.content} ${styles.isNavbarContent}`}>
+			<article className={`${styles.content} ${styles.isNavbar}`}>
 				{children}
 			</article>
 		</div>

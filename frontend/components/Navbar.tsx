@@ -5,6 +5,8 @@ import styles from '@/styles/Navbar.module.scss'
 
 import logo from '@/assets/logo.png'
 import { useSession } from '@/lib/session/hooks'
+import { useState } from 'react'
+import SignIn from './auth/SignIn'
 
 
 const Navbar = () => {
@@ -40,11 +42,14 @@ const Navbar = () => {
 										Регистрация
 									</button>
 								</Link>
-								<Link href={'/auth'}>
-									<button className={`${styles.log} ${styles.button}`}>
-										Войти
-									</button>
-								</Link>
+								{/* <Link href={'/auth'}> */}
+									<SignIn button={
+										<button className={`${styles.log} ${styles.button}`}>
+											Войти
+										</button>
+									} />
+
+								{/* </Link> */}
 							</div>
 						</div>
 						: <div className={styles.lk}>
