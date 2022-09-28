@@ -4,6 +4,9 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { Session } from '@/lib/session'
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
+import { usePrisma } from '@/lib/api/database'
+import { compare } from 'bcryptjs'
+import { UserDto } from '@/lib/dto/users'
 
 const prisma = new PrismaClient()
 
@@ -12,21 +15,27 @@ export default NextAuth({
 		CredentialsProvider({
 			name: 'Credentials',
 			credentials: {
-				username: { label: "Username", type: "text", placeholder: "jsmith" },
+				email: { label: "Email", type: "text", placeholder: "email" },
 				password: { label: "Password", type: "password" }
 			},
 			async authorize(credentials, req) {
-				const res = await fetch("/your/endpoint", {
-					method: 'POST',
-					body: JSON.stringify(credentials),
-					headers: { "Content-Type": "application/json" }
-				})
-				const user = await res.json()
 
-				if (res.ok && user) {
-					return user
-				}
-				return null
+				if (!credentials) throw new Error("credentials is null")
+				const prisma  = usePrisma()
+
+				const user = await prisma.user.findUnique({
+					where:{email:credentials.email}
+				})
+
+				if (!user) throw new Error("No user found with the email")
+
+				const checkPassword = await compare(credentials.password, user.password ?? "")
+
+				if (!checkPassword) throw new Error("Ivalid password")
+
+				if(!user.emailVerified) throw new Error("Email не подтвержден")
+
+				return {id:user.id}
 			}
 		}),
 		YandexProvider({
@@ -37,18 +46,30 @@ export default NextAuth({
 	theme: {
 		colorScheme: "light"
 	},
+	session:{
+		strategy:'jwt'
+	},
+	secret:process.env.NEXTAUTH_SECRET,
 	callbacks: {
-		async session({ session, user, token }) {
+		async session({ session, token }) {
 			const _session = session as Session
-			const scopes = await prisma.scopeJoin.findMany({
+			const user = await prisma.user.findUnique({
 				where: {
-					userId: user.id
-				},
-				include: {
-					scope: true
+					id: token.sub
 				}
-			})
-			_session.scopes = scopes.map(p => p.scope.value)
+			}) as UserDto
+
+
+			if (!user) throw new Error("User not found")
+
+			user.scopes = (await prisma.scopeJoin.findMany({
+				where: { userId: user.id },
+				include: { scope: true }
+			})).map(p => p.scope.value)
+
+			_session.user = user as UserDto
+			_session.scopes = user.scopes
+			_session.address = token.sub
 			return _session
 		}
 	},

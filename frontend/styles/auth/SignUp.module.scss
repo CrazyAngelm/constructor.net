@@ -1,0 +1,88 @@
+@import "../lib/fonts.scss", "../lib/variables.scss", "../lib/bulma.scss";
+
+.notification{
+	@extend .is-success;
+	@extend .message;
+
+	z-index: 110;
+	padding: 0;
+	width: 50%;
+	border-radius: 6px;
+	>header{
+		@extend .has-background-success;
+		@extend .message-header;
+
+		>button{
+			@extend .delete;
+		}
+	}
+	>section{
+		@extend .message-body;
+	}
+}
+
+.signupModal {
+	@extend .modal;
+
+
+	display: flex;
+	justify-content: center;
+  align-items: center;
+	>.background{
+		@extend .modal-background;
+	}
+
+	>.body {
+		z-index: 100;
+		@extend .modal-card;
+		>header{
+			@extend .modal-card-head;
+
+			>p{
+				@extend .modal-card-title;
+			}
+			>button{
+				@extend .delete;
+			}
+		}
+
+		>section {
+			display: flex;
+			flex-direction: column;
+			padding: 5% 10%;
+			gap: 1vh;
+			@extend .modal-card-body;
+
+			>section{
+				display: grid;
+				grid-template-columns: 1fr 2fr;
+    		gap: 3%;
+
+				>label{
+					text-align:right;
+					align-self: center;
+				}
+
+				>input{
+					@extend .input;
+					&.danger{
+						@extend .is-danger;
+					}
+				}
+				>p{
+					grid-column: 2;
+					@extend .has-text-danger;
+				}
+			}
+		}
+
+		>footer{
+			@extend .modal-card-foot;
+			flex-direction: column;
+			>.submit {
+				@extend .button;
+				@extend .is-primary;
+			}
+		}
+	}
+}

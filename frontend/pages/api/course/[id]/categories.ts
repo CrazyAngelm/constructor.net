@@ -17,7 +17,7 @@ interface Query extends NextParsedUrlQuery {
 
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	const data = await prisma.course.findUnique({
 		where: { id },

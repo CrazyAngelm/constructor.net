@@ -17,11 +17,11 @@ interface Query extends NextParsedUrlQuery {
 
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	const data = await prisma.course.findUnique({
 		where: { id }
 	})
-	if (!data) return { error: { code: 400, msg: 'Записи не существует' } }
+	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
 
 	return { response: data }
 })
@@ -29,7 +29,7 @@ handler.get(response(async (req, res) => {
 
 handler.post(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	const data = req.body as CourseDto
 
@@ -52,7 +52,7 @@ handler.post(response(async (req, res) => {
 
 handler.put(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	await prisma.course.delete({
 		where: { id }

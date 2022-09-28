@@ -16,12 +16,12 @@ interface Query extends NextParsedUrlQuery {
 
 handler.get(response(async (req, res) => {
 	const { id } = req.query as Query
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	const user = await prisma.user.findUnique({
 		where: { id }
 	}) as UserDto
 
-	if (!user) return { error: { code: 400, msg: 'Несуществующий пользователь' } }
+	if (!user) return { error: { code: 400, message: 'Несуществующий пользователь' } }
 
 	user.scopes = (await prisma.scopeJoin.findMany({
 		where: { userId: user.id },
@@ -34,7 +34,7 @@ handler.get(response(async (req, res) => {
 
 handler.post(response(async (req, res) => {
 	const { id } = req.query as Query
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	const user = req.body as UserDto
 

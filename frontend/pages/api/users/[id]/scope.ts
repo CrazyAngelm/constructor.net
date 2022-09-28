@@ -16,13 +16,13 @@ interface Query extends NextParsedUrlQuery {
 
 handler.post(response(async (req, res) => {
 	const { id } = req.query as Query
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	const body = req.body as { scope: string, active: boolean }
 
 	const scopeId = await prisma.scope.findFirst({ where: { value: body.scope } })
 
-	if (!scopeId) return { error: { code: 400, msg: 'Значения не существует' } }
+	if (!scopeId) return { error: { code: 400, message: 'Значения не существует' } }
 
 	const scopes = await prisma.scopeJoin.findMany({
 		where: {

@@ -33,7 +33,7 @@ handler.use(upload.array('file'))
 
 handler.post(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	await prisma.task.update({
 		where: { id },

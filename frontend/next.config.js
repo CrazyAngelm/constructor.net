@@ -11,7 +11,14 @@ const nextConfig = {
     if (poll) config.watchOptions.poll = poll
     if (aggregateTimeout) config.watchOptions.aggregateTimeout = aggregateTimeout
     return config
-  }
+  },
+	webpack:(config,options) => {
+		config.module.rules.push({
+				test: /\.html$/i,
+				loader: "html-loader"
+		})
+		return config
+	}
 }
 
 dotenvLoad()

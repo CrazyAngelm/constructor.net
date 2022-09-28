@@ -16,13 +16,13 @@ interface Query extends NextParsedUrlQuery {
 
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Invalid index' } }
+	if (!id) return { error: { code: 400, message: 'Invalid index' } }
 	const data = await prisma.task.findUnique({
 		where: { id },
 		include: { TaskCategory: true }
 	})
 
-	if (!data) return { error: { code: 400, msg: 'The item does not exist' } }
+	if (!data) return { error: { code: 400, message: 'The item does not exist' } }
 
 	return { response: data.TaskCategory }
 })
@@ -30,7 +30,7 @@ handler.get(response(async (req, res) => {
 
 handler.post(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Invalid index' } }
+	if (!id) return { error: { code: 400, message: 'Invalid index' } }
 
 	const data = req.body as RequestIds
 

@@ -22,3 +22,7 @@ export interface UpdaetScopeDto{
 	active:boolean
 }
 
+export interface SignUpDto{
+	email:string,
+	password:string,
+}

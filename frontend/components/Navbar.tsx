@@ -7,6 +7,7 @@ import logo from '@/assets/logo.png'
 import { useSession } from '@/lib/session/hooks'
 import { useState } from 'react'
 import SignIn from './auth/SignIn'
+import SignUp from './auth/SignUp'
 
 
 const Navbar = () => {
@@ -37,19 +38,17 @@ const Navbar = () => {
 					{!(session && session != 'loading')
 						? <div>
 							<div className={styles.buttons}>
-								<Link href={'/auth'}>
+								<SignUp button={
 									<button className={`${styles.sign} ${styles.button}`}>
 										Регистрация
 									</button>
-								</Link>
-								{/* <Link href={'/auth'}> */}
-									<SignIn button={
-										<button className={`${styles.log} ${styles.button}`}>
-											Войти
-										</button>
-									} />
+								} />
 
-								{/* </Link> */}
+								<SignIn button={
+									<button className={`${styles.log} ${styles.button}`}>
+										Войти
+									</button>
+								} />
 							</div>
 						</div>
 						: <div className={styles.lk}>

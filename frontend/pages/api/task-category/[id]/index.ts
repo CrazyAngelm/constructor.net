@@ -17,7 +17,7 @@ interface Query extends NextParsedUrlQuery {
 
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	const data = await prisma.taskCategory.findUnique({
 		where: { id },
 		include: {
@@ -28,7 +28,7 @@ handler.get(response(async (req, res) => {
 			}
 		}
 	})
-	if (!data) return { error: { code: 400, msg: 'Записи не существует' } }
+	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
 
 	const dto = data as TaskCategoryDto
 	dto.courses = data.CourseToCategory.map(p => p.course.id)
@@ -39,7 +39,7 @@ handler.get(response(async (req, res) => {
 
 handler.post(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	const data = req.body as TaskCategoryDto
 
@@ -76,7 +76,7 @@ handler.post(response(async (req, res) => {
 
 handler.put(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	await prisma.taskCategory.delete({
 		where: { id }

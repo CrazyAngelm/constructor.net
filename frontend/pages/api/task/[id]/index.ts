@@ -16,7 +16,7 @@ interface Query extends NextParsedUrlQuery {
 
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	const task = await prisma.task.findUnique({
 		where: { id },
 		include: {
@@ -28,7 +28,7 @@ handler.get(response(async (req, res) => {
 		}
 	})
 
-	if (!task) return { error: { code: 400, msg: 'Записи не существует' } }
+	if (!task) return { error: { code: 400, message: 'Записи не существует' } }
 
 	const dto = task as TaskDto
 	dto.categpries = task?.CategoryToTask.map(p => p.category.id)
@@ -39,7 +39,7 @@ handler.get(response(async (req, res) => {
 
 handler.post(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	const data = req.body as TaskDto
 
@@ -78,7 +78,7 @@ handler.post(response(async (req, res) => {
 
 handler.put(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
-	if (!id) return { error: { code: 400, msg: 'Неверный индекс' } }
+	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
 	await prisma.task.delete({
 		where: { id }

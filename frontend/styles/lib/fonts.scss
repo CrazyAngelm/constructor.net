@@ -1,0 +1,20 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"); */
+
+@mixin font-normal($color) {
+	@include font-default();
+	font-style: normal;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: $color;
+}
+
+@mixin font-bold($color) {
+	@include font-default();
+	font-style: normal;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	color: $color;
+}
+
+@mixin font-default {
+}
