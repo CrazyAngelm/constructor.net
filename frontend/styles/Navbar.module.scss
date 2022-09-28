@@ -6,6 +6,31 @@
 	&.fixed {
 		@extend .is-fixed-top;
 	}
+	.lkNavbar {
+		@extend .navbar-item;
+		@extend .has-dropdown;
+
+		&:hover{
+			.avatarMenu{
+				display: block;
+			}
+		}
+
+		.avatarMenu {
+			@extend .navbar-dropdown;
+
+			> a {
+				@extend .navbar-item;
+
+				&.exit{
+					@extend .has-text-danger;
+				}
+			}
+			> hr {
+				@extend .navbar-divider;
+			}
+		}
+	}
 
 	> .brand {
 		@extend .navbar-brand;

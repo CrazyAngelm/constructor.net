@@ -8,7 +8,6 @@ const Index: NextPage = () => {
 
 	return (
 		<Layout>
-			<button onClick={() => signOut()}>signout</button>
 		</Layout>
 	)
 }
