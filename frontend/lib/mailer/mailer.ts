@@ -21,3 +21,10 @@ export const sendMail = (mailOptions: any) => {
 		}
 	});
 }
+
+export const optionsWithFrom = (options:any):any => {
+	return {
+		from: 'Lab Studio <' + process.env.MAILER_USER +'>',
+		...options
+	}
+}

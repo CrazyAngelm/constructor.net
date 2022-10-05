@@ -4,7 +4,7 @@ import { response } from "@/lib/api/response";
 import { usePrisma } from "@/lib/api/database";
 import { encodeBase64, hash } from 'bcryptjs';
 import { getRegistrationHtml } from "@/lib/mailer/registration";
-import { sendMail } from "@/lib/mailer/mailer";
+import { optionsWithFrom, sendMail } from "@/lib/mailer/mailer";
 
 const prisma = usePrisma()
 const handler = getDefaultHandler()
@@ -34,13 +34,16 @@ handler.post(response(async (req, res) => {
 		email: user.email
 	}), 'binary').toString('base64')
 
-	const mailOptions = {
-		from: 'brothersofabsurd <brothersofabsurd@mail.ru>',
+	const mailOptions = optionsWithFrom({
 		to: email,
-		subject: 'Constructor: Регистрация',
+		subject: 'Регистрация',
 		html: getRegistrationHtml(token),
-		amp: getRegistrationHtml(token)
-	};
+		amp: getRegistrationHtml(token),
+		attachments:[{
+			path: 'assets/logo-512.png',
+			cid: 'logo@nodemailer.com'
+		}]
+	});
 
 	sendMail(mailOptions)
 

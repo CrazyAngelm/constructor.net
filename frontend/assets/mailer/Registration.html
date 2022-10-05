@@ -1,11 +1,18 @@
 <html>
 
 <body>
-	<div style="background-color:rgb(220 220 220);">
+	<div style="background-color:rgb(220 220 220); font-family: system-ui;">
 		<div style="background-color: white;">
-			<div style="background-color:rgb(42, 42, 42); padding: 1vh;">
-				<p style="font-size: 2.5em; color: aliceblue;
-			text-align: center;">Регистрация</p>
+			<div style="    background-color: hsl(347, 90%, 96%);
+				padding: 1vh;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;">
+				<img style="height: 5em" src="cid:logo@nodemailer.com" />
+				<p style="    font-size: 2.5em;
+					color: black;
+					text-align: center; margin: 0 0;">Регистрация</p>
 			</div>
 			<div style="
 			display: flex;
@@ -16,6 +23,8 @@
 					Вы зарегистрировались в нашем сервисе.
 					Для подтверждения Вашего аккаунта нажмите кнопку или перейдите по ссылке:
 					<a href="$link$" target="_blank">$link$</a>
+					<br />
+					Если это не вы, то просто проигнорируйте это письмо
 				</p>
 				<a href="$link$" style="
 				align-self: center;
@@ -29,10 +38,10 @@
     		cursor: pointer;">Подтвердить</a>
 				<p>Если вы не регистрировались просто проигнорируйте это письмо</p>
 			</div>
-			<div style="background-color: #929292;
-    color: white;">
+			<div style="    background-color: hsl(347, 90%, 96%);
+    color: hsl(0, 0%, 48%);">
 				<p style="text-align: end;
-    padding: 0 5%;">&#169; Constructor</p>
+    padding: 0 5%;">&#169; Лаборатория будущего | Lab Studio</p>
 			</div>
 		</div>
 	</div>
