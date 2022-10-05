@@ -21,7 +21,7 @@ const Layout = ({ children, title, navbar = true }: Props) => {
 				<link rel="shortcut icon" href="/favicon.png" />
 			</Head>
 			{navbar && <Navbar />}
-			<article className={`${styles.content} ${styles.isNavbar}`}>
+			<article className={`${styles.content} ${navbar ?? styles.isNavbar}`}>
 				{children}
 			</article>
 		</div>
