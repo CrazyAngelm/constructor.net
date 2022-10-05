@@ -5,7 +5,6 @@ import styles from '@/styles/Navbar.module.scss'
 
 import logo from '@/assets/logo.png'
 import { useSession } from '@/lib/session/hooks'
-import { useState } from 'react'
 import SignIn from './auth/SignIn'
 import SignUp from './auth/SignUp'
 import { signOut } from 'next-auth/react'
@@ -21,9 +20,9 @@ const Navbar = () => {
 					<Link href={'/'}>
 						<section className={styles.about}>
 							<div>
-								{/* <Image src={null} layout='fill' objectFit='contain' /> */}
+								<Image src={logo} layout='fill' objectFit='contain' />
 							</div>
-							<span>Constructor</span>
+							<span>Lab Studio</span>
 						</section>
 					</Link>
 				</div>

@@ -17,7 +17,8 @@ const Layout = ({ children, title, navbar = true }: Props) => {
 		<div className={styles.root}>
 			<Head>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				<title>Neurography{title && ` | ${title}`}</title>
+				<title>Lab Studio{title && ` | ${title}`}</title>
+				<link rel="shortcut icon" href="/favicon.png" />
 			</Head>
 			{navbar && <Navbar />}
 			<article className={`${styles.content} ${styles.isNavbar}`}>
