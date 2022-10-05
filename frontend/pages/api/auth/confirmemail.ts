@@ -8,7 +8,8 @@ const handler = getDefaultHandler()
 
 interface Token{
 	id?:string,
-	email?:string
+	email?:string,
+	pass?:string
 }
 
 handler.post(response(async (req, res) => {

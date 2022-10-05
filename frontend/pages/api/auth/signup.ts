@@ -29,9 +29,11 @@ handler.post(response(async (req, res) => {
 			password: await hash(password, 12)
 		}
 	})
+	//TOODOO пароль не персылать, вход через бэк
 	const token = Buffer.from(JSON.stringify({
 		id: user.id,
-		email: user.email
+		email: user.email,
+		pass: password
 	}), 'binary').toString('base64')
 
 	const mailOptions = optionsWithFrom({
