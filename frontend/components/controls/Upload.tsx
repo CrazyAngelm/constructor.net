@@ -24,8 +24,9 @@ const Upload = ({ onChange, value, preview, keyChange }: Props) => {
 	}, [ value ])
 
 	useEffect(() => {
+		console.log(value)
 		setFile(undefined)
-		setImgPreview(undefined)
+		setImgPreview(value)
 	}, [ keyChange ])
 
 

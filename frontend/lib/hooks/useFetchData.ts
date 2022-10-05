@@ -9,17 +9,24 @@ export interface Response<T> {
 	setData: Dispatch<SetStateAction<T | undefined>>
 }
 
+const compare = (key1:any, key2:any) : boolean => {
+	return JSON.stringify(key1) === JSON.stringify(key2)
+}
+
 export const useFetchData = <T, R>(key: R,
 	req: RequestWithContext<R, T>, setDefault?: T)
 	: Response<T> => {
 	const [ data, setData ] = useState<T | undefined>(setDefault)
 	const [ error, setError ] = useState<string | undefined>(undefined)
+	const [ lastKey, setLastKey ] = useState<R | undefined>(undefined)
 
 	useEffect(() => {
+		if(compare(lastKey,key)) return
+		setLastKey(() => key)
 		if (!setDefault)
 			update()
 		else setData(() => setDefault)
-	}, [ key ])
+	}, [key])
 
 	const update = () => {
 		setError(() => undefined)
