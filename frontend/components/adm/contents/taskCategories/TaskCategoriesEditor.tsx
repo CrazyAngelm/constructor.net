@@ -61,8 +61,10 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 
 	const remove = () => {
 		removeTaskCategory(id)
-			.then(() =>
-				callbackBack && callbackBack())
+			.then(() => {
+				callbackUpdate && callbackUpdate()
+				callbackBack && callbackBack()
+			})
 			.catch(err => handleErrorTsx(err, setError))
 	}
 

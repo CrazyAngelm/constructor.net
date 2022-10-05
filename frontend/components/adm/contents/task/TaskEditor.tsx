@@ -54,8 +54,10 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 
 	const remove = () => {
 		removeTask(id)
-			.then(() =>
-				callbackBack && callbackBack())
+			.then(() => {
+				callbackUpdate && callbackUpdate()
+				callbackBack && callbackBack()
+			})
 			.catch(err => handleErrorTsx(err, setError))
 	}
 

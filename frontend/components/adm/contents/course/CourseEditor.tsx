@@ -49,8 +49,10 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 
 	const remove = () => {
 		removeCourse(id)
-			.then(() =>
-				callbackBack && callbackBack())
+			.then(() => {
+				callbackUpdate && callbackUpdate()
+				callbackBack && callbackBack()
+			})
 			.catch(err => handleErrorTsx(err, setError))
 	}
 
