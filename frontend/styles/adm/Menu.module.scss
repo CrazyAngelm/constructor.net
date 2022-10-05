@@ -12,6 +12,8 @@
 	margin: 0;
 	padding: 1vh 0;
 	@extend .has-background-light;
+	border-right-style: solid;
+	border-color: #00000082;
 	> section {
 		transition: max-width 0.5s linear;
 	}
@@ -55,5 +57,9 @@
 	.img {
 		width: 3vw;
 		height: 3vw;
+		display: flex;
+		align-items: center;
+		border-radius: 100%;
+		@extend .has-background-primary;
 	}
 }

@@ -13,6 +13,9 @@
 		flex: 0 0 auto;
 		max-width: 30%;
 		height: 100%;
+		border-right-style: solid;
+		border-color: #00000082;
+		border-radius: 0;
 		@extend .box;
 	}
 	> .editor {
