@@ -67,7 +67,7 @@ const Navbar = () => {
 								}
 							</div>
 							<section className={styles.avatarMenu}>
-								<Link href={"/lk"}>Личный кабинет</Link>
+								{/* <Link href={"/lk"}>Личный кабинет</Link> */}
 								<hr></hr>
 								<a onClick={() => signOut()} className={styles.exit}>Выход</a>
 							</section>
