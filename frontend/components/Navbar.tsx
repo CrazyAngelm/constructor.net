@@ -30,9 +30,11 @@ const Navbar = () => {
 
 			<section className={styles.menu} >
 				<section className={styles.start}>
-					<Link href={'/'}>Главная</Link>
-					<Link href={'/'}>Цены</Link>
 					<Link href={'/'}>О нас</Link>
+					<Link href={'/'}>Как работает?</Link>
+					<Link href={'/'}>Купить</Link>
+					<Link href={'/'}>Отзывы</Link>
+					<Link href={'/'}>FAQ</Link>
 				</section>
 
 				<section className={styles.end}>

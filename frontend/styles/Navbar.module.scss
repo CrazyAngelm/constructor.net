@@ -3,7 +3,11 @@
 .navbar {
 	@extend .navbar;
 	max-height: $navbar-height;
+	background-color: transparent;
+	margin: 1% 4% 1% 4%;
+
 	&.fixed {
+		position: absolute;
 		@extend .is-fixed-top;
 	}
 	.lkNavbar {
@@ -49,7 +53,6 @@
 			}
 			> span {
 				font-size: 3vh;
-				font-family: cursive;
 				font-weight: 700;
 			}
 		}
@@ -72,6 +75,10 @@
 			> a,
 			div {
 				@extend .navbar-item;
+
+				&:hover{
+					background-color: transparent;
+				}
 			}
 			.lk {
 				gap: 1vh;

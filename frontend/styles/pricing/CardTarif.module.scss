@@ -1,0 +1,59 @@
+.cardTarifs {
+	background: #fff;
+	width: 25vw;
+
+	> header {
+		width: 100%;
+
+		>img{
+			width: 100%;
+		}
+	}
+	> section {
+		display: flex;
+    flex-direction: column;
+
+		padding: 0 30% 0 10%;
+		margin-top: 5.56vh;
+		font-family: "Montserrat", sans-serif;
+		> h3 {
+			margin: 0;
+			font-weight: 600;
+			font-size: 1.17em;
+		}
+
+		> p {
+			font-size: 0.8em;
+			&.description {
+				margin-top: 1.33vh;
+			}
+
+			&.price {
+				line-height: 4vh;
+				font-size: 1em;
+			}
+		}
+
+		> button {
+			color: white;
+			display: block;
+			text-decoration: none;
+			background: rgba(251, 123, 161, 1);
+			background: -moz-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			background: -webkit-gradient(
+				left top,
+				right top,
+				color-stop(0%, rgba(251, 123, 161, 1)),
+				color-stop(100%, rgba(252, 224, 67, 1))
+			);
+			background: -webkit-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			background: -o-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			background: -ms-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			background: linear-gradient(to right, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fb7ba1', endColorstr='#fce043', GradientType=1 );
+			margin-top: 1.56vh;
+			width: 9.19vw;
+			border-radius: 0.63vw;
+		}
+	}
+}
