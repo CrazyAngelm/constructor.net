@@ -2,22 +2,28 @@ export interface CourseDto {
 	id: number
 	name?: string
 	description?: string
+	categories?: number[]
 }
 
 export interface TaskCategoryDto {
 	id: number
 	name?: string
 	description?: string
-	courses?: number[]
+	categories?: number[]
+	tasks?: number[]
+}
+export interface CreateCategoryDto {
+	parentId: number,
+	courseParent?: boolean,
 }
 
 export interface TaskDto {
 	id: number
+	categories?: number[]
 	name?: string
 	description?: string
 	instruction?: string
 	image?: string
-	categpries?: number[]
 }
 
 export interface RequestIds {

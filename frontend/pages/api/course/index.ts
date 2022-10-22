@@ -13,13 +13,22 @@ const handler = getDefaultHandler()
 handler.get(response(async () => {
 	const data = await prisma.course.findMany({
 		include: {
-			taskCategories: {
-				select: { id: true }
+			CourseToCategory: {
+				select: {
+					categoryId: true
+				}
 			}
 		}
 	})
 
-	return { response: data }
+	const resp: CourseDto[] = data.map(p => {
+		return {
+			...p,
+			categories: p.CourseToCategory.map(p => p.categoryId)
+		}
+	})
+
+	return { response: resp }
 })
 )
 

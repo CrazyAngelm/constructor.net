@@ -26,13 +26,15 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 
 	const { data, update, setData, error } = useFetchData(id, getTaskById,
 		id === -1
-			? { id: -1, name: 'Без названия', description: '', categpries: categoryId ? [ categoryId ] : [] }
+			? { id: -1, name: 'Без названия', description: '', categories: categoryId ? [ categoryId ] : [] }
 			: undefined)
+
+	console.log(id, categoryId)
 
 	const setChoiseCategory = (values: boolean[]) => {
 		setData(data => {
 			if (!data) return data
-			data.categpries = categories?.filter((p, i) => values[ i ]).map(p => p.id)
+			data.categories = categories?.filter((p, i) => values[ i ]).map(p => p.id)
 			return { ...data }
 		})
 	}
@@ -70,7 +72,7 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
 						<DropdownCheck label='Категории' isHorizontal callbackChoise={setChoiseCategory}
 							list={categories?.map(p => p.name as string)}
-							value={categories?.map(p => data.categpries?.find(c => c === p.id) ? true : false)} />
+							value={categories?.map(p => data.categories?.find(c => c === p.id) ? true : false)} />
 						<Field onChange={changeHanderDtoString('name', setData)}
 							isHorizontal label='Название' type='text' value={data.name} />
 						<TextArea onChange={changeHanderDtoString('description', setData)}

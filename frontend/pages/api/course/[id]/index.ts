@@ -19,9 +19,17 @@ handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	const data = await prisma.course.findUnique({
-		where: { id }
+		where: { id },
+		include: {
+			taskCategories: { select: { id: true }}
+		}
 	})
 	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
+
+	const resp : CourseDto = {
+		...data,
+		categories:data.taskCategories.map(p => p.id)
+	}
 
 	return { response: data }
 })

@@ -80,7 +80,7 @@ model Course {
 }
 
 model TaskCategory {
-    id               Int                @id @default(autoincrement())
+    id               Int                  @id @default(autoincrement())
     name             String
     description      String
     date             DateTime?
@@ -88,6 +88,8 @@ model TaskCategory {
     Course           Course[]
     CourseToCategory CourseToCategory[]
     CategoryToTask   CategoryToTask[]
+    CategoryChildren CategoryToCategory[] @relation(name: "children")
+    CategoryParent   CategoryToCategory[] @relation(name: "parent")
 }
 
 model CourseToCategory {
@@ -116,6 +118,14 @@ model CategoryToTask {
     task       Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
     category   TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-
     @@id([taskId, categoryId])
+}
+
+model CategoryToCategory {
+    parentId   Int
+    childrenId Int
+    parent     TaskCategory @relation(name: "parent", fields: [parentId], references: [id], onDelete: Cascade)
+    children   TaskCategory @relation(name: "children", fields: [childrenId], references: [id], onDelete: Cascade)
+
+    @@id([parentId, childrenId])
 }

@@ -31,7 +31,7 @@ handler.get(response(async (req, res) => {
 	if (!task) return { error: { code: 400, message: 'Записи не существует' } }
 
 	const dto = task as TaskDto
-	dto.categpries = task?.CategoryToTask.map(p => p.category.id)
+	dto.categories = task?.CategoryToTask.map(p => p.category.id)
 
 	return { response: dto }
 })
@@ -59,14 +59,14 @@ handler.post(response(async (req, res) => {
 			date: new Date().toISOString()
 		}
 	})
-	if (data.categpries) {
+	if (data.categories) {
 		await prisma.categoryToTask.deleteMany({
 			where: {
 				taskId: upset.id
 			}
 		})
 		const a = await prisma.categoryToTask.createMany({
-			data: data.categpries.map(p => {
+			data: data.categories.map(p => {
 				return { taskId: upset.id, categoryId: p }
 			})
 		})

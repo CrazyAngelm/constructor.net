@@ -18,8 +18,33 @@ export interface Props {
 	callbackSave?: () => void
 	callbackUpdate?: () => void
 	callbackRemove?: () => void
-	callbackBack?:() => void
+	callbackBack?: () => void
 	notification?: Notification
+}
+
+interface PropsWarningDelete {
+	callbackRemove?: () => void
+	cancel?: () => void
+}
+
+export const WarningDelete = ({ callbackRemove, cancel }: PropsWarningDelete) => {
+	return (
+		<div className={`${styles.modalWindow} ${styles.isActive}`}>
+			<div className={styles.modalBackground}></div>
+			<div className={styles.modalContent}>
+				<section className={styles.window}>
+					<div>Вы уверены что хотите удалить эелемнт?
+						Действие необратимо
+					</div>
+					<section className={styles.buttons}>
+						<button className={styles.danger}
+							onClick={() => callbackRemove && callbackRemove()}>Да</button>
+						<button onClick={() => cancel && cancel()}>Отмена</button>
+					</section>
+				</section>
+			</div>
+		</div>
+	)
 }
 
 const EditorTemplate = ({ children, error, notification, ...callbacks }: Props) => {
@@ -30,21 +55,7 @@ const EditorTemplate = ({ children, error, notification, ...callbacks }: Props) 
 			<div onClick={callbacks.callbackBack} className={`${callbacks.callbackBack ? styles.back : styles.hide}`}>
 				<Image src={back} layout='fill' objectFit='contain' />
 			</div>
-			<div className={`${styles.modalWindow} ${modal && styles.isActive}`}>
-				<div className={styles.modalBackground}></div>
-				<div className={styles.modalContent}>
-					<section className={styles.window}>
-						<div>Вы уверены что хотите удалить эелемнт?
-							Действие необратимо
-						</div>
-						<section className={styles.buttons}>
-							<button className={styles.danger}
-								onClick={() => callbacks.callbackRemove && callbacks.callbackRemove()}>Да</button>
-							<button onClick={() => setModal(false)}>Отмена</button>
-						</section>
-					</section>
-				</div>
-			</div>
+			{modal && <WarningDelete callbackRemove={callbacks.callbackRemove} cancel={() => setModal(false)} />}
 			<section className={styles.individualEditor}>
 				{children}
 			</section>

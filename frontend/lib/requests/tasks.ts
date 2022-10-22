@@ -1,4 +1,4 @@
-import { CourseDto, RequestIds, Status, TaskCategoryDto, TaskDto } from '../dto/tasks'
+import { CourseDto, CreateCategoryDto, RequestIds, Status, TaskCategoryDto, TaskDto } from '../dto/tasks'
 
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
 
@@ -85,6 +85,17 @@ export const getTaskCategoriesByIdCourse: RequestWithContext<number, TaskCategor
 	return json
 }
 
+export const getTaskCategoriesByIdCategory: RequestWithContext<number, TaskCategoryDto[]> = async (
+	id: number,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<TaskCategoryDto[]> => {
+	const res = await fetch(apiUrl + '/task-category/' + encodeURIComponent(id) + '/categories')
+	handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
+
 export const getTaskCategoryById: RequestWithContext<number, TaskCategoryDto> = async (
 	id: number,
 	{ apiUrl }: RequestContext = defaultRequestContext,
@@ -122,6 +133,27 @@ export const removeTaskCategory = async (
 ): Promise<{}> => {
 	const res = await fetch(apiUrl + `/task-category/${encodeURIComponent(id)}`, {
 		method: 'PUT',
+	})
+
+	await handleNonOk(res)
+
+	return await res.json()
+}
+
+export const createTaskCategory = async (
+	parentId: number,
+	parentCourse?: boolean,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<TaskCategoryDto> => {
+	const res = await fetch(apiUrl + `/task-category/create`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			parentId: parentId,
+			courseParent: parentCourse
+		} as CreateCategoryDto),
 	})
 
 	await handleNonOk(res)

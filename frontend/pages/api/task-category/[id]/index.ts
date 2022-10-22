@@ -21,17 +21,17 @@ handler.get(response(async (req, res) => {
 	const data = await prisma.taskCategory.findUnique({
 		where: { id },
 		include: {
-			CourseToCategory: {
-				include: {
-					course: true
-				}
-			}
+			CategoryChildren: true,
+			CategoryToTask: true
 		}
 	})
 	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
 
-	const dto = data as TaskCategoryDto
-	dto.courses = data.CourseToCategory.map(p => p.course.id)
+	const dto: TaskCategoryDto = {
+		...data,
+		categories: data.CategoryChildren.map(p => p.childrenId),
+		tasks: data.CategoryToTask.map(p => p.taskId)
+	}
 
 	return { response: dto }
 })
@@ -57,7 +57,7 @@ handler.post(response(async (req, res) => {
 		}
 	})
 
-	if (data.courses) {
+	/* if (data.courses) {
 		await prisma.courseToCategory.deleteMany({
 			where: {
 				categoryId: upset.id
@@ -69,7 +69,7 @@ handler.post(response(async (req, res) => {
 			})
 		})
 		console.log(a)
-	}
+	} */
 
 	return { response: upset as TaskCategoryDto }
 }))

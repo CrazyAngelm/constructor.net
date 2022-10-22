@@ -27,7 +27,7 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 
 	const { data, update, setData, error } = useFetchData(id, getTaskCategoryById,
 		id === -1
-			? { id: -1, name: 'Без названия', description: '', courses: courseId ? [ courseId ] : [] }
+			? { id: -1, name: 'Без названия', description: '' }
 			: undefined)
 
 	const { data: tasks, update: updateTasks, error: errorTask } = useFetchData(id, getTasksByIdCategory)
@@ -41,7 +41,7 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 	const choiseCourses = (values: boolean[]) => {
 		setData(data => {
 			if (!data) return data
-			data.courses = courses?.filter((p, i) => values[ i ]).map(p => p.id)
+			//data.courses = courses?.filter((p, i) => values[ i ]).map(p => p.id)
 			return { ...data }
 		})
 	}
@@ -83,9 +83,9 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 				<article className={styles.editor}>
 					<section className={styles.props}>
 						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
-						<DropdownCheck label='Курсы' isHorizontal callbackChoise={choiseCourses}
+						{/* <DropdownCheck label='Курсы' isHorizontal callbackChoise={choiseCourses}
 							list={courses?.map(p => p.name as string)}
-							value={courses?.map(p => data.courses?.find(c => c === p.id) ? true : false)} />
+							value={courses?.map(p => data.courses?.find(c => c === p.id) ? true : false)} /> */}
 						<Field onChange={changeHanderDto('name', setData)}
 							isHorizontal label='Название' type='text' value={data.name} />
 						<TextArea onChange={changeHanderDto('description', setData)}

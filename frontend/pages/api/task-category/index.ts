@@ -9,9 +9,13 @@ import { usePrisma } from "@/lib/api/database";
 
 const prisma = usePrisma()
 const handler = getDefaultHandler()
-
+//obsolete
 handler.get(response(async () => {
-	const data = await prisma.taskCategory.findMany()
+	const data = await prisma.taskCategory.findMany({
+		include: {
+			CategoryChildren:true
+		}
+	})
 
 	return { response: data }
 })

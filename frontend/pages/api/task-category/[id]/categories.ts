@@ -20,28 +20,20 @@ handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
-	const data = await prisma.course.findUnique({
+	const data = await prisma.taskCategory.findUnique({
 		where: { id },
 		include: {
-			CourseToCategory: {
-				include: {
-					category: {
-						include: {
-							CategoryChildren: true
-						}
-					}
-				}
+			CategoryParent: {
+				include: { children: true }
 			}
 		}
 	})
 
-	if(data == null) return {error:{code:402, message:"Неверный запрос"}}
+	console.log(data)
 
-	const resp: TaskCategoryDto[] = data.CourseToCategory.map(p => {
-		const cat: TaskCategoryDto = { ...p.category }
-		cat.categories = p.category.CategoryChildren.map(c => c.childrenId)
-		return cat
-	})
+	if (data == null) return { error: { code: 402, message: "Неверный запрос" } }
+
+	const resp: TaskCategoryDto[] = data.CategoryParent.map(p => p.children)
 
 	return { response: resp }
 })
