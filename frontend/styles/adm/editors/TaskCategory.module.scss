@@ -6,11 +6,15 @@
 	gap: 2vw;
 	height: 100%;
 
+	&.withList {
+		grid-template-columns: 2fr 1fr;
+	}
+
 	.list {
 		@extend .box;
 		height: 100%;
 		display: flex;
-    flex-direction: column;
+		flex-direction: column;
 		border-style: double;
 	}
 }

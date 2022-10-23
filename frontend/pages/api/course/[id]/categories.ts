@@ -25,22 +25,16 @@ handler.get(response(async (req, res) => {
 		include: {
 			CourseToCategory: {
 				include: {
-					category: {
-						include: {
-							CategoryChildren: true
-						}
-					}
+					category: true
 				}
 			}
 		}
 	})
 
-	if(data == null) return {error:{code:402, message:"Неверный запрос"}}
+	if (data == null) return { error: { code: 402, message: "Неверный запрос" } }
 
 	const resp: TaskCategoryDto[] = data.CourseToCategory.map(p => {
-		const cat: TaskCategoryDto = { ...p.category }
-		cat.categories = p.category.CategoryChildren.map(c => c.childrenId)
-		return cat
+		return { ...p.category }
 	})
 
 	return { response: resp }

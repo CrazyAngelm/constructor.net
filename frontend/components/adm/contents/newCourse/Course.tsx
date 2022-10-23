@@ -16,36 +16,11 @@ import { useFetchData } from '@/lib/hooks/useFetchData'
 import { makeFetcher } from '@/lib/fetchers'
 import { WarningDelete } from '../EditorTemplate'
 
-const getCat = (id: number): TaskCategoryDto => {
-	switch (id) {
-		case 0: return { id: 0, name: "cat-0", categories: [ 3, 4 ], tasks: [ 0, 1 ] }
-		case 1: return { id: 1, name: "cat-1", tasks: [ 2, 3 ] }
-		case 2: return { id: 2, name: "cat-2" }
-		case 3: return { id: 3, name: 'cat-3', categories: [ 5 ], tasks: [ 4 ] }
-		case 4: return { id: 4, name: 'cat-4', tasks: [ 5 ] }
-		case 5: return { id: 5, name: 'cat-5' }
-	}
-	return { id: 1000 }
-}
-
-const getTask = (id: number): TaskDto => {
-	switch (id) {
-		case 0: return { id: 0, name: "task-0" }
-		case 1: return { id: 1, name: "task-1" }
-		case 2: return { id: 2, name: "task-2" }
-		case 3: return { id: 3, name: 'task-3' }
-		case 4: return { id: 4, name: 'task-4' }
-		case 5: return { id: 5, name: 'task-5' }
-	}
-	return { id: 1000 }
-}
-
 
 interface PropsItem {
 	id: number
 	parentId?: number
 	name?: string,
-	tasks?: number[]
 	isCourse?: boolean,
 	updater?: Updater
 	setCourse?: (id: number) => void,
@@ -53,7 +28,7 @@ interface PropsItem {
 	setTask?: (id: number) => void
 }
 
-const ItemCat = ({ id, parentId: parentId, name: _name, tasks, isCourse, updater, ...setter }: PropsItem) => {
+const ItemCat = ({ id, parentId: parentId, name: _name, isCourse, updater, ...setter }: PropsItem) => {
 	const [ isDelete, setDelete ] = useState(false)
 	const [ open, setOpen ] = useState(false)
 	const [ name, setName ] = useState(_name)
@@ -128,7 +103,7 @@ const ItemCat = ({ id, parentId: parentId, name: _name, tasks, isCourse, updater
 				<section>
 					{data?.map(p => (
 						<ItemCat parentId={id} setCat={setter.setCat} updater={updater}
-							setTask={setter.setTask} id={p.id} name={p.name} tasks={p.tasks} />
+							setTask={setter.setTask} id={p.id} name={p.name} />
 					))}
 				</section>
 			}

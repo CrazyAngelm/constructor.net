@@ -2,15 +2,12 @@ export interface CourseDto {
 	id: number
 	name?: string
 	description?: string
-	categories?: number[]
 }
 
 export interface TaskCategoryDto {
 	id: number
 	name?: string
 	description?: string
-	categories?: number[]
-	tasks?: number[]
 }
 export interface CreateCategoryDto {
 	parentId: number,

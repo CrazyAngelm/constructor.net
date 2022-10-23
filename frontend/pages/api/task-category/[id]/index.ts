@@ -21,19 +21,12 @@ handler.get(response(async (req, res) => {
 	const data = await prisma.taskCategory.findUnique({
 		where: { id },
 		include: {
-			CategoryChildren: true,
 			CategoryToTask: true
 		}
-	})
+	}) as TaskCategoryDto
 	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
 
-	const dto: TaskCategoryDto = {
-		...data,
-		categories: data.CategoryChildren.map(p => p.childrenId),
-		tasks: data.CategoryToTask.map(p => p.taskId)
-	}
-
-	return { response: dto }
+	return { response: data }
 })
 )
 

@@ -80,7 +80,7 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 		: data ?
 			<EditorTemplate notification={notification} callbackUpdate={updateAll} error={errorMsg}
 				callbackBack={callbackBack} callbackSave={save} callbackRemove={remove} >
-				<article className={styles.editor}>
+				<article className={`${styles.editor} ${styles.withList}`}>
 					<section className={styles.props}>
 						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
 						{/* <DropdownCheck label='Курсы' isHorizontal callbackChoise={choiseCourses}
