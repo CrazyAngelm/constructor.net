@@ -1,16 +1,19 @@
-import { useFetchData } from '@/lib/hooks/useFetchData'
-import { getCourses, getTaskCategoryById, getTasksByIdCategory, removeTaskCategory, updateTaskCategory } from '@/lib/requests/tasks'
 import { useEffect, useState } from 'react'
-import EditorTemplate, { Notification } from '../EditorTemplate'
+
+import { useFetchData } from '@/lib/hooks/useFetchData'
+import { getCourses, getTaskCategoryById, getTasksByIdCategory,
+	removeTaskCategory, updateTaskCategory } from '@/lib/requests/tasks'
+import { handleErrorTsx } from '@/lib/requests'
+import { changeHanderDtoString as changeHanderDto } from '@/lib/changeHandler'
+
 import styles from '@/styles/adm/editors/TaskCategory.module.scss'
+
+import EditorTemplate, { Notification } from '../EditorTemplate'
 import Field from '@/components/controls/Fields'
 import TextArea from '@/components/controls/TextArea'
 import List from '../../List'
-import { ApiError, handleErrorTsx } from '@/lib/requests'
 import ButtonsList from '../ButtonsList'
-import { changeHanderDtoString as changeHanderDto } from '@/lib/changeHandler'
-import TaskEditor from '../task/TaskEditor'
-import DropdownCheck from '@/components/controls/DropdownCheck'
+import TaskEditor from '../hierarchy/TaskEditor'
 
 
 export interface Props {

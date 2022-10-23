@@ -1,19 +1,19 @@
-import { CourseDto, TaskCategoryDto, TaskDto } from '@/lib/dto/tasks'
-import styles from '@/styles/adm/Content.module.scss'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import CourseEditor from '../course/CourseEditor'
-import TaskEditor from '../task/TaskEditor'
-import TaskCategoriesEditor from '../taskCategories/TaskCategoriesEditor'
-import arrow from '@/assets/back.svg'
-import addFolder from '@/assets/addFolder.png'
-import addFile from '@/assets/addFile.png'
-import moveToTask from '@/assets/moveToFolder.png'
-import menu from '@/assets/menu.png'
-import trash from '@/assets/trash.png'
+
 import { createTaskCategory, getCourseById, getCourses, getTaskCategoriesByIdCategory, getTaskCategoriesByIdCourse, getTaskCategoryById, removeCourse, removeTaskCategory, updateCourse, updateTaskCategory } from '@/lib/requests/tasks'
 import { useFetchData } from '@/lib/hooks/useFetchData'
 import { makeFetcher } from '@/lib/fetchers'
+
+import arrow from '@/assets/back.svg'
+import addFolder from '@/assets/addFolder.png'
+import menu from '@/assets/menu.png'
+import trash from '@/assets/trash.png'
+
+import styles from '@/styles/adm/Content.module.scss'
+import CourseEditor from './CourseEditor'
+import TaskEditor from './TaskEditor'
+import TaskCategoriesEditor from './TaskCategoriesEditor'
 import { WarningDelete } from '../EditorTemplate'
 
 
@@ -174,7 +174,7 @@ class Updater {
 	}
 }
 
-const Course = () => {
+const Hierarchy = () => {
 	const [ courseId, setCourseId ] = useState<number>()
 	const [ categoryId, setCategoryId ] = useState<number>()
 	const [ taskId, setTaskId ] = useState<number>()
@@ -214,4 +214,4 @@ const Course = () => {
 	)
 }
 
-export default Course
+export default Hierarchy

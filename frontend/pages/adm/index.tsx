@@ -23,30 +23,20 @@ const Adm: NextPage = () => {
 		}, {
 			label: 'Контент',
 			items: [ {
-				label: 'Иерархия',
-				callback: () => setType(TypeContent.NewCourse)
-				}, {
-					label: 'Курсы',
-					callback: () => setType(TypeContent.Course),
-					items: [ {
-						label: 'Категории',
-						callback: () => setType(TypeContent.Categories)
-					}, {
-						label: 'Задания',
-						callback: () => setType(TypeContent.Tasks)
-					} ]
-				} ]
-			}
-			] as Categories[]
+				label: 'Курсы',
+				callback: () => setType(TypeContent.HierarchyContent)
+			}, ]
+		}
+	] as Categories[]
 
-	return(
-		<Layout navbar = { false} >
-					<article className={styles.adm}>
-						<Menu categories={categories} />
-						<div className={styles.content}>
-							<Content type={typeContent} />
-						</div>
-					</article>
+	return (
+		<Layout navbar={false} >
+			<article className={styles.adm}>
+				<Menu categories={categories} />
+				<div className={styles.content}>
+					<Content type={typeContent} />
+				</div>
+			</article>
 		</Layout >
 	)
 }

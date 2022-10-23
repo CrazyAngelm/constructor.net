@@ -1,13 +1,19 @@
+import { useState } from 'react'
+
+import { changeHanderDtoString } from '@/lib/changeHandler'
+import { useFetchData } from '@/lib/hooks/useFetchData'
+import { handleErrorTsx } from '@/lib/requests'
+import {
+	getTaskById, getTaskCategories, removeTask,
+	updateTask, uploadTaskImage
+} from '@/lib/requests/tasks'
+
+import styles from '@/styles/adm/editors/Task.module.scss'
+
 import DropdownCheck from '@/components/controls/DropdownCheck'
 import Field from '@/components/controls/Fields'
 import TextArea from '@/components/controls/TextArea'
 import Upload from '@/components/controls/Upload'
-import { changeHanderDtoString } from '@/lib/changeHandler'
-import { useFetchData } from '@/lib/hooks/useFetchData'
-import { ApiError, handleErrorTsx } from '@/lib/requests'
-import { getTaskById, getTaskCategories, getTaskCategoriesByIdTask, removeTask, updateCategoriesForTask, updateTask, uploadTaskImage } from '@/lib/requests/tasks'
-import styles from '@/styles/adm/editors/Task.module.scss'
-import { useEffect, useState } from 'react'
 import EditorTemplate, { Notification } from '../EditorTemplate'
 
 export interface Props {

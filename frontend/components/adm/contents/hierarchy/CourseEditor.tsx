@@ -1,17 +1,18 @@
-import { useFetchData } from '@/lib/hooks/useFetchData'
-import { getCourseById, getTaskCategoriesByIdCourse, getTaskCategoryById, getTasksByIdCategory, removeCourse, removeTaskCategory, updateCourse, updateTaskCategory } from '@/lib/requests/tasks'
 import { useEffect, useState } from 'react'
-import EditorTemplate, { Notification } from '../EditorTemplate'
+
+import { useFetchData } from '@/lib/hooks/useFetchData'
+import { getCourseById, getTaskCategoriesByIdCourse,
+	removeCourse, updateCourse } from '@/lib/requests/tasks'
+import { handleErrorTsx } from '@/lib/requests'
+import { changeHanderDtoString as changeHanderDto } from '@/lib/changeHandler'
+import { CourseDto } from '@/lib/dto/tasks'
+
 import styles from '@/styles/adm/editors/TaskCategory.module.scss'
+
 import Field from '@/components/controls/Fields'
 import TextArea from '@/components/controls/TextArea'
-import List from '../../List'
-import { ApiError, handleErrorTsx } from '@/lib/requests'
-import ButtonsList from '../ButtonsList'
-import { changeHanderDtoString as changeHanderDto } from '@/lib/changeHandler'
-import TaskEditor from '../task/TaskEditor'
-import { CourseDto } from '@/lib/dto/tasks'
-import TaskCategoriesEditor from '../taskCategories/TaskCategoriesEditor'
+import EditorTemplate, { Notification } from '../EditorTemplate'
+import TaskCategoriesEditor from './TaskCategoriesEditor'
 
 
 export interface Props {
@@ -32,7 +33,7 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 
 	useEffect(() => {
 		setCategoryId(() => undefined)
-	},[id])
+	}, [ id ])
 
 	const save = () => {
 		if (!data) {
