@@ -77,7 +77,7 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 						<TextArea onChange={changeHanderDto('description', setData)}
 							isFixedSize label='Описание' value={data.description} />
 					</section>
-					<section className={styles.list}>
+					{/* <section className={styles.list}>
 						{tasks
 							? <List name='Категории'
 								length={tasks.length}
@@ -92,7 +92,7 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 							: errorTask
 						}
 						<ButtonsList callbackCreate={() => setCategoryId(-1)} />
-					</section>
+					</section> */}
 				</article>
 			</EditorTemplate >
 			: <article className={styles.error}>{error}</article>
