@@ -4,7 +4,7 @@ import { changeHanderDtoString } from '@/lib/changeHandler'
 import { useFetchData } from '@/lib/hooks/useFetchData'
 import { handleErrorTsx } from '@/lib/requests'
 import {
-	getTaskById, getTaskCategories, removeTask,
+	getTaskById, getTaskCategories, getTaskCategoryById, removeTask,
 	updateTask, uploadTaskImage
 } from '@/lib/requests/tasks'
 
@@ -15,6 +15,7 @@ import Field from '@/components/controls/Fields'
 import TextArea from '@/components/controls/TextArea'
 import Upload from '@/components/controls/Upload'
 import EditorTemplate, { Notification } from '../EditorTemplate'
+import { makeFetcher } from '@/lib/fetchers'
 
 export interface Props {
 	id: number
@@ -69,6 +70,19 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 			.catch(err => handleErrorTsx(err, setError))
 	}
 
+	const copyDescCategory = () => {
+		if (!categoryId) {
+			setError("Невозможно скопировать из категори описание, родительская категория не назначена")
+			return
+		}
+		makeFetcher(getTaskCategoryById)(categoryId).then(resp =>
+			setData(d => {
+				if (!d) return d
+				d.description = resp.description
+				return { ...d }
+			})
+		)
+	}
 	return <EditorTemplate callbackBack={callbackBack} callbackRemove={remove} notification={notification}
 		callbackSave={save} callbackUpdate={update} error={errorMsg}>
 		{data
@@ -83,6 +97,7 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 							isHorizontal label='Название' type='text' value={data.name} />
 						<TextArea onChange={changeHanderDtoString('description', setData)}
 							label='Описание' value={data.description} />
+						<button onClick={copyDescCategory}>Скопирвать из категории</button>
 						<TextArea onChange={changeHanderDtoString('instruction', setData)}
 							label='Инструкция для ребенка' value={data.instruction} />
 					</section>
