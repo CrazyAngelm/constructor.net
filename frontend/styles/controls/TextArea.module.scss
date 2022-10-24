@@ -10,8 +10,6 @@
 	&.isHorizontal {
 		@extend .is-horizontal;
 	}
-
-	align-items: center;
 	.fieldLabel {
 		flex-grow: 0;
 		@extend .field-label;
