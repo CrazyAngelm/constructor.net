@@ -42,7 +42,7 @@ handler.post(response(async (req, res) => {
 			date: new Date().toISOString()
 		},
 		create: {
-			name: data.name ? data.name : 'Без названия',
+			name: data.name ? data.name : 'Новый курс',
 			description: data.description ? data.description : '',
 			date: new Date().toISOString()
 		}

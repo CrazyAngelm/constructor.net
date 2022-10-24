@@ -20,7 +20,7 @@ handler.post(response(async (req, res) => {
 
 	const upset = await prisma.taskCategory.create({
 		data: {
-			name: "Без названия",
+			name: "Новая папка",
 			description: "",
 			date: new Date().toISOString()
 		}

@@ -52,7 +52,7 @@ handler.post(response(async (req, res) => {
 			date: new Date().toISOString()
 		},
 		create: {
-			name: data.name ? data.name : 'Без названия',
+			name: data.name ? data.name : 'Новое задание',
 			description: data.description ? data.description : '',
 			instruction: data.instruction ? data.instruction : '',
 			image: '',
