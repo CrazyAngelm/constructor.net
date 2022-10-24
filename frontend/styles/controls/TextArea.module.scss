@@ -3,12 +3,17 @@
 
 .textArea {
 	@extend .field;
+
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
 	&.isHorizontal {
 		@extend .is-horizontal;
 	}
 
 	align-items: center;
 	.fieldLabel {
+		flex-grow: 0;
 		@extend .field-label;
 		> label {
 			text-align: start;
@@ -22,12 +27,13 @@
 			@extend .field;
 			@extend .control;
 			> textarea {
+				height: 100%;
 				@extend .textarea;
 			}
 			.static {
 				@extend .is-static;
 			}
-			.fixed{
+			.fixed {
 				@extend .has-fixed-size;
 			}
 		}

@@ -75,8 +75,8 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
 						<Field onChange={changeHanderDto('name', setData)}
 							isHorizontal label='Название' type='text' value={data.name} />
-						<TextArea onChange={changeHanderDto('description', setData)}
-							isFixedSize label='Описание' value={data.description} />
+						<TextArea className={styles.description} onChange={changeHanderDto('description', setData)}
+							 label='Описание' value={data.description} />
 					</section>
 					{/* <section className={styles.list}>
 						{tasks

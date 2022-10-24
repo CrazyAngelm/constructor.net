@@ -91,8 +91,8 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 							value={courses?.map(p => data.courses?.find(c => c === p.id) ? true : false)} /> */}
 						<Field onChange={changeHanderDto('name', setData)}
 							isHorizontal label='Название' type='text' value={data.name} />
-						<TextArea onChange={changeHanderDto('description', setData)}
-							isFixedSize label='Описание' value={data.description} />
+						<TextArea className={styles.description} onChange={changeHanderDto('description', setData)}
+							label='Описание' value={data.description} />
 					</section>
 					<section className={styles.list}>
 						{tasks

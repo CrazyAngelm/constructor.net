@@ -1,6 +1,7 @@
 import styles from '@/styles/controls/TextArea.module.scss'
 
 export interface Props {
+	className?:string
 	label?: string
 	value?: string
 	placeholder?: string
@@ -9,9 +10,9 @@ export interface Props {
 	isFixedSize?: boolean
 }
 
-const TextArea = ({ label, value, placeholder, onChange, isReadonly, isFixedSize }: Props) => {
+const TextArea = ({className, label, value, placeholder, onChange, isReadonly, isFixedSize }: Props) => {
 	return (
-		<section className={styles.textArea}>
+		<section className={`${className} ${styles.textArea}`}>
 			<div className={styles.fieldLabel}>
 				<label>{label}</label>
 			</div>

@@ -82,9 +82,9 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 						<Field onChange={changeHanderDtoString('name', setData)}
 							isHorizontal label='Название' type='text' value={data.name} />
 						<TextArea onChange={changeHanderDtoString('description', setData)}
-							isFixedSize label='Описание' value={data.description} />
+							label='Описание' value={data.description} />
 						<TextArea onChange={changeHanderDtoString('instruction', setData)}
-							isFixedSize label='Инструкция для ребенка' value={data.instruction} />
+							label='Инструкция для ребенка' value={data.instruction} />
 					</section>
 					<section className={styles.image}>
 						<Upload keyChange={id.toString()} preview value={data.image} onChange={p => setFormData(p)} />
