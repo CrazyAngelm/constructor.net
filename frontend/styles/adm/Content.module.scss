@@ -1,6 +1,11 @@
 @import "bulma/sass/utilities/_all.sass";
 @import "bulma/sass/elements/_all.sass";
 
+.uninteractable {
+	outline: none;
+	pointer-events: none;
+}
+
 .createCourse {
 	cursor: pointer;
 	background-color: black;
@@ -77,6 +82,7 @@
 		> span {
 			padding: 0 0.5vw;
 			cursor: pointer;
+			max-width: 10em;
 			&:hover {
 				outline: auto;
 			}

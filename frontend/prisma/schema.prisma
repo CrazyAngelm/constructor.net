@@ -129,3 +129,22 @@ model CategoryToCategory {
 
     @@id([parentId, childrenId])
 }
+
+model Manual {
+    id   Int    @id @default(autoincrement())
+    name String
+    html String @db.LongText
+
+    Parent   ManualToManula[] @relation(name: "manualchildren")
+    Children ManualToManula[] @relation(name: "manualParent")
+}
+
+model ManualToManula {
+    parentId   Int
+    childrenId Int
+
+    parent   Manual @relation(name: "manualParent", fields: [parentId], references: [id], onDelete: Cascade)
+    children Manual @relation(name: "manualchildren", fields: [childrenId], references: [id], onDelete: Cascade)
+
+    @@id([parentId, childrenId])
+}

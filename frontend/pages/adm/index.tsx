@@ -25,7 +25,10 @@ const Adm: NextPage = () => {
 			items: [ {
 				label: 'Курсы',
 				callback: () => setType(TypeContent.HierarchyContent)
-			}, ]
+			}, {
+					label: 'Методички',
+					callback: () => setType(TypeContent.Manual)
+				} ]
 		}
 	] as Categories[]
 
