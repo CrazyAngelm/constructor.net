@@ -73,7 +73,7 @@ model ScopeJoin {
 model Course {
     id               Int                @id @default(autoincrement())
     name             String
-    description      String
+    description      String             @db.LongText
     date             DateTime?
     taskCategories   TaskCategory[]
     CourseToCategory CourseToCategory[]
@@ -82,7 +82,7 @@ model Course {
 model TaskCategory {
     id               Int                  @id @default(autoincrement())
     name             String
-    description      String
+    description      String               @db.LongText
     date             DateTime?
     tasks            Task[]
     Course           Course[]
@@ -104,8 +104,8 @@ model CourseToCategory {
 model Task {
     id             Int              @id @default(autoincrement())
     name           String
-    description    String
-    instruction    String
+    description    String           @db.LongText
+    instruction    String           @db.LongText
     image          String
     date           DateTime?
     TaskCategory   TaskCategory[]
