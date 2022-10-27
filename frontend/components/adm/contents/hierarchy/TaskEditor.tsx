@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { changeHanderDtoString } from '@/lib/changeHandler'
+import { changeHanderDtoNumber, changeHanderDtoString } from '@/lib/changeHandler'
 import { useFetchData } from '@/lib/hooks/useFetchData'
 import { handleErrorTsx } from '@/lib/requests'
 import {
@@ -16,6 +16,7 @@ import TextArea from '@/components/controls/TextArea'
 import Upload from '@/components/controls/Upload'
 import EditorTemplate, { Notification } from '../EditorTemplate'
 import { makeFetcher } from '@/lib/fetchers'
+import FieldNumber from '@/components/controls/FieldsNumber'
 
 export interface Props {
 	id: number
@@ -36,7 +37,7 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 			? { id: -1, name: 'Без названия', description: '', categories: categoryId ? [ categoryId ] : [] }
 			: undefined)
 
-	console.log(id, categoryId)
+	console.log(data)
 
 	const setChoiseCategory = (values: boolean[]) => {
 		setData(data => {
@@ -93,6 +94,8 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 
 						<Field onChange={changeHanderDtoString('name', setData)}
 							isHorizontal label='Название' type='text' value={data.name} />
+						<FieldNumber onChange={changeHanderDtoNumber('complexity', setData)}
+							isHorizontal label='Сложность' value={data.complexity} />
 						<TextArea onChange={changeHanderDtoString('description', setData)}
 							label='Описание' value={data.description} />
 						<button onClick={copyDescCategory}>Скопирвать из категории</button>

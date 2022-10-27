@@ -21,6 +21,7 @@ export interface TaskDto {
 	description?: string
 	instruction?: string
 	image?: string
+	complexity?: number
 }
 
 export interface RequestIds {

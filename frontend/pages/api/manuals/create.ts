@@ -18,7 +18,8 @@ handler.post(response(async (req, res) => {
 	const created = await prisma.manual.create({
 		data: {
 			name: "New Manual",
-			html: "<h1>New Manual</h1>"
+			html: "<h1>New Manual</h1>",
+			date: new Date().toISOString()
 		}
 	})
 

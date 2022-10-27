@@ -12,6 +12,18 @@ export const changeHanderDtoString = <T>(field: keyof T, setter: Dispatch<SetSta
 	}
 }
 
+export const changeHanderDtoNumber = <T>(field: keyof T, setter: Dispatch<SetStateAction<T | undefined>>)
+	: ((value: number) => void) => {
+	return v => {
+		setter(data => {
+			if (!data) data = {} as T
+			const obj: any = data
+			obj[ field ] = v
+			return { ...obj }
+		})
+	}
+}
+
 export const onChangeDto = <T>(field: keyof T, setter: Dispatch<SetStateAction<T | undefined>>)
 	: ((ev: ChangeEvent<HTMLInputElement>) => void) => {
 	return ev => {

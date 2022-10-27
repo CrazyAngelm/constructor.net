@@ -107,6 +107,7 @@ model Task {
     description    String           @db.LongText
     instruction    String           @db.LongText
     image          String
+    complexity     Int              @default(1)
     date           DateTime?
     TaskCategory   TaskCategory[]
     CategoryToTask CategoryToTask[]
@@ -131,9 +132,10 @@ model CategoryToCategory {
 }
 
 model Manual {
-    id   Int    @id @default(autoincrement())
+    id   Int       @id @default(autoincrement())
     name String
-    html String @db.LongText
+    html String    @db.LongText
+    date DateTime?
 
     Parent   ManualToManula[] @relation(name: "manualchildren")
     Children ManualToManula[] @relation(name: "manualParent")

@@ -36,7 +36,8 @@ handler.post(response(async (req, res) => {
 		where: { id },
 		data: {
 			name: data.name,
-			html: data.html
+			html: data.html,
+			date: new Date().toISOString()
 		}
 	})
 

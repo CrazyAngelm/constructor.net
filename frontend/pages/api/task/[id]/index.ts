@@ -28,6 +28,8 @@ handler.get(response(async (req, res) => {
 		}
 	})
 
+	console.log(task)
+
 	if (!task) return { error: { code: 400, message: 'Записи не существует' } }
 
 	const dto = task as TaskDto
@@ -49,13 +51,15 @@ handler.post(response(async (req, res) => {
 			name: data.name,
 			description: data.description,
 			instruction: data.instruction,
-			date: new Date().toISOString()
+			date: new Date().toISOString(),
+			complexity: data.complexity
 		},
 		create: {
 			name: data.name ? data.name : 'Новое задание',
 			description: data.description ? data.description : '',
 			instruction: data.instruction ? data.instruction : '',
 			image: '',
+			complexity: data.complexity,
 			date: new Date().toISOString()
 		}
 	})
