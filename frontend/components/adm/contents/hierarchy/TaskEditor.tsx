@@ -90,9 +90,7 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 				<section className={styles.row}>
 					<section>
 						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
-						<DropdownCheck label='Категории' isHorizontal callbackChoise={setChoiseCategory}
-							list={categories?.map(p => p.name as string)}
-							value={categories?.map(p => data.categories?.find(c => c === p.id) ? true : false)} />
+
 						<Field onChange={changeHanderDtoString('name', setData)}
 							isHorizontal label='Название' type='text' value={data.name} />
 						<TextArea onChange={changeHanderDtoString('description', setData)}
