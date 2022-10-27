@@ -53,7 +53,6 @@ const EditorTemplate = ({ children, error, notification, ...callbacks }: Props) 
 	return (
 		<article className={styles.editor}>
 			<div onClick={callbacks.callbackBack} className={`${callbacks.callbackBack ? styles.back : styles.hide}`}>
-				<Image src={back} layout='fill' objectFit='contain' />
 			</div>
 			{modal && <WarningDelete callbackRemove={callbacks.callbackRemove} cancel={() => setModal(false)} />}
 			<section className={styles.individualEditor}>

@@ -209,7 +209,7 @@ const Hierarchy = () => {
 				{(categoryId != undefined && taskId == undefined) && <TaskCategoriesEditor id={categoryId}
 					callbackUpdate={() => updater.update(categoryId)}
 					callbackSelectTask={selectTask}/>}
-				{taskId != undefined && <TaskEditor id={taskId}
+				{taskId != undefined && <TaskEditor id={taskId} categoryId={categoryId}
 					 callbackBack={() => setTaskId(undefined)}/>}
 			</section>
 		</article>
