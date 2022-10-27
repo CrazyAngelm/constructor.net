@@ -193,7 +193,6 @@ const Hierarchy = () => {
 	}
 	const selectTask = (id: number) => {
 		setTaskId(() => id)
-		setCategoryId(() => undefined)
 		setCourseId(() => undefined)
 	}
 
@@ -207,8 +206,11 @@ const Hierarchy = () => {
 			</section>
 			<section className={styles.editor}>
 				{courseId != undefined && <CourseEditor id={courseId} callbackUpdate={() => updater.update(courseId)} />}
-				{categoryId != undefined && <TaskCategoriesEditor id={categoryId} callbackUpdate={() => updater.update(categoryId)} />}
-				{taskId != undefined && <TaskEditor id={taskId} />}
+				{(categoryId != undefined && taskId == undefined) && <TaskCategoriesEditor id={categoryId}
+					callbackUpdate={() => updater.update(categoryId)}
+					callbackSelectTask={selectTask}/>}
+				{taskId != undefined && <TaskEditor id={taskId}
+					 callbackBack={() => setTaskId(undefined)}/>}
 			</section>
 		</article>
 	)

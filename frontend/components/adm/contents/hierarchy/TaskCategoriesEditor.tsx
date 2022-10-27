@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import { useFetchData } from '@/lib/hooks/useFetchData'
-import { getCourses, getTaskCategoryById, getTasksByIdCategory,
-	removeTaskCategory, updateTaskCategory } from '@/lib/requests/tasks'
+import {
+	getCourses, getTaskCategoryById, getTasksByIdCategory,
+	removeTaskCategory, updateTask, updateTaskCategory
+} from '@/lib/requests/tasks'
 import { handleErrorTsx } from '@/lib/requests'
 import { changeHanderDtoString as changeHanderDto } from '@/lib/changeHandler'
 
@@ -14,6 +16,7 @@ import TextArea from '@/components/controls/TextArea'
 import List from '../../List'
 import ButtonsList from '../ButtonsList'
 import TaskEditor from '../hierarchy/TaskEditor'
+import { TaskDto } from '@/lib/dto/tasks'
 
 
 export interface Props {
@@ -21,12 +24,12 @@ export interface Props {
 	courseId?: number
 	callbackUpdate?: () => void
 	callbackBack?: () => void
+	callbackSelectTask?: (id: number) => void
 }
 
-const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Props) => {
+const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack, callbackSelectTask }: Props) => {
 	const [ errorMsg, setError ] = useState<string | undefined>('')
 	const [ notification, setNotification ] = useState<Notification>()
-	const [ taskId, setTaskId ] = useState<number>()
 
 	const { data, update, setData, error } = useFetchData(id, getTaskCategoryById,
 		id === -1
@@ -36,10 +39,6 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 	const { data: tasks, update: updateTasks, error: errorTask } = useFetchData(id, getTasksByIdCategory)
 
 	const { data: courses } = useFetchData({}, getCourses)
-
-	useEffect(() => {
-		setTaskId(() => undefined)
-	}, [ id ])
 
 	const choiseCourses = (values: boolean[]) => {
 		setData(data => {
@@ -76,43 +75,44 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack }: Pr
 		updateTasks()
 	}
 
-	return (taskId ? <TaskEditor callbackBack={() => {
-		setTaskId(undefined)
-		updateAll()
-	}} categoryId={data?.id} id={taskId} />
-		: data ?
-			<EditorTemplate notification={notification} callbackUpdate={updateAll} error={errorMsg}
-				callbackBack={callbackBack} callbackSave={save} callbackRemove={remove} >
-				<article className={`${styles.editor} ${styles.withList}`}>
-					<section className={styles.props}>
-						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
-						{/* <DropdownCheck label='Курсы' isHorizontal callbackChoise={choiseCourses}
-							list={courses?.map(p => p.name as string)}
-							value={courses?.map(p => data.courses?.find(c => c === p.id) ? true : false)} /> */}
-						<Field onChange={changeHanderDto('name', setData)}
-							isHorizontal label='Название' type='text' value={data.name} />
-						<TextArea className={styles.description} onChange={changeHanderDto('description', setData)}
-							label='Описание' value={data.description} />
-					</section>
-					<section className={styles.list}>
-						{tasks
-							? <List name='Задания'
-								length={tasks.length}
-								rows={[ {
-									header: 'id',
-									value: i => tasks[ i ]?.id.toString() as string,
-								}, {
-									header: 'Название',
-									value: i => tasks[ i ]?.name as string
-								} ]}
-								callback={i => setTaskId(tasks[ i ]?.id)} />
-							: errorTask
-						}
-						<ButtonsList callbackCreate={() => setTaskId(-1)} />
-					</section>
-				</article>
-			</EditorTemplate >
-			: <article className={styles.error}>{error}</article>
+	const setTaskId = (id?: number) => {
+		callbackSelectTask && callbackSelectTask(id ? id : -1)
+	}
+
+	const createTask = () => {
+		updateTask(-1, { id: -1, categories: [ id ] } as TaskDto).then(p => setTaskId(p.id))
+	}
+
+	return (data ?
+		<EditorTemplate notification={notification} callbackUpdate={updateAll} error={errorMsg}
+			callbackBack={callbackBack} callbackSave={save} callbackRemove={remove} >
+			<article className={`${styles.editor} ${styles.withList}`}>
+				<section className={styles.props}>
+					<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
+					<Field onChange={changeHanderDto('name', setData)}
+						isHorizontal label='Название' type='text' value={data.name} />
+					<TextArea className={styles.description} onChange={changeHanderDto('description', setData)}
+						label='Описание' value={data.description} />
+				</section>
+				<section className={styles.list}>
+					{tasks
+						? <List name='Задания'
+							length={tasks.length}
+							rows={[ {
+								header: 'id',
+								value: i => tasks[ i ]?.id.toString() as string,
+							}, {
+								header: 'Название',
+								value: i => tasks[ i ]?.name as string
+							} ]}
+							callback={i => setTaskId(tasks[ i ]?.id)} />
+						: errorTask
+					}
+					<ButtonsList callbackCreate={createTask} />
+				</section>
+			</article>
+		</EditorTemplate >
+		: <article className={styles.error}>{error}</article>
 	)
 }
 
