@@ -6,7 +6,7 @@ export const getVersions: RequestWithContext<unknown, Version[]> = async (
 	_?: unknown,
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<Version[]> => {
-	const res = await fetch(apiUrl + '/versions')
+	const res = await fetch(apiUrl + '/versions/all')
 	handleNonOk(res)
 	const json = await res.json()
 
