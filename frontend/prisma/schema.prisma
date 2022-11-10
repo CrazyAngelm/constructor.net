@@ -150,3 +150,11 @@ model ManualToManula {
 
     @@id([parentId, childrenId])
 }
+
+model Version {
+    id      String @id @default(uuid())
+    name    String
+    type    String
+    notes   String
+    archive String
+}

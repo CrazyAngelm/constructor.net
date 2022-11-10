@@ -5,11 +5,13 @@ import styles from '@/styles/adm/Content.module.scss'
 import Hierarchy from './contents/hierarchy/Hierarchy'
 import UserContent from './contents/user/UserContent'
 import Manual from './contents/mauals/Manual'
+import Versions from './contents/versions/Versions'
 
 export enum TypeContent {
 	HierarchyContent,
 	Users,
-	Manual
+	Manual,
+	Versions
 }
 
 export interface Props {
@@ -21,6 +23,7 @@ const getContent = (type?: TypeContent): ReactNode => {
 		case TypeContent.Users: return <UserContent />
 		case TypeContent.HierarchyContent: return <Hierarchy />
 		case TypeContent.Manual: return <Manual />
+		case TypeContent.Versions: return <Versions />
 		default: return null
 	}
 }
