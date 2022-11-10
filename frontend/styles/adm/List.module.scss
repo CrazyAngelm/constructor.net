@@ -4,7 +4,7 @@
 @import "../lib/variables.scss";
 
 .list {
-	width: fit-content;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	height: 1px;
@@ -46,9 +46,7 @@
 	}
 	.content {
 		flex: 1 1 auto;
+		width: 100%;
 		overflow-y: scroll;
-		&::-webkit-scrollbar {
-			display: none;
-		}
 	}
 }
