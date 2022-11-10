@@ -24,6 +24,7 @@ handler.get(response(async (req, res) => {
 		where: { id },
 		include: {
 			CategoryParent: {
+				where: { children: { deleted: false } },
 				include: { children: true }
 			}
 		}

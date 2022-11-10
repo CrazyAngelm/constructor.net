@@ -23,6 +23,9 @@ handler.get(response(async (req, res) => {
 		where: { id },
 		include: {
 			CategoryToTask: {
+				where: {
+					task: { deleted: false },
+				},
 				include: {
 					task: true
 				}

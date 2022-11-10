@@ -21,7 +21,9 @@ handler.get(response(async (req, res) => {
 	const data = await prisma.taskCategory.findUnique({
 		where: { id },
 		include: {
-			CategoryToTask: true
+			CategoryToTask: {
+				where: { task: { deleted: false } },
+			}
 		}
 	}) as TaskCategoryDto
 	if (!data) return { error: { code: 400, message: 'Записи не существует' } }

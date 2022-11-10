@@ -12,8 +12,9 @@ const handler = getDefaultHandler()
 //obsolete
 handler.get(response(async () => {
 	const data = await prisma.taskCategory.findMany({
+		where: { deleted: false },
 		include: {
-			CategoryChildren:true
+			CategoryChildren: true
 		}
 	})
 

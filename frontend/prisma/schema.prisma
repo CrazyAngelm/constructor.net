@@ -75,6 +75,7 @@ model Course {
     name             String
     description      String             @db.LongText
     date             DateTime?
+    deleted          Boolean            @default(false)
     taskCategories   TaskCategory[]
     CourseToCategory CourseToCategory[]
 }
@@ -84,6 +85,7 @@ model TaskCategory {
     name             String
     description      String               @db.LongText
     date             DateTime?
+    deleted          Boolean              @default(false)
     tasks            Task[]
     Course           Course[]
     CourseToCategory CourseToCategory[]
@@ -109,6 +111,7 @@ model Task {
     image          String
     complexity     Int              @default(1)
     date           DateTime?
+    deleted        Boolean          @default(false)
     TaskCategory   TaskCategory[]
     CategoryToTask CategoryToTask[]
 }
@@ -132,11 +135,11 @@ model CategoryToCategory {
 }
 
 model Manual {
-    id   Int       @id @default(autoincrement())
-    name String
-    html String    @db.LongText
-    date DateTime?
-
+    id       Int              @id @default(autoincrement())
+    name     String
+    html     String           @db.LongText
+    date     DateTime?
+    deleted  Boolean          @default(false)
     Parent   ManualToManula[] @relation(name: "manualchildren")
     Children ManualToManula[] @relation(name: "manualParent")
 }

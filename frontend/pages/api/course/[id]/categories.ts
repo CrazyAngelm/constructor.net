@@ -24,6 +24,11 @@ handler.get(response(async (req, res) => {
 		where: { id },
 		include: {
 			CourseToCategory: {
+				where: {
+					category: {
+						deleted: false
+					}
+				},
 				include: {
 					category: true
 				}

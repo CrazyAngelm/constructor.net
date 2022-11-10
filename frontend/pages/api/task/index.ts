@@ -9,7 +9,7 @@ const prisma = usePrisma()
 const handler = getDefaultHandler()
 
 handler.get(response(async () => {
-	const tasks = await prisma.task.findMany()
+	const tasks = await prisma.task.findMany({ where: { deleted: false } })
 
 	return { response: tasks }
 })

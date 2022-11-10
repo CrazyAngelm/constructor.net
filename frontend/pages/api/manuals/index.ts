@@ -8,7 +8,7 @@ const prisma = usePrisma()
 const handler = getDefaultHandler()
 
 handler.get(response(async () => {
-	const data = await prisma.manual.findMany() as Manual[]
+	const data = await prisma.manual.findMany({ where: { deleted: false } }) as Manual[]
 
 	return { response: data }
 })

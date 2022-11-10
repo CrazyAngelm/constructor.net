@@ -12,6 +12,7 @@ const handler = getDefaultHandler()
 
 handler.get(response(async () => {
 	const data = await prisma.course.findMany({
+		where: { deleted: false },
 		include: {
 			CourseToCategory: {
 				select: {

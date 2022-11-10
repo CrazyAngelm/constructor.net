@@ -24,13 +24,24 @@ handler.get(response(async (req, res) => {
 			where: { id },
 			include: {
 				Children: {
-					include: { children: true }
+					where: {
+						children: {
+							deleted: false
+						}
+					},
+					include: {
+						children: true
+					}
 				}
 			}
 		}))?.Children.map(p => p.children as Manual) as Manual[]
 		: (await prisma.manual.findMany({
 			where: {
-				Parent: undefined
+				AND: {
+					Parent: undefined,
+					deleted: false
+				}
+
 			}
 		})) as Manual[]
 
