@@ -20,11 +20,11 @@ handler.post(response(async (req, res) => {
         }
     })
 
-    if (!user) return { error: { code: 422, message: "Неверный логин или пароль" } }
+    if (!user) return { error: { code: 422, message: "Invalid password or email" } }
 
     const checkPassword = await compare(password, user.password ?? "")
 
-    if (!checkPassword) return { error: { code: 422, message: "Неверный логин или пароль" } }
+    if (!checkPassword) return { error: { code: 422, message: "Invalid password or email" } }
 
     return { response: user }
 }))
