@@ -12,7 +12,7 @@ const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
     const { email, password } = req.body
 
-    if (!email || !password) return { error: { code: 422, message: "email or password not found" } }
+    if (!email || !password) return { error: { code: 422, message: "email or password not found"+JSON.stringify(req.body) } }
 
     const user = await prisma.user.findUnique({
         where: {
