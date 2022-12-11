@@ -10,6 +10,6 @@ export const getRegistrationHtml = (token:string) => {
 			token
 		}
 	})
-	html = html.replace(/$link$/g, link)
+	html = html.replace(/\$link\$/g, link)
 	return html
 }
