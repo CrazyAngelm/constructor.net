@@ -1,0 +1,15 @@
+.faq{
+	margin: 0 10vw;
+	>header{
+		font-size: 2.2em;
+		font-weight: 600;
+		margin-bottom: 3vh;
+	}
+	>section{
+		display: flex;
+		flex-direction: column;
+		>hr{
+			border-bottom: solid 1px;
+		}
+	}
+}

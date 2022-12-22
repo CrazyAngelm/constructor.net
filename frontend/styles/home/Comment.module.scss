@@ -1,0 +1,40 @@
+.comment {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	margin: 0 20vw;
+	gap: 2vw;
+	> .text {
+		>div{
+			color: #5D6AFB;
+			margin-bottom: 1rem;
+		}
+		>header{
+			font-size: 1.6em;
+			font-weight: 500;
+			margin-bottom: 1rem;
+		}
+	}
+	> .autor {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		> div {
+			background-position: center;
+			background-size: cover;
+
+			border-radius: 100vw;
+			width: 17vw;
+			height: 17vw;
+			margin-bottom: 1rem;
+		}
+		> header {
+			font-size: 1.3;
+			font-weight: 600;
+		}
+		> p {
+			font-size: 0.8em;
+			color: #909090;
+		}
+	}
+}

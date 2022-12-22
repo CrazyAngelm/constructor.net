@@ -1,11 +1,64 @@
-.tarifs{
-	display: flex;
-    flex-direction: row;
-    width: 100vw;
-    gap: 5%;
-    overflow: scroll;
-    padding: 10%;
-    justify-content: flex-start;
-    align-items: center;
-    flex-wrap: nowrap;
+@import "../lib/variables.scss";
+@import "../lib/bulma.scss";
+
+.tarifs {
+	position: relative;
+	.cards {
+		display: flex;
+		flex-direction: row;
+		width: 100vw;
+		gap: 5%;
+		overflow: none;
+		padding: 10%;
+		justify-content: flex-start;
+		align-items: center;
+		flex-wrap: nowrap;
+		> .background {
+			background: rgba(255, 214, 0, 0.1);
+			filter: blur(100px);
+			width: 100vw;
+			height: 100vh;
+			position: absolute;
+			bottom: -1vh;
+			right: 0;
+			border-radius: 100rem 100rem 0 0;
+			z-index: -1;
+		}
+	}
+	.free {
+		background-color: $black-color;
+		color: $white-color;
+		padding: 8.3vh 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		> header {
+			font-size: 3.4em;
+		}
+		> p {
+			width: 40vw;
+			text-align: center;
+		}
+		> button {
+			@extend .button;
+			color: $white-color;
+			border-radius: 0.63vw;
+			padding: 1.5rem 2rem;
+
+			background: rgba(251, 123, 161, 1);
+			background: -moz-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			background: -webkit-gradient(
+				left top,
+				right top,
+				color-stop(0%, rgba(251, 123, 161, 1)),
+				color-stop(100%, rgba(252, 224, 67, 1))
+			);
+			background: -webkit-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			background: -o-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			background: -ms-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			background: linear-gradient(to right, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fb7ba1', endColorstr='#fce043', GradientType=1 );
+		}
+	}
 }

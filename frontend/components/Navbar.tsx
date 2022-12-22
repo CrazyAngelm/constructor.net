@@ -41,12 +41,6 @@ const Navbar = () => {
 					{!(session && session != 'loading')
 						? <div>
 							<div className={styles.buttons}>
-								<SignUp button={
-									<button className={`${styles.sign} ${styles.button}`}>
-										Регистрация
-									</button>
-								} />
-
 								<SignIn button={
 									<button className={`${styles.log} ${styles.button}`}>
 										Войти

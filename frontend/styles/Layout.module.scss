@@ -1,8 +1,10 @@
 @import "./lib/bulma.scss";
+@import "./lib/variables.scss";
 
 .root {
 	//Тут будут перечисления всех стилей стандартных
-
+	min-height: 100vh;
+	position: relative;
 	.content {
 		&.isNavbar {
 			margin-top: $navbar-height;
@@ -17,11 +19,53 @@
 	}
 	label {
 		@extend .label;
-		&:not(:last-child){
+		&:not(:last-child) {
 			margin-bottom: 0;
 		}
 	}
 	table {
 		@extend .table;
+	}
+	.footer {
+		position: relative;
+		bottom: 0;
+		height: 20vh;
+		padding: 0;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		font-size: 1.2em;
+		.info {
+			background: $yellow-gradient;
+			padding: 3vh 10vw;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			> header {
+				display: flex;
+				flex-direction: row;
+				font-size: 1.4em;
+				font-weight: 600;
+				align-items: center;
+				gap: 1vw;
+				> div {
+					position: relative;
+					height: 3rem;
+					width: 3rem;
+				}
+			}
+			> section {
+				>header{
+					font-weight: 600;
+					margin-bottom: 1vh;
+				}
+				grid-row: 2;
+				display: flex;
+				flex-direction: column;
+			}
+		}
+		.other {
+			background-color: $black-color;
+			color: white;
+			padding: 1vh 5vw;
+		}
 	}
 }

@@ -1,0 +1,107 @@
+@import "../lib/variables.scss";
+
+.about {
+	position: relative;
+
+	.background {
+		background: rgba(255, 214, 0, 0.3);
+		filter: blur(100px);
+		width: 100vw;
+		height: 110vw;
+		right: -20vw;
+		top: -85vw;
+		position: absolute;
+		transform: rotate(24deg) scale(1, 1.2);
+		z-index: -2;
+	}
+	.grid {
+		display: grid;
+		height: 80vh;
+		grid-template-columns: 1fr 1fr 2fr;
+		grid-template-rows: 2fr 1fr;
+		margin: 15vh 10vw;
+		div {
+			margin: 2vh;
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-position: center;
+			border-radius: 3vh;
+		}
+		.cardImage1 {
+			background-image: url("../../assets/home/about/image 4.png");
+			grid-column: span 2/3;
+		}
+		.cardImage2 {
+			background-image: url("../../assets/home/about/image 5.png");
+			grid-row: 2;
+			grid-column: 1;
+		}
+		.cardImage3 {
+			background-image: url("../../assets/home/about/image 6.png");
+			grid-column: 2;
+		}
+		.cardAbout {
+			background: $green-gradient;
+			grid-row: span 2/3;
+			grid-column: 3;
+			padding: 0 3vw;
+			color: $white-color;
+			> header {
+				font-size: 2.1em;
+				text-align: center;
+				margin: 2vh 0;
+			}
+		}
+	}
+
+	.blocks {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		margin: 15vh 10vw;
+		gap: 3vw;
+		> section {
+			display: flex;
+			flex-direction: column;
+			> div {
+				background: linear-gradient(rgb(255, 255, 255) 0 0) padding-box, $yellow-gradient border-box;
+				color: #313149;
+				padding: 2rem 3rem;
+				border: 0.1rem solid transparent;
+				border-radius: 1rem;
+				display: inline-block;
+				margin: 2rem 0;
+
+				> header {
+					font-size: 1.3em;
+					font-weight: 600;
+					margin-bottom: 1rem;
+				}
+			}
+			.block1 {
+				margin-right: 7vw;
+			}
+		}
+		.left {
+			margin-top: 5vh;
+		}
+		.right {
+			margin-top: -5vh;
+		}
+	}
+	.gallery {
+		background-color: $black-color;
+		color: $white-color;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		padding: 5.5vh 12.5vw;
+		gap: 2vh 5vw;
+		> header {
+			font-size: 1.5em;
+		}
+		> section {
+			grid-row: 2;
+			grid-column: span 2;
+		}
+	}
+}

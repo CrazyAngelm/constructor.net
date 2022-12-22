@@ -4,6 +4,8 @@ import Head from 'next/head'
 import styles from '@/styles/Layout.module.scss'
 
 import Navbar from './Navbar'
+import logo from '@/assets/logo.png'
+import Image from 'next/image'
 
 
 export interface Props {
@@ -24,6 +26,31 @@ const Layout = ({ children, title, navbar = true }: Props) => {
 			<article className={`${styles.content} ${navbar ?? styles.isNavbar}`}>
 				{children}
 			</article>
+			<section className={styles.footer}>
+				<section className={styles.info}>
+					<header>
+						<div>
+							<Image src={logo} layout='fill' objectFit='contain' />
+						</div>
+						Lab Studio
+					</header>
+					<section>
+						<header>Адресс</header>
+						<div>city Nizhny novgorod</div>
+						<div>bestlaboratory@mail.ru</div>
+						<div>+7 922 333 4455</div>
+					</section>
+					<section>
+						<header>Соц сети</header>
+						<a>Telegramm</a>
+						<a>Vk</a>
+						<a>Instagramm</a>
+					</section>
+				</section>
+				<section className={styles.other}>
+					Любая доп инфа, если нужно, донат, обратная связь и тд
+				</section>
+			</section>
 		</div>
 	)
 }

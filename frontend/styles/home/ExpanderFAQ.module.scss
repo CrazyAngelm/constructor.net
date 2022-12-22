@@ -1,0 +1,40 @@
+.expander {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	justify-content: space-between;
+	> header {
+		font-size: 1.3em;
+		font-weight: 700;
+		width: 30vw;
+	}
+	> section {
+		width: 40vw;
+		align-self: flex-start;
+		overflow: hidden;
+		transition-property: height;
+		transition-duration: 0.2s;
+		&.hide{
+			height: 0;
+		}
+	}
+	> .arrow {
+		transform: rotate(45deg) translate(0, 0.5em);
+		width: 1em;
+		height: 1em;
+		cursor: pointer;
+		&:hover{
+			opacity: 0.8;
+		}
+		&.expand {
+			transform: rotate(225deg) translate(0, -0.5em);
+		}
+		> div {
+			border-style: none solid solid none;
+			width: 1em;
+			height: 1em;
+			margin-bottom: 0.5vw;
+			border-width: 0.2vw;
+		}
+	}
+}

@@ -1,6 +1,9 @@
+@import '../lib/bulma.scss';
+
 .cardTarifs {
 	background: #fff;
 	width: 25vw;
+	padding-bottom: 3%;
 
 	> header {
 		width: 100%;
@@ -23,18 +26,19 @@
 		}
 
 		> p {
-			font-size: 0.8em;
+			font-size: 1em;
 			&.description {
 				margin-top: 1.33vh;
 			}
 
 			&.price {
-				line-height: 4vh;
-				font-size: 1em;
+				font-size: 1.2em;
+				font-weight: 600;
 			}
 		}
 
 		> button {
+			@extend .button;
 			color: white;
 			display: block;
 			text-decoration: none;
@@ -51,7 +55,7 @@
 			background: -ms-linear-gradient(left, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
 			background: linear-gradient(to right, rgba(251, 123, 161, 1) 0%, rgba(252, 224, 67, 1) 100%);
 			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fb7ba1', endColorstr='#fce043', GradientType=1 );
-			margin-top: 1.56vh;
+			margin-top: 1.2vh;
 			width: 9.19vw;
 			border-radius: 0.63vw;
 		}

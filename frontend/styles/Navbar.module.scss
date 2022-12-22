@@ -1,7 +1,7 @@
 @import "./lib/bulma.scss";
+@import "./lib/variables.scss";
 
 .navbar {
-	@extend .navbar;
 	max-height: $navbar-height;
 	background-color: transparent;
 	margin: 1% 4% 1% 4%;
@@ -64,7 +64,9 @@
 		.buttons {
 			@extend .buttons;
 			.log {
-				@extend .is-light;
+				background: $login-color;
+				color: $white-color;
+				border: none;
 			}
 			.sign {
 				@extend .is-link;
