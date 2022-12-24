@@ -9,6 +9,57 @@ interface Props {
 }
 
 const CardTarif = ({ title, img, price, description }: Props) => {
+
+	const onSubmit = () => {
+		fetch("https://api.yookassa.ru/v3/payments", {
+			body: JSON.stringify({
+				amount: {
+					value: "2.00",
+					currency: "RUB",
+				},
+				confirmation: {
+					type: "embedded"
+				},
+				capture: true,
+				description: "Тестовый заказ"
+			}),
+			headers: {
+				Authorization: 'Basic ' + Buffer.from('884508' + ':' + 'test_3etiMD4uJEYSuBxCRqTZ7wLD8hPV-qx0kSFAB1_Dtnw').toString('base64'),
+				"Content-Type": "application/json",
+				"Idempotence-Key": "idempotence"
+			},
+			method: 'POST'
+		}).then(async p => {
+			console.log("sucess")
+
+			try {
+				const json = await p.json()
+				console.log(json)
+				const checkout = (window as any).YooMoneyCheckoutWidget({
+					confirmation_token: json.confirmation.confirmation_token,
+					return_url: 'https://labstudio-inc.ru',
+					customization: {
+						modal: true
+					},
+					error_callback: (error: any) => {
+						console.log("error vidjet")
+						console.log(error)
+					}
+				})
+				checkout.render().then(() => {
+					console.log("sucess render")
+				}).catch(() => console.log("error render"))
+			} catch {
+				console.log("undefined json")
+				console.log(p)
+			}
+
+		}).catch(p => {
+			console.log("error")
+			console.log(p)
+		})
+	}
+
 	return (
 		<article className={styles.cardTarifs}>
 			<header>
@@ -20,7 +71,7 @@ const CardTarif = ({ title, img, price, description }: Props) => {
 					{description}
 				</p>
 				<p className={styles.price}>{price}₽/мес.</p>
-				<button>Купить</button>
+				<button onClick={onSubmit}>Купить</button>
 			</section>
 		</article>
 	)
