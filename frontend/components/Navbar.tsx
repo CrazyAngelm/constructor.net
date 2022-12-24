@@ -5,9 +5,8 @@ import styles from '@/styles/Navbar.module.scss'
 
 import logo from '@/assets/logo.png'
 import { useSession } from '@/lib/session/hooks'
-import SignIn from './auth/SignIn'
-import SignUp from './auth/SignUp'
 import { signOut } from 'next-auth/react'
+import Auth from './auth/Auth'
 
 
 const Navbar = () => {
@@ -41,7 +40,7 @@ const Navbar = () => {
 					{!(session && session != 'loading')
 						? <div>
 							<div className={styles.buttons}>
-								<SignIn button={
+								<Auth button={
 									<button className={`${styles.log} ${styles.button}`}>
 										Войти
 									</button>

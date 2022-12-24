@@ -1,0 +1,95 @@
+@import "../lib/fonts.scss", "../lib/variables.scss", "../lib/bulma.scss";
+
+.auth {
+	> .modal {
+		@extend .modal;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100vw;
+		height: 100vh;
+		background-color: rgba(0, 0, 0, 0.252);
+		> .body {
+			background-color: white;
+			width: 30em;
+			padding: 2.5em;
+			.close {
+				position: relative;
+				display: flex;
+				justify-content: flex-end;
+				> div {
+					position: absolute;
+					width: 2em;
+					height: 2em;
+				}
+			}
+			.content {
+				display: flex;
+				flex-direction: column;
+				gap: 2em;
+				> header {
+					font-size: 3.125em;
+				}
+				> input {
+					border: none;
+					border-bottom: solid;
+					padding: 0;
+					border-radius: 0;
+					&:focus {
+						outline: none;
+					}
+					&::placeholder {
+						color: #909090;
+						font-size: 0.7em;
+					}
+				}
+				> .buttons {
+					align-items: center;
+					display: flex;
+					flex-wrap: wrap;
+					justify-content: flex-start;
+					gap: 1rem;
+					> .primary {
+						background: $login-color;
+						border-radius: 0.5em;
+						color: $white-color;
+						padding: 1.4em 3em;
+					}
+					> .secondary {
+						color: #4a94ff;
+						background: transparent;
+						border: none;
+						&:hover {
+							opacity: 0.8;
+						}
+					}
+				}
+			}
+		}
+	}
+	.error {
+		color: red;
+	}
+}
+
+.notification {
+	@extend .is-success;
+	@extend .message;
+
+	z-index: 110;
+	padding: 0;
+	width: 50%;
+	border-radius: 6px;
+	> header {
+		@extend .has-background-success;
+		@extend .message-header;
+
+		> button {
+			@extend .delete;
+		}
+	}
+	> section {
+		@extend .message-body;
+	}
+}
