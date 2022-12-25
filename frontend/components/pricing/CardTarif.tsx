@@ -11,24 +11,18 @@ interface Props {
 const CardTarif = ({ title, img, price, description }: Props) => {
 
 	const onSubmit = () => {
+		var j = '{ "amount": { "value": "2.00", "currency": "RUB" }, "confirmation": { "type": "embedded","locale": "en_US"},"capture": false, "description": "Заказ №72"}'
+		console.log(j)
 		fetch("https://api.yookassa.ru/v3/payments", {
-			body: JSON.stringify({
-				amount: {
-					value: "2.00",
-					currency: "RUB",
-				},
-				confirmation: {
-					type: "embedded"
-				},
-				capture: true,
-				description: "Тестовый заказ"
-			}),
+			body: j,
 			headers: {
-				Authorization: 'Basic ' + Buffer.from('884508' + ':' + 'test_3etiMD4uJEYSuBxCRqTZ7wLD8hPV-qx0kSFAB1_Dtnw').toString('base64'),
+				"Authorization": 'Basic ' + Buffer.from('884508' + ':' + 'test_3etiMD4uJEYSuBxCRqTZ7wLD8hPV-qx0kSFAB1_Dtnw').toString('base64'),
 				"Content-Type": "application/json",
-				"Idempotence-Key": "idempotence"
+				"Idempotence-Key": "qwer",
+				"Access-Control-Allow-Origin": "https://labstudio-inc",
+				"Access-Control-Expose-Headers": "Authorization,Idempotence-Key"
 			},
-			method: 'POST'
+			method: 'POST',
 		}).then(async p => {
 			console.log("sucess")
 
