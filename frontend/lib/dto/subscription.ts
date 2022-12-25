@@ -15,3 +15,14 @@ export interface Subscription {
 	lastPayment?: Date,
 	active?: boolean
 }
+
+export interface SubscribeReq {
+	userId?: string
+	licenseId?: number
+}
+
+export interface SubscribeRes {
+	licenseId: number
+	confirmationToken: string
+	returnUrl?: string
+}

@@ -6,6 +6,7 @@ import styles from '@/styles/Layout.module.scss'
 import Navbar from './Navbar'
 import logo from '@/assets/logo.png'
 import Image from 'next/image'
+import Script from 'next/script'
 
 
 export interface Props {
@@ -21,7 +22,7 @@ const Layout = ({ children, title, navbar = true }: Props) => {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<title>Lab Studio{title && ` | ${title}`}</title>
 				<link rel="shortcut icon" href="/favicon.png" />
-				<script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js"></script>
+
 			</Head>
 			{navbar && <Navbar />}
 			<article className={`${styles.content} ${navbar ?? styles.isNavbar}`}>

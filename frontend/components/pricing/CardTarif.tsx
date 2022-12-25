@@ -1,4 +1,8 @@
-import { LicenseDto } from '@/lib/dto/subscription'
+import { LicenseDto, SubscribeRes } from '@/lib/dto/subscription'
+import { makeFetcher } from '@/lib/fetchers'
+import { subscribe } from '@/lib/requests/subscription'
+import { useSession } from '@/lib/session/hooks'
+import { YooCheckoutWidget } from '@/lib/YooCheckoutWidget'
 import styles from '@/styles/pricing/CardTarif.module.scss'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -10,18 +14,46 @@ interface Props {
 }
 
 const CardTarif = ({ license, img }: Props) => {
+	const session = useSession()
 
-	const onSubmit = () => {
-		/* fetch('/api/subscription/subscribe', {
-			method: "GET",
-		}).then(p => console.log(p))
-		.catch(err => console.log(err)) */
+	const onSubmit = async () => {
 
+		if (session == null || session == 'loading') return; //ошибку авторизации кинуть
 
+		try {
+			const res = await makeFetcher(subscribe)({
+				userId: session.user?.id,
+				licenseId: license.id
+			}) as SubscribeRes
+
+			YooCheckoutWidget(res.confirmationToken, res.returnUrl,
+				(err) => console.log(err))
+		} catch (err) {
+			console.log("error", err)
+		}
+
+		//console.log("sucessful", res)
+		/* const checkout = new (window as any).YooMoneyCheckoutWidget({
+			confirmation_token: "ct-2b3ac3a2-000f-5000-a000-1683f26ec7f9",
+			return_url: 'https://localhost',
+			customization: {
+				modal: true
+			},
+			error_callback: (error: any) => {
+				console.log("error vidjet")
+				console.log(error)
+			}
+		})
+		checkout.render().then(() => {
+			console.log("sucess render")
+		}).catch(() => console.log("error render")) */
 	}
 
 	return (
 		<article className={styles.cardTarifs}>
+			<Head>
+				<script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js"></script>
+			</Head>
 			<div id='payment-form'></div>
 			<header>
 				{img && <img src={img}></img>}
