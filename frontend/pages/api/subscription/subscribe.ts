@@ -97,7 +97,7 @@ handler.post(response(async (req, res) => {
 			response: {
 				licenseId: body.licenseId,
 				confirmationToken: payment.confirmation.confirmation_token,
-				returnUrl: 'http://localhost'
+				returnUrl: process.env.YOOCHECKOUT_REDIRECT_URL
 			} as SubscribeRes
 		}
 	} catch (err) {
