@@ -23,12 +23,14 @@
 			margin: 0;
 			font-weight: 600;
 			font-size: 1.17em;
+			height: 3em;
 		}
 
 		> p {
 			font-size: 1em;
 			&.description {
 				margin-top: 1.33vh;
+				height: 7em;
 			}
 
 			&.price {
