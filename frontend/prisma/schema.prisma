@@ -167,11 +167,11 @@ model Version {
 model License {
     id          Int            @id @default(autoincrement())
     name        String
-    description String?
+    description String?        @db.MediumText
     price       Int            @default(0)
     duration    Int
     freeCourses Int
-    courses     String?
+    courses     String?        @db.LongText
     Subcription Subscription[]
 }
 

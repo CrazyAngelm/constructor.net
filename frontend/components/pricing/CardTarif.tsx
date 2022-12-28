@@ -9,6 +9,7 @@ import Image from 'next/image'
 import Script from 'next/script'
 import { useState } from 'react'
 import Auth from '../auth/Auth'
+import ok from '@/assets/ok.svg'
 
 interface Props {
 	license: LicenseDto,
@@ -32,7 +33,7 @@ const CardTarif = ({ license, img }: Props) => {
 			}) as SubscribeRes
 
 			YooCheckoutWidget(res.confirmationToken,
-				res.returnUrl+'/subscribe-sucessful',
+				res.returnUrl + '/subscribe-sucessful',
 				(err) => console.log(err))
 		} catch (err) {
 			console.log("error", err)
@@ -67,7 +68,15 @@ const CardTarif = ({ license, img }: Props) => {
 			<section>
 				<h3>{license.name}</h3>
 				<p className={styles.description}>
-					{license?.description}
+					{license.description?.split('-')
+						.map(p => p != "" && <div className={styles.block}>
+							<div>
+								<Image src={ok} objectFit="contain" layout='fill' />
+							</div>
+							<span>
+								{p}
+							</span>
+						</div>)}
 				</p>
 				<p className={styles.price}>{license?.price}₽ / {license.duration} д.</p>
 				{!session || session == 'loading' ?

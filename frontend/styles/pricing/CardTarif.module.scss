@@ -1,20 +1,21 @@
-@import '../lib/bulma.scss';
+@import "../lib/bulma.scss";
 
 .cardTarifs {
 	background: #fff;
-	width: 25vw;
+	width: 17em;
 	padding-bottom: 3%;
+	flex: 0 0 auto;
 
 	> header {
 		width: 100%;
 
-		>img{
+		> img {
 			width: 100%;
 		}
 	}
 	> section {
 		display: flex;
-    flex-direction: column;
+		flex-direction: column;
 
 		padding: 0 30% 0 10%;
 		margin-top: 5.56vh;
@@ -30,7 +31,21 @@
 			font-size: 1em;
 			&.description {
 				margin-top: 1.33vh;
-				height: 7em;
+				height: 15em;
+
+				> .block {
+					> div {
+						position: relative;
+						width: 1em;
+						height: 1em;
+						flex: 0 0 auto;
+						margin: 0.4em 0.3em 0 0;
+						margin-left: -10%;
+					}
+					display: flex;
+					flex-direction: row;
+					margin-bottom: 0.2em;
+				}
 			}
 
 			&.price {
