@@ -39,7 +39,7 @@ const Adm: NextPage = () => {
 	] as Categories[]
 
 	return (
-		<Layout navbar={false} >
+		<Layout navbar={false} footer={false} >
 			<article className={styles.adm}>
 				<Menu categories={categories} />
 				<div className={styles.content}>

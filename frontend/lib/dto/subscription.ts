@@ -26,3 +26,7 @@ export interface SubscribeRes {
 	confirmationToken: string
 	returnUrl?: string
 }
+
+export interface SubscriptionReq {
+	id?: string
+}

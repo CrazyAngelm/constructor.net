@@ -58,7 +58,7 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 	}
 
 	return (
-		<Layout title='Lk'>
+		<Layout title='Lk' navbar={false} footer={false}>
 			<article className={styles.lk}>
 				<nav>
 					<section className={styles.info}>

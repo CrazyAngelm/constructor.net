@@ -1,5 +1,19 @@
-import { LicenseDto, SubscribeReq, SubscribeRes } from '../dto/subscription'
+import { LicenseDto, SubscribeReq, SubscribeRes, Subscription, SubscriptionReq } from '../dto/subscription'
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
+
+export const getSubscription: RequestWithContext<SubscriptionReq, Subscription[]> = async (
+	dto: SubscriptionReq,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<Subscription[]> => {
+	const res = await fetch(apiUrl + '/subscription', {
+		method: 'POST',
+		body: JSON.stringify(dto)
+	})
+	handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
 
 export const getLicenses: RequestWithContext<unknown, LicenseDto[]> = async (
 	_?: unknown,
