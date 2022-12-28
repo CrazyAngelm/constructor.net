@@ -3,7 +3,13 @@ export interface LicenseDto {
 	name?: string,
 	description?: string,
 	price?: number,
-	duration?: number
+	duration?: number,
+	freeCourses?: number
+	courses: Courses
+}
+
+export interface Courses {
+	id: number
 }
 
 export interface Subscription {

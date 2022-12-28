@@ -1,0 +1,17 @@
+.index {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+	height: 100vh;
+	gap: 5vh;
+	> .image {
+		position: relative;
+		height: 20vh;
+		width: 20vh;
+	}
+	> section {
+		text-align: center;
+	}
+}

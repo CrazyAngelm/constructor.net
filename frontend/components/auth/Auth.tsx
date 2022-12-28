@@ -54,7 +54,7 @@ const Auth = ({ button, visible: _visible }: Props) => {
 				<section className={styles.modal}>
 					<section className={styles.body}>
 						<section className={styles.close}>
-							<div>
+							<div onClick={() => setVisible(false)}>
 								<Image src={close} layout='fill' objectFit='contain' />
 							</div>
 						</section>

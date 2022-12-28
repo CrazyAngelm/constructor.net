@@ -170,6 +170,8 @@ model License {
     description String?
     price       Int            @default(0)
     duration    Int
+    freeCourses Int
+    courses     String?
     Subcription Subscription[]
 }
 

@@ -58,7 +58,7 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 	}
 
 	return (
-		<Layout title='Lk' navbar={false} footer={false}>
+		<Layout title='Личный кабинет' navbar={false} footer={false}>
 			<article className={styles.lk}>
 				<nav>
 					<section className={styles.info}>
@@ -78,6 +78,10 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 						<hr />
 						<a onClick={() => signOut()} className={styles.danger}>Выход</a>
 					</section>
+					<a href='https://labstudio-inc.ru/boundles/labstudio_hub_installer.exe'
+						target={'_blank'}>
+						<button>Скачать приложение</button>
+					</a>
 				</nav>
 				<section>
 					{page?.node}

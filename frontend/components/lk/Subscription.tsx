@@ -27,6 +27,7 @@ const Subscription = () => {
 		<>
 			{data &&
 				<article className={styles.subcriprion}>
+					Пока нет информации о подписках
 					{data.map(p => <Item item={p} />)}
 				</article>
 			}

@@ -7,6 +7,8 @@ import styles from '@/styles/pricing/CardTarif.module.scss'
 import Head from 'next/head'
 import Image from 'next/image'
 import Script from 'next/script'
+import { useState } from 'react'
+import Auth from '../auth/Auth'
 
 interface Props {
 	license: LicenseDto,
@@ -14,11 +16,14 @@ interface Props {
 }
 
 const CardTarif = ({ license, img }: Props) => {
+	const [ errorAuth, setErrorAuth ] = useState<boolean>(false);
+
 	const session = useSession()
 
 	const onSubmit = async () => {
 
-		if (session == null || session == 'loading') return; //ошибку авторизации кинуть
+		if (session == null || session == 'loading') return
+
 
 		try {
 			const res = await makeFetcher(subscribe)({
@@ -26,7 +31,8 @@ const CardTarif = ({ license, img }: Props) => {
 				licenseId: license.id
 			}) as SubscribeRes
 
-			YooCheckoutWidget(res.confirmationToken, res.returnUrl,
+			YooCheckoutWidget(res.confirmationToken,
+				res.returnUrl+'/subscribe-sucessful',
 				(err) => console.log(err))
 		} catch (err) {
 			console.log("error", err)
@@ -64,7 +70,11 @@ const CardTarif = ({ license, img }: Props) => {
 					{license?.description}
 				</p>
 				<p className={styles.price}>{license?.price}₽ / {license.duration} д.</p>
-				<button onClick={onSubmit}>Купить</button>
+				{!session || session == 'loading' ?
+					<Auth button={<button className={styles.btn} onClick={onSubmit}>Купить</button>} />
+					: <button className={styles.btn} onClick={onSubmit}>Купить</button>
+				}
+
 			</section>
 		</article>
 	)
