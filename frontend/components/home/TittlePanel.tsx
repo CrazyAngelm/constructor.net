@@ -12,7 +12,9 @@ const TittlePanel = () => {
 					<p className={styles.intro}>
 						Удобный конструктор заданий для вашего ученика. Сэкономьте ваше время и повысьте эффективность обучения
 					</p>
-					<button className={styles.btn}>Попробовать бесплатно</button>
+					<a href='#free'>
+						<button className={styles.btn}>Попробовать бесплатно</button>
+					</a>
 				</div>
 				<section className={styles.child}>
 					<Image src={child} />

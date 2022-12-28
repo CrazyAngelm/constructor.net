@@ -47,8 +47,7 @@
 			align-items: center;
 			gap: 1vh;
 			> div {
-				height: 7vh;
-				width: 7vh;
+				width: 3em;
 				position: relative;
 			}
 			> span {
@@ -77,6 +76,14 @@
 			> a,
 			div {
 				@extend .navbar-item;
+
+				&:focus{
+					background-color: transparent;
+				}
+
+				&:focus-within{
+					background-color: transparent;
+				}
 
 				&:hover{
 					background-color: transparent;

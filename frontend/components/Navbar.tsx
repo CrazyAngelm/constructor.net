@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 import styles from '@/styles/Navbar.module.scss'
 
-import logo from '@/assets/logo.png'
+import logo from '@/assets/new-logo.png'
 import { useSession } from '@/lib/session/hooks'
 import { signOut } from 'next-auth/react'
 import Auth from './auth/Auth'
@@ -29,11 +29,10 @@ const Navbar = () => {
 
 			<section className={styles.menu} >
 				<section className={styles.start}>
-					<Link href={'/'}>О нас</Link>
-					<Link href={'/'}>Как работает?</Link>
-					<Link href={'/'}>Купить</Link>
-					<Link href={'/'}>Отзывы</Link>
-					<Link href={'/'}>FAQ</Link>
+					<Link href={'#about'}>О нас</Link>
+					<Link href={'#pricing'}>Купить</Link>
+					<Link href={'#comments'}>Отзывы</Link>
+					<Link href={'#faq'}>FAQ</Link>
 				</section>
 
 				<section className={styles.end}>
@@ -60,7 +59,7 @@ const Navbar = () => {
 								}
 							</div>
 							<section className={styles.avatarMenu}>
-								{/* <Link href={"/lk"}>Личный кабинет</Link> */}
+								<Link href={"/lk"}>Личный кабинет</Link>
 								<hr></hr>
 								<a onClick={() => signOut()} className={styles.exit}>Выход</a>
 							</section>

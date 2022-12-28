@@ -18,6 +18,7 @@
 				position: relative;
 				display: flex;
 				justify-content: flex-end;
+				cursor: pointer;
 				> div {
 					position: absolute;
 					width: 2em;
@@ -91,5 +92,22 @@
 	}
 	> section {
 		@extend .message-body;
+	}
+}
+
+.not {
+	> header {
+		font-size: 1.7em;
+		font-weight: 500;
+	}
+	> div {
+		padding: 1em 0 0 0;
+	}
+	> .buttons {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		margin-top: 1em;
 	}
 }

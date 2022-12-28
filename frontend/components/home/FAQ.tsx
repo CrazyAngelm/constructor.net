@@ -3,7 +3,7 @@ import ExpanderFAQ from './ExpanderFAQ';
 
 const FAQ = () => {
 	return (
-		<article className={styles.faq}>
+		<article className={styles.faq} id="faq">
 			<header>Вопросы и ответы</header>
 			<section>
 				<hr/>

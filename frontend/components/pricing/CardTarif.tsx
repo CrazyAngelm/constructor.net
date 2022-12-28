@@ -10,6 +10,8 @@ import Script from 'next/script'
 import { useState } from 'react'
 import Auth from '../auth/Auth'
 import ok from '@/assets/ok.svg'
+import Router from 'next/router'
+import Order from './Order'
 
 interface Props {
 	license: LicenseDto,
@@ -18,13 +20,17 @@ interface Props {
 
 const CardTarif = ({ license, img }: Props) => {
 	const [ errorAuth, setErrorAuth ] = useState<boolean>(false);
-
+	const [ visible, setVisible ] = useState(false)
 	const session = useSession()
 
 	const onSubmit = async () => {
-
+		setVisible(false)
 		if (session == null || session == 'loading') return
 
+		if (license.price == 0) {
+			Router.push('./subscribe-sucessful');
+			return;
+		}
 
 		try {
 			const res = await makeFetcher(subscribe)({
@@ -38,26 +44,17 @@ const CardTarif = ({ license, img }: Props) => {
 		} catch (err) {
 			console.log("error", err)
 		}
+	}
 
-		//console.log("sucessful", res)
-		/* const checkout = new (window as any).YooMoneyCheckoutWidget({
-			confirmation_token: "ct-2b3ac3a2-000f-5000-a000-1683f26ec7f9",
-			return_url: 'https://localhost',
-			customization: {
-				modal: true
-			},
-			error_callback: (error: any) => {
-				console.log("error vidjet")
-				console.log(error)
-			}
-		})
-		checkout.render().then(() => {
-			console.log("sucess render")
-		}).catch(() => console.log("error render")) */
+	const click = () => {
+		setVisible(true)
 	}
 
 	return (
 		<article className={styles.cardTarifs}>
+			{visible && <Order okCallback={onSubmit}
+				closeCallback={() => setVisible(false)}
+				license={license} />}
 			<Head>
 				<script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js"></script>
 			</Head>
@@ -80,8 +77,10 @@ const CardTarif = ({ license, img }: Props) => {
 				</p>
 				<p className={styles.price}>{license?.price}₽ / {license.duration} д.</p>
 				{!session || session == 'loading' ?
-					<Auth button={<button className={styles.btn} onClick={onSubmit}>Купить</button>} />
-					: <button className={styles.btn} onClick={onSubmit}>Купить</button>
+					<Auth button={<button className={styles.btn}>
+						Купить
+					</button>} />
+					: <button className={styles.btn} onClick={click}>Купить</button>
 				}
 
 			</section>

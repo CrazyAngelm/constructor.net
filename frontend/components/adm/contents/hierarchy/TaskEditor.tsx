@@ -98,7 +98,7 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 							isHorizontal label='Сложность' value={data.complexity} />
 						<TextArea onChange={changeHanderDtoString('description', setData)}
 							label='Описание' value={data.description} />
-						<button onClick={copyDescCategory}>Скопирвать из категории</button>
+						<button onClick={copyDescCategory}>Скопировать из категории</button>
 						<TextArea onChange={changeHanderDtoString('instruction', setData)}
 							label='Инструкция для ребенка' value={data.instruction} />
 					</section>

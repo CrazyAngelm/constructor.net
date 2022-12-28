@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 const Comments = () => {
 	return (
-		<article className={styles.comments}>
+		<article className={styles.comments} id="comments">
 			<header>Более 480 репетиторов и директоров по всей Россииуже воспользовались нашим продуктом</header>
 			<section className={styles.content}>
 				<Comment name='Зигмунд Фрейд' status='Старый психолог'
