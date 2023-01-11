@@ -1,0 +1,12 @@
+.docs {
+	height: 100vw;
+	width: 100vw;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+	> embed {
+		height: 100vw;
+		width: 100vw;
+	}
+}
