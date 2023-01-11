@@ -20,7 +20,9 @@ const Index: NextPage = () => {
 				<TittlePanel />
 				<About />
 				<Tarifs />
-				<Comments />
+				<br />
+				<br />
+				{/* <Comments /> */}
 				<FAQ />
 			</div>
 		</Layout>

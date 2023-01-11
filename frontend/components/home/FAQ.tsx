@@ -7,17 +7,17 @@ const FAQ = () => {
 			<header>Вопросы и ответы</header>
 			<section>
 				<hr/>
-				<ExpanderFAQ question='Which Plan Should I Purchase?'
-					answer='If you are looking to publish an application using Model Targets or Area Targets, you will need to purchase a Premium Plan. All other applications can use a Basic Plan. We currently do not have any special licenses for non-profits.' />
+				<ExpanderFAQ question='Как понять, подойдет ли мне приложение «LAB STUDIO»?'
+					answer='для того, чтобы понять, подходит ли Вам приложение, воспользуйтесь пробным периодом длительностью 14 дней' />
 				<hr />
-				<ExpanderFAQ question='What Are Area Targets?'
-					answer='Magna enim reprehenderit consequat consectetur ea dolore ipsum quis tempor excepteur consectetur commodo cillum dolor. Labore nisi enim nostrud esse adipisicing et ea velit. Laboris ipsum pariatur aliqua aliquip magna aute ea est sit ad pariatur aute cillum aute. Do esse laborum excepteur cillum cillum nostrud deserunt nisi ad laboris duis eu sit sunt. Voluptate culpa excepteur nisi consequat laborum culpa. Aute occaecat ea nostrud aliqua.' />
+				<ExpanderFAQ question='Будут ли мои конспекты сохраняться в приложении?'
+					answer='Да, все ваши конспекты и подборки заданий сохраняются на вашем ПК' />
 				<hr />
-				<ExpanderFAQ question='Which Plan Should I Purchase?'
-					answer='If you are looking to publish an application using Model Targets or Area Targets, you will need to purchase a Premium Plan. All other applications can use a Basic Plan. We currently do not have any special licenses for non-profits.' />
+				<ExpanderFAQ question='Будут ли иметь доступ к моим материалам (конспектам и подборкам заданий) другие пользователи приложения?'
+					answer='Нет, ваши материалы будут доступны только Вам' />
 				<hr />
-				<ExpanderFAQ question='Which Plan Should I Purchase?'
-					answer='If you are looking to publish an application using Model Targets or Area Targets, you will need to purchase a Premium Plan. All other applications can use a Basic Plan. We currently do not have any special licenses for non-profits.' />
+				<ExpanderFAQ question='Могу ли я добавлять свои материалы в конспект или подборку задач?'
+					answer='Да, есть возможность помимо заданий из базы приложения, добавлять в конспект свои материалы' />
 				<hr />
 			</section>
 		</article>

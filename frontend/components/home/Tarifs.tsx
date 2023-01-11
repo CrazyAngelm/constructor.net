@@ -34,7 +34,7 @@ const Tarifs = () => {
 		<article className={styles.tarifs} id="pricing">
 			{visible && <Order okCallback={onSubmit}
 				closeCallback={() => setVisible(false)}
-				license={data ? data[0] : undefined} />}
+				license={data ? data[ 0 ] : undefined} />}
 			<section className={styles.cards}>
 				<div className={styles.background} />
 				{
@@ -43,7 +43,8 @@ const Tarifs = () => {
 			</section>
 			<section className={styles.free} id="free">
 				<header>Бесплатное тестирование</header>
-				<p>Попробуйте бесплатно конструктор Lab Studio для вашей деятельности. Мы гарантируем поддержку на каждом этапе работы с нашем конструктором.</p>
+				<p>Мы предоставляем 14 дней пользования приложением в подарок!<br />
+					Зарегистрируйся и пройди тестовый период!</p>
 				{!session || session == 'loading' ?
 					<Auth
 						button={<button>Попробовать бесплатно</button>} />

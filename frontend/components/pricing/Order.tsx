@@ -24,9 +24,9 @@ const Order = ({ closeCallback, okCallback, license }: Props) => {
 						<div>
 							Вы собираетесь оформить подписку на тариф
 							"{license?.name}" <br />
-							Оформляя подписку вы соглашаетесь с <a>лицензионным соглашением</a>
-							 (если есть)<br />
-							Подписку можно будет отключить в личном кабинете
+							Оформляя подписку вы соглашаетесь с <a href='/license' target={'_blank'}>лицензионным соглашением</a>
+							<br />
+							Подписку можно будет отключить в личном кабинете в любой момент
 						</div>
 						<section className={styles.buttons}>
 							<button onClick={okCallback}>Оформить</button>

@@ -7,6 +7,7 @@ import Navbar from './Navbar'
 import logo from '@/assets/logo.png'
 import Image from 'next/image'
 import Script from 'next/script'
+import Auth from './auth/Auth'
 
 
 export interface Props {
@@ -39,20 +40,22 @@ const Layout = ({ children, title, navbar = true, footer = true }: Props) => {
 							Lab Studio
 						</header>
 						<section>
-							<header>Адресс</header>
-							<div>city Nizhny novgorod</div>
+							<header>Контакты</header>
+							<div>РФ, г. Киров</div>
 							<div>bestlaboratory@mail.ru</div>
-							<div>+7 922 333 4455</div>
+							<div>8-922-9800770</div>
 						</section>
 						<section>
 							<header>Соц сети</header>
-							<a>Telegramm</a>
-							<a>Vk</a>
-							<a>Instagramm</a>
+							<a href='https://t.me/labstudio'>Telegramm</a>
+							<a href='https://vk.com/studiolab'>ВКонтакте</a>
 						</section>
 					</section>
 					<section className={styles.other}>
-						Любая доп инфа, если нужно, донат, обратная связь и тд
+						<div>Для оформления подписики авторизируйтесь</div>
+						<Auth button={
+							<button>Вход / Регистрация</button>
+						} />
 					</section>
 				</footer>
 			}

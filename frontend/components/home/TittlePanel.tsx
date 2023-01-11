@@ -1,4 +1,4 @@
-import child from '@/assets/home/child.png'
+import image from '@/assets/home/Kollazh.png'
 
 import styles from '@/styles/home/TittlePanel.module.scss'
 import Image from 'next/image';
@@ -16,8 +16,8 @@ const TittlePanel = () => {
 						<button className={styles.btn}>Попробовать бесплатно</button>
 					</a>
 				</div>
-				<section className={styles.child}>
-					<Image src={child} />
+				<section className={styles.image}>
+					<Image src={image} layout='fill' objectFit='contain'/>
 				</section>
 			</section>
 		</article>
