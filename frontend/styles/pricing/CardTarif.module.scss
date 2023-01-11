@@ -78,3 +78,13 @@
 		}
 	}
 }
+
+.error {
+	display: flex;
+	flex-direction: column;
+	gap: 1em;
+	> header {
+		font-weight: 700;
+		font-family: 1.4em;
+	}
+}

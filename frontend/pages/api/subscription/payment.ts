@@ -7,6 +7,10 @@ import { subscribe } from "@/lib/requests/subscription";
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 
+const addMont = (date: Date): Date => {
+	return new Date(date.setMonth(date.getMonth() + 1))
+}
+
 interface INotification {
 	type: string
 	event: string,
@@ -38,15 +42,18 @@ handler.post(response(async (req, res) => {
 					licenseId: _payment.licenseId,
 					active: true,
 					lastPaymentId: _payment.id,
-					endDate: new Date(Date.now() +
-						new Date(0, 1, 0, 0, 0, 0, 0).getDate())
+					startDate: new Date(),
+					endDate: addMont(new Date())
 				}
 			})
 		} else {
-			subscription.active = true;
-			subscription.lastPaymentId = _payment.id,
-				subscription.endDate = new Date((subscription.endDate?.getDate() ?? Date.now()) +
-					new Date(0, 1, 0, 0, 0, 0, 0).getDate())
+			subscription.active = true
+			subscription.lastPaymentId = _payment.id
+			subscription.endDate = addMont(subscription.endDate ?? new Date())
+			await prisma.subscription.update({
+				where: { id: subscription.id },
+				data: subscription
+			})
 		}
 	}
 

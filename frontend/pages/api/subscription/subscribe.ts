@@ -16,11 +16,14 @@ const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
 	const body = JSON.parse(req.body)
 
-	console.log()
-	console.log(body.userId)
 
-	console.log("user:", body.userId, " license: ", body.licenseId)
 	if (!body.userId || !body.licenseId) return { error: { code: 400, message: "Неверный запрос" } }
+
+	const subscription = await prisma.subscription.findFirst({
+		where: { userId: body.userId, canceled: false }
+	})
+
+	if (subscription) return { error: { code: 412, message: 'У данного пользователя уже есть активная подписка' } }
 
 	const user = await prisma.user.findUnique({
 		where: { id: body.userId }
@@ -57,7 +60,7 @@ handler.post(response(async (req, res) => {
 		const payment = await checkout.createPayment(createPayload, idempotentKey);
 
 		await prisma.payment.create({
-			data:{
+			data: {
 				id: payment.id,
 				userId: user.id,
 				amount: license.price,

@@ -15,7 +15,8 @@ handler.post(response(async (req, res) => {
 
 	const data = await prisma.subscription.findMany({
 		where: {
-			userId: id
+			userId: id,
+			canceled: false
 		}
 	}) as Subscription[]
 

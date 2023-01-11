@@ -1,0 +1,24 @@
+.item {
+	> table {
+		width: auto;
+		.header {
+			font-weight: 700;
+		}
+	}
+}
+
+.subscription {
+	> button {
+		margin-top: 2em;
+	}
+}
+.notification {
+	display: flex;
+	flex-direction: column;
+	gap: 1em;
+
+	>header{
+		font-weight: 700;
+		font-size: 1.4em;
+	}
+}

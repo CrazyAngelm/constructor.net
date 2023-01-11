@@ -12,6 +12,8 @@ import Auth from '../auth/Auth'
 import ok from '@/assets/ok.svg'
 import Router from 'next/router'
 import Order from './Order'
+import { ApiError } from '@/lib/requests'
+import Modal from '../controls/Modal'
 
 interface Props {
 	license: LicenseDto,
@@ -20,6 +22,7 @@ interface Props {
 
 const CardTarif = ({ license, img }: Props) => {
 	const [ errorAuth, setErrorAuth ] = useState<boolean>(false);
+	const [ error, setError ] = useState<string>()
 	const [ visible, setVisible ] = useState(false)
 	const session = useSession()
 
@@ -42,6 +45,10 @@ const CardTarif = ({ license, img }: Props) => {
 				res.returnUrl + '/subscribe-sucessful',
 				(err) => console.log(err))
 		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status == 412) setError('Вы уже имеете активную подписку, чтобы оформить новую отмените текущую в личном кабинете')
+				else setError(err.message)
+			}
 			console.log("error", err)
 		}
 	}
@@ -52,6 +59,13 @@ const CardTarif = ({ license, img }: Props) => {
 
 	return (
 		<article className={styles.cardTarifs}>
+			<Modal closeCallback={() => setError(undefined)}
+				visible={error != undefined}>
+				<section className={styles.error}>
+					<header>Ошибка!</header>
+					<div>{error}</div>
+				</section>
+			</Modal>
 			{visible && <Order okCallback={onSubmit}
 				closeCallback={() => setVisible(false)}
 				license={license} />}

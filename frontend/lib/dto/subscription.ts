@@ -36,3 +36,12 @@ export interface SubscribeRes {
 export interface SubscriptionReq {
 	id?: string
 }
+
+export interface UnsubscribeReq {
+	subscriptionId?: string,
+	userId?: string
+}
+
+export interface UnsubscribeRes {
+
+}

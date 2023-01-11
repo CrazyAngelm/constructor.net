@@ -1,4 +1,4 @@
-import { LicenseDto, SubscribeReq, SubscribeRes, Subscription, SubscriptionReq } from '../dto/subscription'
+import { LicenseDto, SubscribeReq, SubscribeRes, Subscription, SubscriptionReq, UnsubscribeReq, UnsubscribeRes } from '../dto/subscription'
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
 
 export const getSubscription: RequestWithContext<SubscriptionReq, Subscription[]> = async (
@@ -31,6 +31,20 @@ export const subscribe: RequestWithContext<SubscribeReq, SubscribeRes> = async (
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<SubscribeRes> => {
 	const res = await fetch(apiUrl + '/subscription/subscribe', {
+		method: "POST",
+		body: JSON.stringify(dto)
+	})
+	handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
+
+export const unsubscribe: RequestWithContext<UnsubscribeReq, UnsubscribeRes> = async (
+	dto: UnsubscribeReq,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<UnsubscribeRes> => {
+	const res = await fetch(apiUrl + '/subscription/unsubscribe', {
 		method: "POST",
 		body: JSON.stringify(dto)
 	})
