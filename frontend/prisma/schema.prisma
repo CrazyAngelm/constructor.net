@@ -183,6 +183,7 @@ model Subscription {
     endDate       DateTime?
     active        Boolean   @default(true)
     lastPaymentId String?
+    canceled      Boolean   @default(false)
 
     user        User     @relation(fields: [userId], references: [id])
     license     License  @relation(fields: [licenseId], references: [id])
@@ -190,11 +191,11 @@ model Subscription {
 }
 
 model Payment {
-    id             String   @id @default(uuid())
-    amount         Int
-    userId         String
-    subscriptionId String
-    createdAt      DateTime @default(now())
+    id        String   @id @default(uuid())
+    amount    Int
+    userId    String
+    licenseId Int
+    createdAt DateTime @default(now())
 
     user        User           @relation(fields: [userId], references: [id])
     Subcription Subscription[]

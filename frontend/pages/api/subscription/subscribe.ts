@@ -13,42 +13,6 @@ const prisma = usePrisma()
 const handler = getDefaultHandler()
 
 
-const checkPayment = async (checkout: YooCheckout, paymentId: string,
-	userId: string, licenseId: number) => {
-	try {
-		const payment = await checkout.getPayment(paymentId)
-		console.log("check ", payment);
-		if (payment.status != 'succeeded' && payment.status != 'canceled')
-			setInterval(() => checkPayment(checkout, paymentId, userId, licenseId), 1000)
-		else {
-			const subscription = await prisma.subscription.create({
-				data: {
-					userId: userId,
-					licenseId: licenseId,
-					active: true
-				}
-			})
-
-			const pm = await prisma.payment.create({
-				data: {
-					userId: userId,
-					amount: Number(parseFloat(payment.amount.value)),
-					createdAt: Date(),
-					subscriptionId: subscription.id
-				}
-			})
-
-			prisma.subscription.update({
-				where: { id: subscription.id },
-				data: { lastPaymentId: pm.id }
-			})
-
-		}
-	} catch (err) {
-		console.log("check error", err)
-	}
-}
-
 handler.post(response(async (req, res) => {
 	const body = JSON.parse(req.body)
 
@@ -91,8 +55,16 @@ handler.post(response(async (req, res) => {
 	}
 	try {
 		const payment = await checkout.createPayment(createPayload, idempotentKey);
-		console.log(payment);
-		//heckPayment(checkout, payment.id, body.userId, body.licenseId)
+
+		await prisma.payment.create({
+			data:{
+				id: payment.id,
+				userId: user.id,
+				amount: license.price,
+				licenseId: license.id
+			}
+		})
+
 		return {
 			response: {
 				licenseId: body.licenseId,
@@ -104,48 +76,6 @@ handler.post(response(async (req, res) => {
 		console.log(err);
 		return { error: { code: 415, message: JSON.stringify(err) } }
 	}
-
-	var j = '{ "amount": { "value": "2.00", "currency": "RUB" }, "confirmation": { "type": "embedded","locale": "en_US"},"capture": false, "description": "Заказ №73"}'
-	console.log(j)
-	fetch("https://api.yookassa.ru/v3/payments", {
-		body: j,
-		headers: {
-			"Authorization": 'Basic ' + Buffer.from('884508' + ':' + 'test_3etiMD4uJEYSuBxCRqTZ7wLD8hPV-qx0kSFAB1_Dtnw').toString('base64'),
-			"Content-Type": "application/json",
-			"Idempotence-Key": "rtyhghn",
-		},
-		method: 'POST',
-
-	}).then(async p => {
-		console.log("sucess")
-
-		try {
-			const json = await p.json()
-			console.log(json)
-			/* const checkout = (window as any).YooMoneyCheckoutWidget({
-				confirmation_token: json.confirmation.confirmation_token,
-				return_url: 'https://labstudio-inc.ru',
-				customization: {
-					modal: true
-				},
-				error_callback: (error: any) => {
-					console.log("error vidjet")
-					console.log(error)
-				}
-			})
-			checkout.render().then(() => {
-				console.log("sucess render")
-			}).catch(() => console.log("error render")) */
-		} catch {
-			console.log("undefined json")
-			console.log(p)
-		}
-
-	}).catch(p => {
-		console.log("error")
-		console.log(p)
-	})
-	return {}
 }))
 
 export default handler
