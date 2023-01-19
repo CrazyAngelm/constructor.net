@@ -1,22 +1,101 @@
-import { Subscription } from '@/lib/dto/subscription'
+import { LicenseDto, Subscription } from '@/lib/dto/subscription'
+import { CourseDto } from '@/lib/dto/tasks'
 import { makeFetcher } from '@/lib/fetchers'
 import { useFetchData } from '@/lib/hooks/useFetchData'
-import { changePaymentMethod, getLicenses, getSubscription, resetPaymentMethod, unsubscribe } from '@/lib/requests/subscription'
+import { changeCourses, changePaymentMethod, getLicenses, getSubscription, resetPaymentMethod, unsubscribe } from '@/lib/requests/subscription'
+import { getCourses } from '@/lib/requests/tasks'
 import { useSession } from '@/lib/session/hooks'
 import { YooCheckoutWidget } from '@/lib/YooCheckoutWidget'
 import styles from '@/styles/lk/Subscription.module.scss'
 import Head from 'next/head'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import Checkbox from '../controls/Checkbox'
 import Modal from '../controls/Modal'
+
+interface ChangeCoursesProps {
+	license?: LicenseDto,
+	subscription?: Subscription,
+	update?: () => void
+}
+
+const ChangeCourse = ({ license, subscription, update }: ChangeCoursesProps) => {
+	const [ visible, setVisible ] = useState<boolean>(false)
+	const [ checkedCourses, setCheckedCourses ] = useState<boolean[]>()
+
+	const { data } = useFetchData({}, getCourses)
+
+	useEffect(() => {
+		setCheckedCourses(data?.map(p => subscriptionCourses.indexOf(p.id) > -1 ? true : false))
+	}, [ data ])
+
+	const licenseCourses = license?.courses ? JSON.parse(license?.courses) as number[] : []
+	const subscriptionCourses = subscription?.courses ? JSON.parse(subscription.courses) as number[] : []
+
+	const onChange = (index: number, value: boolean) => {
+		if (!data || !checkedCourses || !license?.freeCourses) return
+
+		if (checkedCourses?.filter(p => p === true).length >= license?.freeCourses
+			&& value)
+			return;
+
+		setCheckedCourses(p => {
+			if (!p) return p
+			p[ index ] = value
+			return [ ...p ]
+		})
+	}
+
+	const apply = async () => {
+
+		await makeFetcher(changeCourses)({
+			userId: subscription?.userId,
+			coursesId: data?.filter((p, i) => checkedCourses && checkedCourses[ i ])
+				.map(p => p.id)
+		})
+
+		update && update()
+		setVisible(false)
+	}
+	return <article className={styles.changeCourses}>
+		<Modal visible={visible} closeCallback={() => setVisible(false)}>
+			<header>{checkedCourses?.filter(p => p === true).length}/
+				{license?.freeCourses} курсов выбрано</header>
+			{data?.map((p, id) => <section key={p.id} className={styles.courses}>
+				<Checkbox value={licenseCourses.indexOf(p.id) !== -1
+					? true
+					: checkedCourses ? checkedCourses[ id ] : false
+				}
+					disabled={licenseCourses.indexOf(p.id) !== -1}
+					onChange={v => onChange(id, v)} />
+				<p>{p.name}</p>
+			</section>)}
+			<button onClick={apply}>Применить</button>
+		</Modal>
+		<button onClick={() => setVisible(true)}>
+			Сменить доступные курсы
+		</button>
+	</article>
+}
 
 interface PropsItem {
 	item: Subscription
+	update?: () => void
 }
 
-const Item = ({ item }: PropsItem) => {
+const Item = ({ item, update }: PropsItem) => {
+
 	const { data } = useFetchData({}, getLicenses)
+	const { data: courses } = useFetchData({}, getCourses)
 
 	const license = data?.find(p => p.id == item.licenseId)
+
+	const getAvialableCourses = (): CourseDto[] => {
+		const licenseCourses = license?.courses ? JSON.parse(license?.courses) as number[] : []
+		const subscriptionCourses = item.courses ? JSON.parse(item.courses) as number[] : []
+
+		const ids = [ ...licenseCourses, ...subscriptionCourses ]
+		return courses?.filter(p => ids.indexOf(p.id) > -1) ?? []
+	}
 	return (
 		<section className={styles.item}>
 			<table>
@@ -60,6 +139,16 @@ const Item = ({ item }: PropsItem) => {
 							: 'Способ оплаты не привязан'}</td>
 					</tr>
 				}
+				<tr>
+					<td className={styles.header}>Доступные курсы</td>
+					<td>
+						<section>
+							{getAvialableCourses().map(p => <div>{p.name}<br /></div>)}
+							<ChangeCourse subscription={item} license={license}
+								update={update} />
+						</section>
+					</td>
+				</tr>
 			</table>
 		</section>
 	)
@@ -134,7 +223,7 @@ const Subscription = () => {
 						<div>Пока нет информации о подписках</div>
 						:
 						<>{data.map(p => <>
-							<Item key={p.id} item={p} />
+							<Item key={p.id} item={p} update={update} />
 							{p.paymentTitle &&
 								<button onClick={resetPayment}>отвязать способ оплаты</button>
 							}

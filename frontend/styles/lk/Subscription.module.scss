@@ -27,3 +27,19 @@
 		font-size: 1.4em;
 	}
 }
+
+.changeCourses {
+	header {
+		margin-bottom: 1em;
+	}
+	.courses {
+		display: flex;
+		flex-direction: row;
+		gap: 1em;
+		align-items: center;
+	}
+	button {
+		margin-top: 1em;
+		align-self: center;
+	}
+}

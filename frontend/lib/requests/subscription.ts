@@ -1,4 +1,4 @@
-import { ChangePaymentMethodReq, ChangePaymentMethodRes, LicenseDto, SubscribeReq, SubscribeRes, Subscription, SubscriptionReq, UnsubscribeReq, UnsubscribeRes } from '../dto/subscription'
+import { ChangeCourseReq, ChangePaymentMethodReq, ChangePaymentMethodRes, LicenseDto, SubscribeReq, SubscribeRes, Subscription, SubscriptionReq, UnsubscribeReq, UnsubscribeRes } from '../dto/subscription'
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
 
 export const getSubscription: RequestWithContext<SubscriptionReq, Subscription[]> = async (
@@ -87,6 +87,20 @@ export const resetPaymentMethod: RequestWithContext<ChangePaymentMethodReq, Chan
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<ChangePaymentMethodRes> => {
 	const res = await fetch(apiUrl + '/subscription/reset-payment-method', {
+		method: "POST",
+		body: JSON.stringify(dto)
+	})
+	await handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
+
+export const changeCourses: RequestWithContext<ChangeCourseReq, {}> = async (
+	dto: ChangeCourseReq,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<{}> => {
+	const res = await fetch(apiUrl + '/subscription/change-course', {
 		method: "POST",
 		body: JSON.stringify(dto)
 	})

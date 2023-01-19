@@ -5,7 +5,7 @@ export interface LicenseDto {
 	price?: number,
 	duration?: number,
 	freeCourses?: number
-	courses: Courses
+	courses?: string
 }
 
 export interface Courses {
@@ -20,7 +20,8 @@ export interface Subscription {
 	endDate?: Date,
 	lastPayment?: Date,
 	active?: boolean,
-	paymentTitle?: string
+	paymentTitle?: string,
+	courses?: string
 }
 
 export interface SubscribeReq {
@@ -55,4 +56,9 @@ export interface ChangePaymentMethodReq {
 export interface ChangePaymentMethodRes {
 	confirmationToken: string
 	returnUrl?: string
+}
+
+export interface ChangeCourseReq {
+	userId?: string
+	coursesId?: number[]
 }

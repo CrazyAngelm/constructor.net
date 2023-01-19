@@ -186,6 +186,7 @@ model Subscription {
     canceled      Boolean   @default(false)
     paymentToken  String?
     paymentTitle  String?
+    courses       String?
 
     user        User     @relation(fields: [userId], references: [id])
     license     License  @relation(fields: [licenseId], references: [id])

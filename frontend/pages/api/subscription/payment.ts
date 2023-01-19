@@ -3,6 +3,7 @@ import { response } from "@/lib/api/response";
 import { usePrisma } from "@/lib/api/database";
 import { Payment } from "@a2seven/yoo-checkout";
 import { subscribe } from "@/lib/requests/subscription";
+import { License } from "@prisma/client";
 
 const prisma = usePrisma()
 const handler = getDefaultHandler()
@@ -63,7 +64,8 @@ handler.post(response(async (req, res) => {
 					startDate: new Date(),
 					endDate: addMont(new Date()),
 					paymentToken: payment.object.payment_method.id,
-					paymentTitle: payment.object.payment_method.title
+					paymentTitle: payment.object.payment_method.title,
+					courses: await getCourses(_payment.licenseId)
 				}
 			})
 		} else {
@@ -79,5 +81,25 @@ handler.post(response(async (req, res) => {
 
 	return { response: {} }
 }))
+
+const getCourses = async (licenseId: number)
+	: Promise<string> => {
+
+	const license = await prisma.license.findUnique({ where: { id: licenseId } })
+
+	const licenseCourses = license?.courses ? JSON.parse(license.courses) as number[]
+		: []
+
+	const courses = await prisma.course.findMany({
+		where: {
+			id: {
+				notIn: licenseCourses
+			},
+			deleted: false
+		}
+	})
+
+	return JSON.stringify(courses.slice(0, license?.freeCourses).map(p => p.id))
+}
 
 export default handler
