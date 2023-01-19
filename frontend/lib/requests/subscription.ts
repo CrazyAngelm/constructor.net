@@ -9,7 +9,7 @@ export const getSubscription: RequestWithContext<SubscriptionReq, Subscription[]
 		method: 'POST',
 		body: JSON.stringify(dto)
 	})
-	handleNonOk(res)
+	await handleNonOk(res)
 	const json = await res.json()
 
 	return json
@@ -20,7 +20,7 @@ export const getLicenses: RequestWithContext<unknown, LicenseDto[]> = async (
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<LicenseDto[]> => {
 	const res = await fetch(apiUrl + '/subscription/license')
-	handleNonOk(res)
+	await handleNonOk(res)
 	const json = await res.json()
 
 	return json
@@ -34,7 +34,21 @@ export const subscribe: RequestWithContext<SubscribeReq, SubscribeRes> = async (
 		method: "POST",
 		body: JSON.stringify(dto)
 	})
-	handleNonOk(res)
+	await handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
+
+export const freeSubscribe: RequestWithContext<SubscribeReq, SubscribeRes> = async (
+	dto: SubscribeReq,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<SubscribeRes> => {
+	const res = await fetch(apiUrl + '/subscription/trial-subscribe', {
+		method: "POST",
+		body: JSON.stringify(dto)
+	})
+	await handleNonOk(res)
 	const json = await res.json()
 
 	return json
@@ -48,7 +62,7 @@ export const unsubscribe: RequestWithContext<UnsubscribeReq, UnsubscribeRes> = a
 		method: "POST",
 		body: JSON.stringify(dto)
 	})
-	handleNonOk(res)
+	await handleNonOk(res)
 	const json = await res.json()
 
 	return json
@@ -62,7 +76,7 @@ export const changePaymentMethod: RequestWithContext<ChangePaymentMethodReq, Cha
 		method: "POST",
 		body: JSON.stringify(dto)
 	})
-	handleNonOk(res)
+	await handleNonOk(res)
 	const json = await res.json()
 
 	return json
@@ -76,7 +90,7 @@ export const resetPaymentMethod: RequestWithContext<ChangePaymentMethodReq, Chan
 		method: "POST",
 		body: JSON.stringify(dto)
 	})
-	handleNonOk(res)
+	await handleNonOk(res)
 	const json = await res.json()
 
 	return json

@@ -37,7 +37,11 @@ const Item = ({ item }: PropsItem) => {
 					})}</td>
 				</tr>
 				<tr>
-					<td className={styles.header}>Дата следующей оплаты</td>
+					<td className={styles.header}>
+						{license?.price === 0
+							? <>Дата окончания</>
+							: <> Дата следующей оплаты</>
+						}</td>
 					<td>{new Date(item.endDate ?? Date()).toLocaleString('ru-RU', {
 						year: 'numeric',
 						month: 'long',
@@ -48,12 +52,14 @@ const Item = ({ item }: PropsItem) => {
 					<td className={styles.header}>Активна</td>
 					<td>{item.active ? 'Да' : 'Нет'}</td>
 				</tr>
-				<tr>
-					<td className={styles.header}>Способ оплаты</td>
-					<td>{item.paymentTitle ?
-						item.paymentTitle
-						: 'Способ оплаты не привязан'}</td>
-				</tr>
+				{license?.price !== 0 &&
+					<tr>
+						<td className={styles.header}>Способ оплаты</td>
+						<td>{item.paymentTitle ?
+							item.paymentTitle
+							: 'Способ оплаты не привязан'}</td>
+					</tr>
+				}
 			</table>
 		</section>
 	)
@@ -132,7 +138,9 @@ const Subscription = () => {
 							{p.paymentTitle &&
 								<button onClick={resetPayment}>отвязать способ оплаты</button>
 							}
-							<button onClick={changePayment}>привязать способ оплаты</button>
+							{p.licenseId !== 1 &&
+								< button onClick={changePayment}>привязать способ оплаты</button>
+							}
 							<br />
 							<button onClick={() => setNot(true)}
 								className={styles.danger}>

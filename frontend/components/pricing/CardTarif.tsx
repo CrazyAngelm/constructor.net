@@ -1,6 +1,6 @@
 import { LicenseDto, SubscribeRes } from '@/lib/dto/subscription'
 import { makeFetcher } from '@/lib/fetchers'
-import { subscribe } from '@/lib/requests/subscription'
+import { freeSubscribe, subscribe } from '@/lib/requests/subscription'
 import { useSession } from '@/lib/session/hooks'
 import { YooCheckoutWidget } from '@/lib/YooCheckoutWidget'
 import styles from '@/styles/pricing/CardTarif.module.scss'
@@ -12,8 +12,8 @@ import Auth from '../auth/Auth'
 import ok from '@/assets/ok.svg'
 import Router from 'next/router'
 import Order from './Order'
-import { ApiError } from '@/lib/requests'
 import Modal from '../controls/Modal'
+import { ApiError } from '@/lib/requests'
 
 interface Props {
 	license: LicenseDto,
@@ -30,20 +30,24 @@ const CardTarif = ({ license, img }: Props) => {
 		setVisible(false)
 		if (session == null || session == 'loading') return
 
-		if (license.price == 0) {
-			Router.push('./subscribe-sucessful');
-			return;
-		}
-
 		try {
-			const res = await makeFetcher(subscribe)({
-				userId: session.user?.id,
-				licenseId: license.id
-			}) as SubscribeRes
+			if (license.price == 0) {
+				const res = await makeFetcher(freeSubscribe)({
+					userId: session.user?.id,
+					licenseId: license.id
+				})
+
+				Router.push('/subscribe-sucessful')
+			} else{
+				const res = await makeFetcher(subscribe)({
+					userId: session.user?.id,
+					licenseId: license.id
+				}) as SubscribeRes
 
 			YooCheckoutWidget(res.confirmationToken,
 				res.returnUrl + '/subscribe-sucessful',
 				(err) => console.log(err))
+			}
 		} catch (err) {
 			if (err instanceof ApiError) {
 				if (err.status == 412) setError('Вы уже имеете активную подписку, чтобы оформить новую отмените текущую в личном кабинете')

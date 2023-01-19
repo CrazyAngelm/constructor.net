@@ -23,7 +23,7 @@ handler.post(response(async (req, res) => {
 		where: { userId: body.userId, canceled: false }
 	})
 
-	if (subscription) return { error: { code: 412, message: 'У данного пользователя уже есть активная подписка' } }
+	if (subscription && subscription.licenseId !== 1) return { error: { code: 412, message: 'У данного пользователя уже есть активная подписка' } }
 
 	const user = await prisma.user.findUnique({
 		where: { id: body.userId }
