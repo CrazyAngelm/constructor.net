@@ -1,4 +1,4 @@
-import { LicenseDto, SubscribeReq, SubscribeRes, Subscription, SubscriptionReq, UnsubscribeReq, UnsubscribeRes } from '../dto/subscription'
+import { ChangePaymentMethodReq, ChangePaymentMethodRes, LicenseDto, SubscribeReq, SubscribeRes, Subscription, SubscriptionReq, UnsubscribeReq, UnsubscribeRes } from '../dto/subscription'
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
 
 export const getSubscription: RequestWithContext<SubscriptionReq, Subscription[]> = async (
@@ -45,6 +45,34 @@ export const unsubscribe: RequestWithContext<UnsubscribeReq, UnsubscribeRes> = a
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<UnsubscribeRes> => {
 	const res = await fetch(apiUrl + '/subscription/unsubscribe', {
+		method: "POST",
+		body: JSON.stringify(dto)
+	})
+	handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
+
+export const changePaymentMethod: RequestWithContext<ChangePaymentMethodReq, ChangePaymentMethodRes> = async (
+	dto: ChangePaymentMethodReq,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<ChangePaymentMethodRes> => {
+	const res = await fetch(apiUrl + '/subscription/change-payment-method', {
+		method: "POST",
+		body: JSON.stringify(dto)
+	})
+	handleNonOk(res)
+	const json = await res.json()
+
+	return json
+}
+
+export const resetPaymentMethod: RequestWithContext<ChangePaymentMethodReq, ChangePaymentMethodRes> = async (
+	dto: ChangePaymentMethodReq,
+	{ apiUrl }: RequestContext = defaultRequestContext,
+): Promise<ChangePaymentMethodRes> => {
+	const res = await fetch(apiUrl + '/subscription/reset-payment-method', {
 		method: "POST",
 		body: JSON.stringify(dto)
 	})

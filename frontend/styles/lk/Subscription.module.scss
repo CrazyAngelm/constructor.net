@@ -10,6 +10,11 @@
 .subscription {
 	> button {
 		margin-top: 2em;
+		margin-right: 2em;
+	}
+	.danger {
+		background-color: rgb(154, 2, 2);
+		color: white;
 	}
 }
 .notification {
@@ -17,7 +22,7 @@
 	flex-direction: column;
 	gap: 1em;
 
-	>header{
+	> header {
 		font-weight: 700;
 		font-size: 1.4em;
 	}

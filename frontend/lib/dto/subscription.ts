@@ -19,7 +19,8 @@ export interface Subscription {
 	startDate?: Date,
 	endDate?: Date,
 	lastPayment?: Date,
-	active?: boolean
+	active?: boolean,
+	paymentTitle?: string
 }
 
 export interface SubscribeReq {
@@ -44,4 +45,14 @@ export interface UnsubscribeReq {
 
 export interface UnsubscribeRes {
 
+}
+
+export interface ChangePaymentMethodReq {
+	userId?: string,
+	subscriptionId?: string
+}
+
+export interface ChangePaymentMethodRes {
+	confirmationToken: string
+	returnUrl?: string
 }

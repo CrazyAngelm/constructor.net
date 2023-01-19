@@ -184,6 +184,8 @@ model Subscription {
     active        Boolean   @default(true)
     lastPaymentId String?
     canceled      Boolean   @default(false)
+    paymentToken  String?
+    paymentTitle  String?
 
     user        User     @relation(fields: [userId], references: [id])
     license     License  @relation(fields: [licenseId], references: [id])

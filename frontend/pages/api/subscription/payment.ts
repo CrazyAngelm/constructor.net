@@ -31,8 +31,26 @@ handler.post(response(async (req, res) => {
 			return { response: {} }
 		}
 
+		if (_payment.licenseId == -1) {
+			const subscriptions = await prisma.subscription.findMany({
+				where: { userId: _payment.userId, canceled: false }
+			})
+
+			subscriptions.forEach(async p => {
+				await prisma.subscription.update({
+					where: { id: p.id },
+					data: {
+						paymentToken: payment.object.payment_method.id,
+						paymentTitle: payment.object.payment_method.title
+					}
+				})
+			})
+
+			return { response: {} }
+		}
+
 		const subscription = (await prisma.subscription.findMany({
-			where: { userId: _payment.id, canceled: false }
+			where: { userId: _payment.userId, canceled: false }
 		}))?.find(p => p.licenseId == _payment.licenseId)
 
 		if (!subscription) {
@@ -43,7 +61,9 @@ handler.post(response(async (req, res) => {
 					active: true,
 					lastPaymentId: _payment.id,
 					startDate: new Date(),
-					endDate: addMont(new Date())
+					endDate: addMont(new Date()),
+					paymentToken: payment.object.payment_method.id,
+					paymentTitle: payment.object.payment_method.title
 				}
 			})
 		} else {

@@ -17,34 +17,34 @@ interface Props {
 }
 
 interface NavigationPage {
-	label:string
-	hash:string,
-	node:ReactNode
+	label: string
+	hash: string,
+	node: ReactNode
 }
 
 const navigation = [
 	{
 		label: 'Личные данные',
-		hash:'account',
+		hash: 'account',
 		node: <Account />
 	},
 	{
 		label: 'Подписки',
-		hash:'subscription',
-		node:<Subscription />
+		hash: 'subscription',
+		node: <Subscription />
 	}
 ] as NavigationPage[]
 
 const Lk: NextPage<Props> = ({ user }: Props) => {
 	const session = useSession()
 	const router = useRouter()
-	const [page, setPage] = useState<NavigationPage>()
+	const [ page, setPage ] = useState<NavigationPage>()
 
 	/* if(window && page?.hash !== window.location.hash){
 		setPage(navigation.find(p => p.hash == window.location.hash))
 	} */
 
-	const nav = (page:NavigationPage) => () => {
+	const nav = (page: NavigationPage) => () => {
 		console.log(page)
 		window.location.hash = page.hash
 		setPage(page)
@@ -72,16 +72,17 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 						{
 							navigation.map(p =>
 								<a key={p.hash}
-								className={p.hash == page?.hash ? styles.active:''}
-								onClick={nav(p)}>{p.label}</a>)
+									className={p.hash == page?.hash ? styles.active : ''}
+									onClick={nav(p)}>{p.label}</a>)
 						}
 						<hr />
 						<a onClick={() => signOut()} className={styles.danger}>Выход</a>
 					</section>
-					<a href='https://labstudio-inc.ru/boundles/labstudio_hub_installer.exe'
+					<p>Приложение пока не доступно,<br /> идет настройка магазина</p>
+					{/* <a href='https://labstudio-inc.ru/boundles/labstudio_hub_installer.exe'
 						target={'_blank'}>
 						<button>Скачать приложение</button>
-					</a>
+					</a> */}
 				</nav>
 				<section>
 					{page?.node}

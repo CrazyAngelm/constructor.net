@@ -1,9 +1,11 @@
 import { Subscription } from '@/lib/dto/subscription'
 import { makeFetcher } from '@/lib/fetchers'
 import { useFetchData } from '@/lib/hooks/useFetchData'
-import { getLicenses, getSubscription, unsubscribe } from '@/lib/requests/subscription'
+import { changePaymentMethod, getLicenses, getSubscription, resetPaymentMethod, unsubscribe } from '@/lib/requests/subscription'
 import { useSession } from '@/lib/session/hooks'
+import { YooCheckoutWidget } from '@/lib/YooCheckoutWidget'
 import styles from '@/styles/lk/Subscription.module.scss'
+import Head from 'next/head'
 import { useState } from 'react'
 import Modal from '../controls/Modal'
 
@@ -15,8 +17,6 @@ const Item = ({ item }: PropsItem) => {
 	const { data } = useFetchData({}, getLicenses)
 
 	const license = data?.find(p => p.id == item.licenseId)
-
-
 	return (
 		<section className={styles.item}>
 			<table>
@@ -44,6 +44,16 @@ const Item = ({ item }: PropsItem) => {
 						day: 'numeric'
 					})}</td>
 				</tr>
+				<tr>
+					<td className={styles.header}>Активна</td>
+					<td>{item.active ? 'Да' : 'Нет'}</td>
+				</tr>
+				<tr>
+					<td className={styles.header}>Способ оплаты</td>
+					<td>{item.paymentTitle ?
+						item.paymentTitle
+						: 'Способ оплаты не привязан'}</td>
+				</tr>
 			</table>
 		</section>
 	)
@@ -55,6 +65,30 @@ const Subscription = () => {
 	const session = useSession()
 	const { data, update } = useFetchData({ id: (session != 'loading') ? session?.user?.id : undefined },
 		getSubscription);
+
+	const resetPayment = async () => {
+		if (session == 'loading' || !data || data.length === 0) return;
+
+		await makeFetcher(resetPaymentMethod)({
+			userId: session?.user?.id,
+			subscriptionId: data[ 0 ]?.id
+		})
+
+		update()
+	}
+
+	const changePayment = async () => {
+		if (session == 'loading' || !data || data.length === 0) return;
+
+		const res = await makeFetcher(changePaymentMethod)({
+			userId: session?.user?.id,
+			subscriptionId: data[ 0 ]?.id
+		})
+
+		YooCheckoutWidget(res.confirmationToken,
+			res.returnUrl + '/lk',
+			(err) => console.log(err))
+	}
 
 	const cancelSubscription = async () => {
 		if (session == 'loading' || !data) return
@@ -73,6 +107,9 @@ const Subscription = () => {
 	}
 	return (
 		<>
+			<Head>
+				<script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js"></script>
+			</Head>
 			<Modal closeCallback={() => setNot(false)}
 				visible={not}>
 				<section className={styles.notification}>
@@ -85,13 +122,24 @@ const Subscription = () => {
 					<button onClick={cancelSubscription}>Все равно отписаться</button>
 				</section>
 			</Modal>
-			{data &&
+			{(data && data.length > 0) &&
 				<article className={styles.subscription}>
 					{!data ?
 						<div>Пока нет информации о подписках</div>
 						:
-						<>{data.map(p => <Item key={p.id} item={p} />)}
-							<button onClick={() => setNot(true)}>Отписаться</button>
+						<>{data.map(p => <>
+							<Item key={p.id} item={p} />
+							{p.paymentTitle &&
+								<button onClick={resetPayment}>отвязать способ оплаты</button>
+							}
+							<button onClick={changePayment}>привязать способ оплаты</button>
+							<br />
+							<button onClick={() => setNot(true)}
+								className={styles.danger}>
+								Отписаться
+							</button>
+						</>)}
+
 						</>
 					}
 				</article>
