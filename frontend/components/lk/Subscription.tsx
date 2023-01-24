@@ -59,7 +59,8 @@ const ChangeCourse = ({ license, subscription, update }: ChangeCoursesProps) => 
 	return <article className={styles.changeCourses}>
 		<Modal visible={visible} closeCallback={() => setVisible(false)}>
 			<header>{checkedCourses?.filter(p => p === true).length}/
-				{license?.freeCourses} курсов выбрано</header>
+				{(license?.freeCourses && data) && license.freeCourses < data.length
+				? license?.freeCourses : data?.length} курсов выбрано</header>
 			{data?.map((p, id) => <section key={p.id} className={styles.courses}>
 				<Checkbox value={licenseCourses.indexOf(p.id) !== -1
 					? true

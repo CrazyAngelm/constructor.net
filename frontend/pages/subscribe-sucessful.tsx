@@ -15,7 +15,7 @@ const SubscribeSucessful: NextPage = () => {
 				</div>
 				<section>Подписка совершена успешно!<br />
 					Перейдите в личный кабинет, что бы скачать приложение</section>
-				<a href='../lk'><button>Перейти</button></a>
+				<a href='../lk#subscription'><button>Перейти</button></a>
 			</article>
 		</Layout>
 	)

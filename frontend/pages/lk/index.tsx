@@ -8,7 +8,7 @@ import styles from '@/styles/lk/index.module.scss'
 import { useSession } from '@/lib/session/hooks'
 import Router, { useRouter } from 'next/router'
 import { signOut } from 'next-auth/react'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import Account from '@/components/lk/Account'
 import Subscription from '@/components/lk/Subscription'
 
@@ -40,12 +40,13 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 	const router = useRouter()
 	const [ page, setPage ] = useState<NavigationPage>()
 
-	/* if(window && page?.hash !== window.location.hash){
-		setPage(navigation.find(p => p.hash == window.location.hash))
-	} */
+	useEffect(() => {
+		if (window && page?.hash !== window.location.hash) {
+			setPage(navigation.find(p => "#" +p.hash == window.location.hash))
+		}
+	}, [])
 
 	const nav = (page: NavigationPage) => () => {
-		console.log(page)
 		window.location.hash = page.hash
 		setPage(page)
 	}
@@ -78,11 +79,11 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 						<hr />
 						<a onClick={() => signOut()} className={styles.danger}>Выход</a>
 					</section>
-					<p>Приложение пока не доступно,<br /> идет настройка магазина</p>
-					{/* <a href='https://labstudio-inc.ru/boundles/labstudio_hub_installer.exe'
+					{/* <p>Приложение пока не доступно,<br /> идет настройка магазина</p> */}
+					<a href='https://labstudio-inc.ru/boundles/labstudio_hub_installer.exe'
 						target={'_blank'}>
 						<button>Скачать приложение</button>
-					</a> */}
+					</a>
 				</nav>
 				<section>
 					{page?.node}
