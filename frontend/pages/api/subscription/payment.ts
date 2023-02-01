@@ -20,7 +20,7 @@ interface INotification {
 
 handler.post(response(async (req, res) => {
 	const payment = req.body as INotification
-	if (payment.event.indexOf('payment') > -1 && payment.object && payment.object.status == 'succeeded') {
+	if (payment.event.indexOf('payment') > -1 && payment.object) {
 		const _payment = await prisma.payment.findUnique({
 			where: {
 				id: payment.object.id
@@ -28,7 +28,6 @@ handler.post(response(async (req, res) => {
 		})
 
 		if (_payment == null) {
-			console.log('error. _payment not found', payment)
 			return { response: {} }
 		}
 
@@ -54,28 +53,38 @@ handler.post(response(async (req, res) => {
 			where: { userId: _payment.userId, canceled: false }
 		}))?.find(p => p.licenseId == _payment.licenseId)
 
-		if (!subscription) {
-			await prisma.subscription.create({
-				data: {
-					userId: _payment.userId,
-					licenseId: _payment.licenseId,
-					active: true,
-					lastPaymentId: _payment.id,
-					startDate: new Date(),
-					endDate: addMont(new Date()),
-					paymentToken: payment.object.payment_method.id,
-					paymentTitle: payment.object.payment_method.title,
-					courses: await getCourses(_payment.licenseId)
-				}
-			})
-		} else {
-			subscription.active = true
-			subscription.lastPaymentId = _payment.id
-			subscription.endDate = addMont(subscription.endDate ?? new Date())
-			await prisma.subscription.update({
-				where: { id: subscription.id },
-				data: subscription
-			})
+		if (payment.object.status === 'canceled') {
+			if (subscription)
+				await prisma.subscription.update({
+					where: { id: subscription.id },
+					data: { active: false }
+				})
+			return { response: {} }
+		}
+		if (payment.object.status === 'succeeded') {
+			if (!subscription) {
+				const cerated = await prisma.subscription.create({
+					data: {
+						userId: _payment.userId,
+						licenseId: _payment.licenseId,
+						active: true,
+						lastPaymentId: _payment.id,
+						startDate: new Date(),
+						endDate: addMont(new Date()),
+						paymentToken: payment.object.payment_method.id,
+						paymentTitle: payment.object.payment_method.title,
+						courses: await getCourses(_payment.licenseId)
+					}
+				})
+			} else {
+				subscription.active = true
+				subscription.lastPaymentId = _payment.id
+				subscription.endDate = addMont(subscription.endDate ?? new Date())
+				await prisma.subscription.update({
+					where: { id: subscription.id },
+					data: subscription
+				})
+			}
 		}
 	}
 

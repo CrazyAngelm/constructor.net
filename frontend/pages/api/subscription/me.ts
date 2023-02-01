@@ -17,9 +17,7 @@ handler.get(responseAuth(async (req, res, userId) => {
 
 	if (user?.scopes.find(p => p.scope.value === ScopeEnum.admin)) {
 		return {
-			response: { license: { name: 'admin' } } as (Subscription & {
-				license: License;
-			}) | null
+			response: { license: { name: 'admin' } }
 		}
 	}
 

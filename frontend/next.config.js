@@ -26,6 +26,10 @@ const nextConfig = {
 	}
 }
 
+const CroneClass = require('./lib/cronejs.js')
+
+CroneClass.Init()
+
 dotenvLoad()
 const withNextEnv = nextEnv()
 
