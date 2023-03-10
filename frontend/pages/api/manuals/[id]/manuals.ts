@@ -38,14 +38,13 @@ handler.get(response(async (req, res) => {
 		: (await prisma.manual.findMany({
 			where: {
 				AND: {
-					Parent: undefined,
-					deleted: false
+					deleted: false,
+					Parent: {
+						none: {}
+					}
 				}
-
 			}
 		})) as Manual[]
-
-
 
 	if (data == null) return { error: { code: 402, message: "Неверный запрос" } }
 

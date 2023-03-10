@@ -23,8 +23,6 @@ handler.post(response(async (req, res) => {
 		}
 	})
 
-	console.log(data, created.id)
-
 	if (data.parentId && data.parentId >= 0)
 		await prisma.manualToManula.create({
 			data: {
