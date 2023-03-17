@@ -1,0 +1,57 @@
+.docs {
+	min-height: 100vh;
+	padding: 6em 5vw 0 5vw;
+	display: flex;
+	flex-direction: row;
+
+	.list {
+		width: 20vw;
+		position: fixed;
+
+		> header {
+			font-size: 1.33em;
+			font-weight: 500;
+			margin-bottom: 11px;
+		}
+		.item {
+			margin-top: 0.2em;
+			> header {
+				display: flex;
+				flex-direction: row;
+				gap: 0.5em;
+				> div {
+					width: 0.7em;
+					.arrow {
+						margin-top: 0.2em;
+						cursor: pointer;
+
+						&.open {
+							transform: rotate(90deg);
+						}
+					}
+				}
+				> span {
+					cursor: pointer;
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+			> section {
+				margin-left: 20px;
+			}
+		}
+	}
+
+	.content {
+		margin-left: 25vw;
+		margin-bottom: 2rem;
+		width: 70vw;
+
+		>header{
+			font-size: 2em;
+			font-weight: 700;
+			margin-bottom: 1rem;
+		}
+	}
+}
