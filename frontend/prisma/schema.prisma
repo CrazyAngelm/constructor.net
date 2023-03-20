@@ -220,8 +220,8 @@ model CategoryToWorklist {
     categoryId Int
     worklistId String
 
-    worklist Worklist     @relation(fields: [worklistId], references: [id])
-    category TaskCategory @relation(fields: [categoryId], references: [id])
+    worklist Worklist     @relation(fields: [worklistId], references: [id], onDelete: Cascade)
+    category TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
     @@id([categoryId, worklistId])
 }
@@ -230,8 +230,8 @@ model CourseToWorklist {
     courseId   Int
     worklistId String
 
-    worklist Worklist @relation(fields: [worklistId], references: [id])
-    course   Course   @relation(fields: [courseId], references: [id])
+    worklist Worklist @relation(fields: [worklistId], references: [id], onDelete: Cascade)
+    course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
     @@id([courseId, worklistId])
 }
