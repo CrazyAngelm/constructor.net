@@ -6,12 +6,14 @@ import Hierarchy from './contents/hierarchy/Hierarchy'
 import UserContent from './contents/user/UserContent'
 import Manual from './contents/mauals/Manual'
 import Versions from './contents/versions/Versions'
+import Worklists from './contents/worklists/Worklists'
 
 export enum TypeContent {
 	HierarchyContent,
 	Users,
 	Manual,
-	Versions
+	Versions,
+	Worklists
 }
 
 export interface Props {
@@ -24,6 +26,7 @@ const getContent = (type?: TypeContent): ReactNode => {
 		case TypeContent.HierarchyContent: return <Hierarchy />
 		case TypeContent.Manual: return <Manual />
 		case TypeContent.Versions: return <Versions />
+		case TypeContent.Worklists: return <Worklists />
 		default: return null
 	}
 }

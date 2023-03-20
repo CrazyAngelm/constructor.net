@@ -80,20 +80,22 @@ model Course {
     deleted          Boolean            @default(false)
     taskCategories   TaskCategory[]
     CourseToCategory CourseToCategory[]
+    CourseToWorklist CourseToWorklist[]
 }
 
 model TaskCategory {
-    id               Int                  @id @default(autoincrement())
-    name             String
-    description      String               @db.LongText
-    date             DateTime?
-    deleted          Boolean              @default(false)
-    tasks            Task[]
-    Course           Course[]
-    CourseToCategory CourseToCategory[]
-    CategoryToTask   CategoryToTask[]
-    CategoryChildren CategoryToCategory[] @relation(name: "children")
-    CategoryParent   CategoryToCategory[] @relation(name: "parent")
+    id                 Int                  @id @default(autoincrement())
+    name               String
+    description        String               @db.LongText
+    date               DateTime?
+    deleted            Boolean              @default(false)
+    tasks              Task[]
+    Course             Course[]
+    CourseToCategory   CourseToCategory[]
+    CategoryToTask     CategoryToTask[]
+    CategoryChildren   CategoryToCategory[] @relation(name: "children")
+    CategoryParent     CategoryToCategory[] @relation(name: "parent")
+    CategoryToWorklist CategoryToWorklist[]
 }
 
 model CourseToCategory {
@@ -202,4 +204,34 @@ model Payment {
 
     user        User           @relation(fields: [userId], references: [id])
     Subcription Subscription[]
+}
+
+model Worklist {
+    id   String    @id @default(uuid())
+    name String?
+    json String?   @db.LongText
+    date DateTime?
+
+    CategoryToWorklist CategoryToWorklist[]
+    CourseToWorklist   CourseToWorklist[]
+}
+
+model CategoryToWorklist {
+    categoryId Int
+    worklistId String
+
+    worklist Worklist     @relation(fields: [worklistId], references: [id])
+    category TaskCategory @relation(fields: [categoryId], references: [id])
+
+    @@id([categoryId, worklistId])
+}
+
+model CourseToWorklist {
+    courseId   Int
+    worklistId String
+
+    worklist Worklist @relation(fields: [worklistId], references: [id])
+    course   Course   @relation(fields: [courseId], references: [id])
+
+    @@id([courseId, worklistId])
 }
