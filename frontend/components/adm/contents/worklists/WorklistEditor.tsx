@@ -36,6 +36,8 @@ const WorklistsEditor = ({ category, isCourse, callbackBack }: Props) => {
 					{category.name}
 				</header>
 				<section>
+					{data && data.length == 0 &&
+						<span>Нет загруженных конпсектов в этой категории</span>}
 					{data?.map(p => <Item worklist={p} />)}
 				</section>
 			</article>
