@@ -4,7 +4,7 @@ import Head from 'next/head'
 import styles from '@/styles/Layout.module.scss'
 
 import Navbar from './Navbar'
-import logo from '@/assets/logo.png'
+import logo from '@/assets/logo.svg'
 import Image from 'next/image'
 import Script from 'next/script'
 import Auth from './auth/Auth'
@@ -23,8 +23,7 @@ const Layout = ({ children, title, navbar = true, footer = true }: Props) => {
 			<Head>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<title>Lab Studio{title && ` | ${title}`}</title>
-				<link rel="shortcut icon" href="/favicon.png" />
-
+				<link rel="icon" type='image/png' href="/logo.png" />
 			</Head>
 			{navbar && <Navbar />}
 			<article className={`${styles.content} ${navbar ?? styles.isNavbar}`}>

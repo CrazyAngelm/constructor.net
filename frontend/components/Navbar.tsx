@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 import styles from '@/styles/Navbar.module.scss'
 
-import logo from '@/assets/new-logo.png'
+import logo from '@/assets/logo-text.svg'
 import { useSession } from '@/lib/session/hooks'
 import { signOut } from 'next-auth/react'
 import Auth from './auth/Auth'
@@ -21,7 +21,7 @@ const Navbar = () => {
 							<div>
 								<Image src={logo} layout='fill' objectFit='contain' />
 							</div>
-							<span>Lab Studio</span>
+							{/* <span>Lab Studio</span> */}
 						</section>
 					</Link>
 				</div>
