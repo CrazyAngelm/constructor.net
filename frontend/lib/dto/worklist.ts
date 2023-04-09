@@ -4,14 +4,25 @@ export interface WorklistDto {
 	json?: string
 }
 
-export interface CreateWorklistInCategoryDto {
+export interface CreateWorklistInFolderDto {
 	name?: string
 	json?: string
-	categoryId: number
+	folderId: string
 }
 
 export interface CreateWorklistInCourse {
 	name?: string
 	json?: string
 	courseId: number
+}
+
+export interface FolderDto {
+	id?: string,
+	name?: string
+}
+
+export interface CreateFolderDto {
+	name: string
+	parentFolderId?: string
+	parentCourseId?: number
 }

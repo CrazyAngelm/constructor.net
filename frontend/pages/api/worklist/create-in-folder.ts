@@ -3,7 +3,7 @@ import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { usePrisma } from "@/lib/api/database";
-import { CreateWorklistInCategoryDto } from "@/lib/dto/worklist";
+import { CreateWorklistInFolderDto, FolderDto } from "@/lib/dto/worklist";
 
 
 const prisma = usePrisma()
@@ -11,12 +11,12 @@ const handler = getDefaultHandler()
 
 
 handler.post(response(async (req, res) => {
-	const data = req.body as CreateWorklistInCategoryDto
+	const data = req.body as CreateWorklistInFolderDto
 
 
-	const isWorklistName = await prisma.categoryToWorklist.findFirst({
+	const isWorklistName = await prisma.folderToWorklist.findFirst({
 		where: {
-			categoryId: data.categoryId,
+			folderId: data.folderId,
 			worklist: {
 				name: data.name
 			}
@@ -38,14 +38,14 @@ handler.post(response(async (req, res) => {
 		}
 	})
 
-	await prisma.categoryToWorklist.create({
+	await prisma.folderToWorklist.create({
 		data: {
-			categoryId: data.categoryId,
+			folderId: data.folderId,
 			worklistId: created.id
 		}
 	})
 
-	return { response: true }
+	return { response: created as FolderDto }
 }))
 
 export default handler

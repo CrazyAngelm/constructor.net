@@ -3,7 +3,7 @@ import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { usePrisma } from "@/lib/api/database";
-import { CreateWorklistInCategoryDto, CreateWorklistInCourse } from "@/lib/dto/worklist";
+import { CreateWorklistInCourse, FolderDto } from "@/lib/dto/worklist";
 
 
 const prisma = usePrisma()
@@ -20,7 +20,6 @@ handler.post(response(async (req, res) => {
 		}
 	}
 
-	console.log(prisma.categoryToWorklist)
 
 	const isWorklistName = await prisma.courseToWorklist.findFirst({
 		where: {
@@ -53,7 +52,7 @@ handler.post(response(async (req, res) => {
 		}
 	})
 
-	return { response: true }
+	return { response: created as FolderDto }
 }))
 
 export default handler

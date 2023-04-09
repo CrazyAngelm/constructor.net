@@ -81,21 +81,21 @@ model Course {
     taskCategories   TaskCategory[]
     CourseToCategory CourseToCategory[]
     CourseToWorklist CourseToWorklist[]
+    FolderToCourse   FolderToCourse[]
 }
 
 model TaskCategory {
-    id                 Int                  @id @default(autoincrement())
-    name               String
-    description        String               @db.LongText
-    date               DateTime?
-    deleted            Boolean              @default(false)
-    tasks              Task[]
-    Course             Course[]
-    CourseToCategory   CourseToCategory[]
-    CategoryToTask     CategoryToTask[]
-    CategoryChildren   CategoryToCategory[] @relation(name: "children")
-    CategoryParent     CategoryToCategory[] @relation(name: "parent")
-    CategoryToWorklist CategoryToWorklist[]
+    id               Int                  @id @default(autoincrement())
+    name             String
+    description      String               @db.LongText
+    date             DateTime?
+    deleted          Boolean              @default(false)
+    tasks            Task[]
+    Course           Course[]
+    CourseToCategory CourseToCategory[]
+    CategoryToTask   CategoryToTask[]
+    CategoryChildren CategoryToCategory[] @relation(name: "children")
+    CategoryParent   CategoryToCategory[] @relation(name: "parent")
 }
 
 model CourseToCategory {
@@ -212,18 +212,47 @@ model Worklist {
     json String?   @db.LongText
     date DateTime?
 
-    CategoryToWorklist CategoryToWorklist[]
-    CourseToWorklist   CourseToWorklist[]
+    CourseToWorklist CourseToWorklist[]
+    FolderToWorklist FolderToWorklist[]
 }
 
-model CategoryToWorklist {
-    categoryId Int
+model Folder {
+    id      String   @id @default(uuid())
+    name    String
+    date    DateTime
+    deleted Boolean
+
+    FolderToCourse   FolderToCourse[]
+    FolderToWorklist FolderToWorklist[]
+    FolderChildren   FolderToFolder[]   @relation(name: "childrenFolder")
+    FolderParent     FolderToFolder[]   @relation(name: "parentFolder")
+}
+
+model FolderToCourse {
+    folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+    course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    folderId String
+    courseId Int
+
+    @@id([folderId, courseId])
+}
+
+model FolderToFolder {
+    parentId   String
+    childrenId String
+    parent     Folder @relation(name: "parentFolder", fields: [parentId], references: [id], onDelete: Cascade)
+    children   Folder @relation(name: "childrenFolder", fields: [childrenId], references: [id], onDelete: Cascade)
+
+    @@id([parentId, childrenId])
+}
+
+model FolderToWorklist {
+    worklist   Worklist @relation(fields: [worklistId], references: [id], onDelete: Cascade)
+    Folder     Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
     worklistId String
+    folderId   String
 
-    worklist Worklist     @relation(fields: [worklistId], references: [id], onDelete: Cascade)
-    category TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-    @@id([categoryId, worklistId])
+    @@id([worklistId, folderId])
 }
 
 model CourseToWorklist {

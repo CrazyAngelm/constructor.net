@@ -1,11 +1,8 @@
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 
-import { PrismaClient } from "@prisma/client";
-
 import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { usePrisma } from "@/lib/api/database";
-import { TaskCategoryDto } from "@/lib/dto/tasks";
 
 
 
@@ -17,24 +14,27 @@ interface Query extends NextParsedUrlQuery {
 }
 
 handler.get(response(async (req, res) => {
-	const id = Number.parseInt((req.query as Query).id as string)
+	const id = (req.query as Query).id as string
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
-	const data = await prisma.taskCategory.findUnique({
+	const data = await prisma.folder.findUnique({
 		where: { id },
 		include: {
-			CategoryParent: {
-				where: { children: { deleted: false } },
-				include: { children: true }
+			FolderToWorklist: {
+				include: {
+					worklist: {
+						select: {
+							id: true,
+							name: true,
+							date: true
+						}
+					}
+				}
 			}
 		}
 	})
 
-	if (data == null) return { error: { code: 402, message: "Неверный запрос" } }
-
-	const resp: TaskCategoryDto[] = data.CategoryParent.map(p => p.children)
-
-	return { response: resp }
+	return { response: data?.FolderToWorklist.map(p => p.worklist) }
 })
 )
 
