@@ -72,7 +72,7 @@ handler.delete(responseAuth(async (req, res, userId) => {
 		const id = (req.query as Query).id
 		if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
-		await prisma.categoryToWorklist.deleteMany({
+		await prisma.folderToWorklist.deleteMany({
 			where: {
 				worklistId: id
 			}

@@ -3,10 +3,11 @@ import { PrismaClient } from "@prisma/client";
 import { TaskCategoryDto } from "@/lib/dto/tasks";
 
 import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
+import { response, responseAdmin, responseAuth } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { usePrisma } from "@/lib/api/database";
 import { FolderDto } from "@/lib/dto/worklist";
+import { ScopeEnum } from "@/lib/dto/users";
 
 
 const prisma = usePrisma()
@@ -29,7 +30,7 @@ handler.get(response(async (req, res) => {
 })
 )
 
-handler.post(response(async (req, res) => {
+handler.post(responseAdmin(async (req, res) => {
 	const id = (req.query as Query).id as string
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
@@ -39,13 +40,14 @@ handler.post(response(async (req, res) => {
 		where: { id },
 		data: {
 			name: data.name,
-			date: new Date().toISOString()
+			date: new Date().toISOString(),
+			deleted: false
 		}
 	})
 	return { response: upset as FolderDto }
 }))
 
-handler.delete(response(async (req, res) => {
+handler.delete(responseAdmin(async (req, res, userId) => {
 	const id = (req.query as Query).id as string
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
@@ -56,7 +58,7 @@ handler.delete(response(async (req, res) => {
 		}
 	})
 
-	return { response: { status: 'Ok' } }
+	return { response: true }
 
 }))
 

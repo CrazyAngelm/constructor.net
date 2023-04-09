@@ -3,7 +3,7 @@ import { PrismaClient, User, Version } from "@prisma/client";
 import { UserDto } from "@/lib/dto/users";
 
 import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { Error, response } from "@/lib/api/response";
+import { Error, response, responseAdmin } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 
 
@@ -27,7 +27,7 @@ handler.get(response(async (req, res) => {
 }
 ))
 
-handler.post(response(async (req, res) => {
+handler.post(responseAdmin(async (req, res) => {
 	const { id } = req.query as Query
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 
