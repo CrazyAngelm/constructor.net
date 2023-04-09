@@ -1,7 +1,7 @@
 import { CreateCategoryDto, TaskCategoryDto } from "@/lib/dto/tasks";
 
 import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response, responseAdmin } from "@/lib/api/response";
+import { response } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { usePrisma } from "@/lib/api/database";
 import { CreateFolderDto, FolderDto } from "@/lib/dto/worklist";
@@ -14,7 +14,7 @@ interface Query extends NextParsedUrlQuery {
 	id?: string
 }
 
-handler.post(responseAdmin(async (req, res) => {
+handler.post(response(async (req, res) => {
 	const data = req.body as CreateFolderDto
 
 	const upset = await prisma.folder.create({

@@ -1,6 +1,6 @@
 
 import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response, responseAdmin } from "@/lib/api/response";
+import { response } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { usePrisma } from "@/lib/api/database";
 import { CreateWorklistInFolderDto, FolderDto } from "@/lib/dto/worklist";
@@ -10,7 +10,7 @@ const prisma = usePrisma()
 const handler = getDefaultHandler()
 
 
-handler.post(responseAdmin(async (req, res) => {
+handler.post(response(async (req, res) => {
 	const data = req.body as CreateWorklistInFolderDto
 
 
