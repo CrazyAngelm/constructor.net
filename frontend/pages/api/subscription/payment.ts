@@ -19,11 +19,13 @@ interface INotification {
 }
 
 handler.post(response(async (req, res) => {
-	const payment = req.body as INotification
+	const payment = JSON.parse(req.body) as INotification
+	console.log(payment)
+	console.log(payment.event)
 	if (payment.event.indexOf('payment') > -1 && payment.object) {
 		const _payment = await prisma.payment.findUnique({
 			where: {
-				id: payment.object.id
+				id: payment.object.id,
 			}
 		})
 
