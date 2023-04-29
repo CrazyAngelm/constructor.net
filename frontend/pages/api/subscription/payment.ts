@@ -19,9 +19,8 @@ interface INotification {
 }
 
 handler.post(response(async (req, res) => {
-	const payment = JSON.parse(req.body) as INotification
-	console.log(payment)
-	console.log(payment.event)
+	const payment = req.body as INotification
+
 	if (payment.event.indexOf('payment') > -1 && payment.object) {
 		const _payment = await prisma.payment.findUnique({
 			where: {
@@ -56,7 +55,6 @@ handler.post(response(async (req, res) => {
 		}))?.find(p => p.licenseId == _payment.licenseId)
 
 		if (payment.object.status === 'canceled') {
-			await prisma.payment.delete({ where: { id: _payment.id } })
 			if (subscription)
 				await prisma.subscription.update({
 					where: { id: subscription.id },
@@ -65,6 +63,10 @@ handler.post(response(async (req, res) => {
 			return { response: {} }
 		}
 		if (payment.object.status === 'succeeded') {
+			await prisma.payment.update({
+				where: { id: _payment.id },
+				data: { confirmed: true }
+			})
 			if (!subscription) {
 				const cerated = await prisma.subscription.create({
 					data: {

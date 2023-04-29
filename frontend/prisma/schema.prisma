@@ -201,6 +201,7 @@ model Payment {
     userId    String
     licenseId Int
     createdAt DateTime @default(now())
+    confirmed Boolean  @default(false)
 
     user        User           @relation(fields: [userId], references: [id])
     Subcription Subscription[]
