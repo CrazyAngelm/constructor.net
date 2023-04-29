@@ -5,6 +5,9 @@
 	max-height: $navbar-height;
 	background-color: transparent;
 	margin: 1% 4% 1% 4%;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
 
 	&.fixed {
 		position: absolute;
@@ -14,15 +17,14 @@
 		@extend .navbar-item;
 		@extend .has-dropdown;
 
-		&:hover{
-			.avatarMenu{
-				display: block;
-			}
-		}
 
 		.avatarMenu {
+			background-color: aliceblue;
+			&.open{
+				display: block;
+			}
 			@extend .navbar-dropdown;
-
+			display: none;
 			> a {
 				@extend .navbar-item;
 
@@ -57,10 +59,13 @@
 			}
 		}
 	}
-
 	> .menu {
-		@extend .navbar-menu;
-
+		width: 100%;
+		display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+		justify-content: space-between;
+    margin-top: 0.5em;
 		.buttons {
 			@extend .buttons;
 			.log {
@@ -74,6 +79,8 @@
 		}
 
 		> section {
+			display: flex;
+			flex-direction: row;
 			> a,
 			div {
 				@extend .navbar-item;
@@ -91,6 +98,8 @@
 				}
 			}
 			.lk {
+				display: flex;
+				flex-direction: row;
 				gap: 1vh;
 				cursor: pointer;
 				img {
@@ -104,6 +113,7 @@
 					@extend .rounded;
 					@extend .has-background-primary;
 					@extend .has-text-white;
+					display: flex;
 					justify-content: center;
 					width: 2rem;
 					height: 2rem;

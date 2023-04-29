@@ -4,6 +4,7 @@
 .root {
 	//Тут будут перечисления всех стилей стандартных
 	min-height: 100vh;
+	min-width: 1080px;
 	position: relative;
 	.content {
 		&.isNavbar {

@@ -7,10 +7,12 @@ import logo from '@/assets/logo-text.svg'
 import { useSession } from '@/lib/session/hooks'
 import { signOut } from 'next-auth/react'
 import Auth from './auth/Auth'
+import { useState } from 'react'
 
 
 const Navbar = () => {
 	const session = useSession()
+	const [isOpenAvatarMenu, setOpenAvatarMenu] = useState(false)
 
 	return (
 		<nav className={`${styles.navbar} ${styles.fixed}`} role="navigation" aria-label="main navigation">
@@ -48,8 +50,7 @@ const Navbar = () => {
 							</div>
 						</div>
 						: <section className={styles.lkNavbar}>
-							<div className={styles.lk}>
-								<span>{session.user?.name ? session.user.name : 'unknow'}</span>
+							<div className={styles.lk} onClick={() => setOpenAvatarMenu(p => !p)}>
 								{session.user?.image
 									? <img src={session.user?.image} className={styles.rounded} />
 									: <div className={styles.avatar}>
@@ -58,8 +59,9 @@ const Navbar = () => {
 										</span>
 									</div>
 								}
+								<span>{session.user?.name ? session.user.name : 'unknow'}</span>
 							</div>
-							<section className={styles.avatarMenu}>
+							<section className={`${styles.avatarMenu} ${isOpenAvatarMenu ? styles.open : ""}`}>
 								<Link href={"/lk"}>Личный кабинет</Link>
 								<hr></hr>
 								<a onClick={() => signOut()} className={styles.exit}>Выход</a>
