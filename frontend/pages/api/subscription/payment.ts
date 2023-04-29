@@ -54,6 +54,7 @@ handler.post(response(async (req, res) => {
 		}))?.find(p => p.licenseId == _payment.licenseId)
 
 		if (payment.object.status === 'canceled') {
+			await prisma.payment.delete({ where: { id: _payment.id } })
 			if (subscription)
 				await prisma.subscription.update({
 					where: { id: subscription.id },
