@@ -1,6 +1,7 @@
 export const ScopeEnum = {
 	admin: 'admin',
 	editor: 'editor',
+	developer: 'developer',
 
 	Contains: (value: string, scopes?: string[]): boolean => {
 		if (!scopes) return false

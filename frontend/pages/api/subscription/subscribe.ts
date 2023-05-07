@@ -8,6 +8,7 @@ import { optionsWithFrom, sendMail } from "@/lib/mailer/mailer";
 import { YooCheckout, ICreatePayment } from '@a2seven/yoo-checkout';
 import { v4 } from 'uuid'
 import { SubscribeReq, SubscribeRes } from "@/lib/dto/subscription";
+import { ScopeEnum } from "@/lib/dto/users";
 
 const prisma = usePrisma()
 const handler = getDefaultHandler()
@@ -26,7 +27,12 @@ handler.post(response(async (req, res) => {
 	if (subscription && subscription.licenseId !== 1) return { error: { code: 412, message: 'У данного пользователя уже есть активная подписка' } }
 
 	const user = await prisma.user.findUnique({
-		where: { id: body.userId }
+		where: { id: body.userId },
+		include: {scopes: {
+			include: {
+				scope: true
+			}
+		}}
 	})
 
 	if (!user) return { error: { code: 400, message: "Такого пользователя не сущетсвует" } }
@@ -43,6 +49,11 @@ handler.post(response(async (req, res) => {
 	})
 
 	const idempotentKey = v4()
+
+	if(ScopeEnum.Contains(ScopeEnum.developer, user.scopes.map(p => p.scope.value))){
+		license.name += "(developer)"
+		license.price = 1
+	}
 
 	const createPayload: ICreatePayment = {
 		amount: {
