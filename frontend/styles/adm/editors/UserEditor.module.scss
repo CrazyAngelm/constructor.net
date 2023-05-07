@@ -2,11 +2,10 @@
 @import "bulma/sass/form/_all.sass";
 
 .editor {
-	padding: 5vh 5vw;
 	> article {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: flex-start;
 		gap: 5vh;
 		> section {

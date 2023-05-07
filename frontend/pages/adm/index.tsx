@@ -28,10 +28,7 @@ const Adm: NextPage = () => {
 			}, {
 				label: 'Методички',
 				callback: () => setType(TypeContent.Manual)
-			}, {
-				label: 'Конспекты',
-				callback: () => setType(TypeContent.Worklists)
-			} ]
+			}]
 		}, {
 			label: 'Приложение',
 			items: [ {

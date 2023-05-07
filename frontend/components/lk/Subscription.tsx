@@ -83,7 +83,7 @@ interface PropsItem {
 	update?: () => void
 }
 
-const Item = ({ item, update }: PropsItem) => {
+export const Item = ({ item, update }: PropsItem) => {
 
 	const { data } = useFetchData({}, getLicenses)
 	const { data: courses } = useFetchData({}, getCourses)
