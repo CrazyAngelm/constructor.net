@@ -49,15 +49,14 @@ const CheckSubscribtion = async () => {
 	subscription.forEach(async p => {
 		if (!p.endDate) return
 		if (new Date() > p.endDate) {
+			await prisma.subscription.update({
+				where: { id: p.id },
+				data: {
+					active: false
+				}
+			})
 			if (p.paymentToken)
 				payment(p.license, p.userId, p.paymentToken)
-			else
-				await prisma.subscription.update({
-					where: { id: p.id },
-					data: {
-						active: false
-					}
-				})
 		}
 	});
 }

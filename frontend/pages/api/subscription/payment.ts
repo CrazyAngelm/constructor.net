@@ -54,19 +54,7 @@ handler.post(response(async (req, res) => {
 			where: { userId: _payment.userId, canceled: false }
 		}))?.find(p => p.licenseId == _payment.licenseId)
 
-		if (payment.object.status === 'canceled') {
-			if (subscription)
-				await prisma.subscription.update({
-					where: { id: subscription.id },
-					data: { active: false }
-				})
-			return { response: {} }
-		}
 		if (payment.object.status === 'succeeded') {
-			await prisma.payment.update({
-				where: { id: _payment.id },
-				data: { confirmed: true }
-			})
 			if (!subscription) {
 				const cerated = await prisma.subscription.create({
 					data: {
@@ -90,6 +78,11 @@ handler.post(response(async (req, res) => {
 					data: subscription
 				})
 			}
+
+			await prisma.payment.update({
+				where: { id: _payment.id },
+				data: { confirmed: true }
+			})
 		}
 	}
 
