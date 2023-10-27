@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer'
 
 export const getTransport = () => {
-	return nodemailer.createTransport({
+
+	const transport = nodemailer.createTransport({
 		host: 'smtp.mail.ru',
 		port: 465,
 		secure: true,
@@ -10,6 +11,8 @@ export const getTransport = () => {
 			pass: process.env.MAILER_PASS
 		}
 	})
+	console.log(transport)
+	return transport
 }
 
 export const sendMail = (mailOptions: any) => {
