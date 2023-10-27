@@ -1,45 +1,48 @@
 <html>
 
 <body>
-	<div style="background-color:rgb(220 220 220); font-family: system-ui;">
-		<div style="background-color: white;">
-			<div style="    background-color: hsl(347, 90%, 96%);
-				padding: 1vh;
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: center;">
+	<div style="background-color:#eeeeee; font-family: system-ui;">
+		<div style="background-color: white; width: 600px; margin: 0 auto;">
+			<div style="background-color: white;
+				padding: 2% 10%;">
 				<img style="height: 5em" src="cid:logo@nodemailer.com" />
 				<p style="    font-size: 2.5em;
-					color: black;
-					text-align: center; margin: 0 0;">Регистрация</p>
+					color: black; font-weight: 600;
+					margin: 0 0;">Регистрация</p>
 			</div>
-			<div style="
-			display: flex;
-			flex-direction: column;
-			align-content: center;
-			padding: 2% 10%;">
+			<div style="padding: 2% 10%;">
 				<p>
-					Вы зарегистрировались в нашем сервисе.
-					Для подтверждения Вашего аккаунта нажмите кнопку или перейдите по ссылке:
-					<a href="$link$" target="_blank">$link$</a>
-					<br />
-					Если это не вы, то просто проигнорируйте это письмо
+				<header style="font-size: 1.5em;
+    font-weight: 500;
+    margin-bottom: 15px;">Здравствуйте!</header>
+				Поздравляем Вас с регистрацией на сайте LabStudio.
+				Что бы подтвердить регистрацию и активировать аккаунт, пожалуйста перейдите по ссылке: <a href="$link$"
+					target="_blank">$link$</a>
+				<br />
+				<br />
+				Или нажмите кнопку нижу
 				</p>
-				<a href="$link$" style="
-				align-self: center;
+				<br />
+				<div style="    display: flex;
+    align-items: center;
+    justify-content: center;">
+					<a href="$link$" style="
 				background-color: hsl(171, 100%, 41%);
 				border: none;
 				border-radius: 5px;
-				padding: 1vh;
+				padding: 10px 15px;
 				color: white;
 				font-weight: bold;
 				text-decoration: none;
     		cursor: pointer;">Подтвердить</a>
-				<p>Если вы не регистрировались просто проигнорируйте это письмо</p>
+				</div>
+				<br />
+				<br />
+				<p>Если вы не регистрировались на нашем сайте, и письмо пришло по ошибке, не переходите по ссылке и аккаунт не
+					будет создан.</p>
 			</div>
-			<div style="    background-color: hsl(347, 90%, 96%);
-    color: hsl(0, 0%, 48%);">
+			<div style="background-color: #f6f7f7;
+    color: hsl(0, 0%, 48%); padding: 7px 0;">
 				<p style="text-align: end;
     padding: 0 5%;">&#169; Лаборатория будущего | Lab Studio</p>
 			</div>

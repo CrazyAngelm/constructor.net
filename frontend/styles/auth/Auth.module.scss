@@ -1,7 +1,7 @@
 @import "../lib/fonts.scss", "../lib/variables.scss", "../lib/bulma.scss";
 
 .auth {
-	> .modal {
+	.modal {
 		@extend .modal;
 
 		display: flex;
@@ -109,5 +109,15 @@
 		align-items: center;
 		justify-content: center;
 		margin-top: 1em;
+	}
+}
+
+.resendEmail {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	> header {
+		font-size: 1.5em;
+		font-weight: 500;
 	}
 }

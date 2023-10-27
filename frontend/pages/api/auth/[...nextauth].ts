@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client"
 import { usePrisma } from '@/lib/api/database'
 import { compare } from 'bcryptjs'
 import { UserDto } from '@/lib/dto/users'
+import { ConfirmEmailError } from '@/lib/api/error'
 
 const prisma = new PrismaClient()
 
@@ -32,8 +33,7 @@ export default NextAuth({
 				const checkPassword = await compare(credentials.password, user.password ?? "")
 
 				if (!checkPassword) throw new Error("Ivalid password")
-
-				if(!user.emailVerified) throw new Error("Email не подтвержден")
+				if (!user.emailVerified) throw ConfirmEmailError
 
 				return {id:user.id}
 			}
