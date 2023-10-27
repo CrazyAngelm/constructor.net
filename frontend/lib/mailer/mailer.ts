@@ -4,7 +4,7 @@ export const getTransport = () => {
 
 	const transport = nodemailer.createTransport({
 		host: 'smtp.mail.ru',
-		port: 465,
+		port: 25,
 		secure: true,
 		auth: {
 			user: process.env.MAILER_USER,
