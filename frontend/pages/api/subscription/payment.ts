@@ -21,6 +21,8 @@ interface INotification {
 handler.post(response(async (req, res) => {
 	const payment = req.body as INotification
 
+	console.log(payment)
+
 	if (payment.event.indexOf('payment') > -1 && payment.object) {
 		const _payment = await prisma.payment.findUnique({
 			where: {
