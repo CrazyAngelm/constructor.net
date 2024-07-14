@@ -33,7 +33,7 @@ class CroneClass {
 			},
 			capture: false,
 			payment_method_id: paymentId,
-			description: 'Подписка, тариф: ' + license.name
+			description: `Подписка, тариф:  + ${license.name}, user: ${userId}`
 		}
 		const payment = await checkout.createPayment(createPayload, idempotentKey)
 

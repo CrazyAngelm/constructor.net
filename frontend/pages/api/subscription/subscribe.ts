@@ -64,7 +64,7 @@ handler.post(response(async (req, res) => {
 			type: 'embedded'
 		},
 		capture: true,
-		description: 'Подписка, тариф: ' + license.name,
+		description: `Подписка, тариф:  + ${license.name}, user: ${user.id}`,
 		save_payment_method: true
 	}
 	try {
