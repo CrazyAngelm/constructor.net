@@ -14,7 +14,7 @@ class CroneClass {
 			null, true)
 	}
 
-	static async Payment(license, userId, paymentId) {
+	static async Payment(subId, license, userId, paymentId) {
 		const YooCheckout = require('@a2seven/yoo-checkout').YooCheckout
 		const v4 = require('uuid').v4
 
@@ -45,7 +45,17 @@ class CroneClass {
 				licenseId: license.id
 			}
 		})
-		const capture = await checkout.capturePayment(payment.id, {})
+		try {
+			const capture = await checkout.capturePayment(payment.id, {})
+		} catch {
+			console.error("Ошибка при зачислении платежа", capture)
+			await CroneClass.prisma.subscription.update({
+				where: { id: p.id },
+				data: {
+					active: false
+				}
+			})
+		}
 	}
 
 	static async Check() {
@@ -64,7 +74,7 @@ class CroneClass {
 			if (!p.endDate) return
 			if (new Date() > p.endDate) {
 				if (p.paymentToken)
-					CroneClass.Payment(p.license, p.userId, p.paymentToken)
+					CroneClass.Payment(p.id, p.license, p.userId, p.paymentToken)
 				else
 					await CroneClass.prisma.subscription.update({
 						where: { id: p.id },
