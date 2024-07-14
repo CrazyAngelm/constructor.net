@@ -9,7 +9,7 @@ class CroneClass {
 
 		this.prisma = new PrismaClient()
 		console.log("init")
-		const job = new CronJob("00 00 00 * * *",
+		const job = new CronJob("00 * * * * *",
 			this.Check,
 			null, true)
 	}
@@ -36,7 +36,7 @@ class CroneClass {
 			description: 'Подписка, тариф: ' + license.name
 		}
 		const payment = await checkout.createPayment(createPayload, idempotentKey)
-
+		console.log(payment)
 		await CroneClass.prisma.payment.create({
 			data: {
 				id: payment.id,
@@ -46,11 +46,13 @@ class CroneClass {
 			}
 		})
 		const capture = await checkout.capturePayment(payment.id, {})
+		console.log(capture)
 	}
 
 	static async Check() {
 		const subscription = await CroneClass.prisma.subscription.findMany({
 			where: {
+				userId: 'clo8ff9dj0002flstdpsliglu',
 				canceled: false,
 				active: true
 			},
@@ -60,8 +62,11 @@ class CroneClass {
 			}
 		})
 
+
+
 		subscription.forEach(async p => {
-			if (!p.endDate) return
+			console.log(`Check user ${p.userId}, endDate: ${p.endDate}`)
+			/* if (!p.endDate) return
 			if (new Date() > p.endDate) {
 				if (p.paymentToken)
 					CroneClass.Payment(p.license, p.userId, p.paymentToken)
@@ -72,7 +77,7 @@ class CroneClass {
 							active: false
 						}
 					})
-			}
+			} */
 		})
 	}
 }

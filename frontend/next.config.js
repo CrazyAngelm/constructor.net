@@ -26,7 +26,7 @@ const nextConfig = {
 	}
 }
 
-const CroneClass = require('./lib/cronejs.js')
+const CroneClass = require('./lib/cronejs-test.js')
 
 CroneClass.Init()
 
