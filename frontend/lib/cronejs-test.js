@@ -36,7 +36,7 @@ class CroneClass {
 			description: 'Подписка, тариф: ' + license.name
 		}
 		const payment = await checkout.createPayment(createPayload, idempotentKey)
-		console.log(payment)
+		console.log(`payment: ${payment}`)
 		await CroneClass.prisma.payment.create({
 			data: {
 				id: payment.id,
@@ -46,7 +46,7 @@ class CroneClass {
 			}
 		})
 		const capture = await checkout.capturePayment(payment.id, {})
-		console.log(capture)
+		console.log(`capture: ${capture}`)
 	}
 
 	static async Check() {
@@ -66,7 +66,7 @@ class CroneClass {
 
 		subscription.forEach(async p => {
 			console.log(`Check user ${p.userId}, endDate: ${p.endDate}`)
-			/* if (!p.endDate) return
+			if (!p.endDate) return
 			if (new Date() > p.endDate) {
 				if (p.paymentToken)
 					CroneClass.Payment(p.license, p.userId, p.paymentToken)
@@ -77,7 +77,7 @@ class CroneClass {
 							active: false
 						}
 					})
-			} */
+			}
 		})
 	}
 }
