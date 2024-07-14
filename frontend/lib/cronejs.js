@@ -31,7 +31,7 @@ class CroneClass {
 				value: `${license.price}.00`,
 				currency: 'RUB'
 			},
-			capture: true,
+			capture: false,
 			payment_method_id: paymentId,
 			description: 'Подписка, тариф: ' + license.name
 		}
@@ -45,6 +45,7 @@ class CroneClass {
 				licenseId: license.id
 			}
 		})
+		const capture = await checkout.capturePayment(payment.id, {})
 	}
 
 	static async Check() {
@@ -52,7 +53,8 @@ class CroneClass {
 
 		const subscription = await CroneClass.prisma.subscription.findMany({
 			where: {
-				canceled: false
+				canceled: false,
+				active: true
 			},
 			include: {
 				lastPayment: true,

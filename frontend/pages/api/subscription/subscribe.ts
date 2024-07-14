@@ -63,7 +63,7 @@ handler.post(response(async (req, res) => {
 		confirmation: {
 			type: 'embedded'
 		},
-		capture: true,
+		capture: false,
 		description: 'Подписка, тариф: ' + license.name,
 		save_payment_method: true
 	}
@@ -78,6 +78,8 @@ handler.post(response(async (req, res) => {
 				licenseId: license.id
 			}
 		})
+		const capture  = await checkout.capturePayment(payment.id, {})
+		console.log(capture)
 
 		return {
 			response: {

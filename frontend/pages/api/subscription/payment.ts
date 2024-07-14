@@ -84,6 +84,16 @@ handler.post(response(async (req, res) => {
 				data: { confirmed: true }
 			})
 		}
+		if (payment.object.status === 'canceled') {
+			if(subscription) {
+				subscription.active = false
+				subscription.lastPaymentId = _payment.id
+				await prisma.subscription.update({
+					where: { id: subscription.id },
+					data: subscription
+				})
+			}
+		}
 	}
 
 	return { response: {} }

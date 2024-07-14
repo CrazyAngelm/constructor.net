@@ -130,7 +130,8 @@ export const Item = ({ item, update }: PropsItem) => {
 				</tr>
 				<tr>
 					<td className={styles.header}>Активна</td>
-					<td>{item.active ? 'Да' : 'Нет'}</td>
+					<td>{item.active ? 'Да'
+					: 'Нет. Оплата не прошла, для возобновления отмените и подпишитесь заново'}</td>
 				</tr>
 				{license?.price !== 0 &&
 					<tr>
@@ -155,7 +156,7 @@ export const Item = ({ item, update }: PropsItem) => {
 	)
 }
 
-const Subscription = () => {
+const Subscriptions = () => {
 	const [ not, setNot ] = useState(false)
 
 	const session = useSession()
@@ -246,4 +247,4 @@ const Subscription = () => {
 	)
 }
 
-export default Subscription
+export default Subscriptions

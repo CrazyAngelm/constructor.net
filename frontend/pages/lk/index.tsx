@@ -10,7 +10,7 @@ import Router, { useRouter } from 'next/router'
 import { signOut } from 'next-auth/react'
 import { ReactNode, useEffect, useState } from 'react'
 import Account from '@/components/lk/Account'
-import Subscription from '@/components/lk/Subscription'
+import Subscriptions from '@/components/lk/Subscription'
 
 interface Props {
 	user: UserDto
@@ -31,7 +31,7 @@ const navigation = [
 	{
 		label: 'Подписки',
 		hash: 'subscription',
-		node: <Subscription />
+		node: <Subscriptions />
 	}
 ] as NavigationPage[]
 

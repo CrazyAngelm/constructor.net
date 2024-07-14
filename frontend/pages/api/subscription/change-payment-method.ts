@@ -34,7 +34,7 @@ handler.post(response(async (req, res) => {
 		confirmation: {
 			type: 'embedded'
 		},
-		capture: true,
+		capture: false,
 		description: 'Привязка нового способа оплаты',
 		save_payment_method: true
 	}
@@ -49,6 +49,8 @@ handler.post(response(async (req, res) => {
 				licenseId: -1
 			}
 		})
+
+		await checkout.capturePayment(payment.id, {})
 
 		return {
 			response: {
