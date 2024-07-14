@@ -63,13 +63,13 @@ handler.post(response(async (req, res) => {
 		confirmation: {
 			type: 'embedded'
 		},
-		capture: false,
+		capture: true,
 		description: 'Подписка, тариф: ' + license.name,
 		save_payment_method: true
 	}
 	try {
 		const payment = await checkout.createPayment(createPayload, idempotentKey);
-		console.log(`created payment: ${payment.id}`)
+
 		await prisma.payment.create({
 			data: {
 				id: payment.id,
@@ -78,8 +78,6 @@ handler.post(response(async (req, res) => {
 				licenseId: license.id
 			}
 		})
-		const capture  = await checkout.capturePayment(payment.id, {})
-		console.log(`capture ${capture.status}`)
 
 		return {
 			response: {
