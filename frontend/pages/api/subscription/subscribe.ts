@@ -69,7 +69,7 @@ handler.post(response(async (req, res) => {
 	}
 	try {
 		const payment = await checkout.createPayment(createPayload, idempotentKey);
-
+		console.log(`created payment: ${payment.id}`)
 		await prisma.payment.create({
 			data: {
 				id: payment.id,
@@ -79,7 +79,7 @@ handler.post(response(async (req, res) => {
 			}
 		})
 		const capture  = await checkout.capturePayment(payment.id, {})
-		console.log(capture)
+		console.log(`capture ${capture.status}`)
 
 		return {
 			response: {
