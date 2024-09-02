@@ -49,6 +49,11 @@ const Layout = ({ children, title, navbar = true, footer = true }: Props) => {
 							<a href='https://t.me/labstudio'>Telegramm</a>
 							<a href='https://vk.com/studiolab'>ВКонтакте</a>
 						</section>
+						<div className={styles.ur}>
+							<div>Индивидуальный предприниматель Калашникова Виктория Владимировна</div>
+							<div>ОГРНИП 319435000027099</div>
+							<div>ИНН 434510331832</div>
+						</div>
 					</section>
 					<section className={styles.other}>
 						<div>Для оформления подписики авторизируйтесь</div>
