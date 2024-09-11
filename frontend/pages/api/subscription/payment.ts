@@ -86,7 +86,7 @@ handler.post(response(async (req, res) => {
 				data: { confirmed: true }
 			})
 		}
-		if (payment.object.status === 'canceled') {
+		/* if (payment.object.status === 'canceled') {
 			if(subscription) {
 				subscription.active = false
 				subscription.lastPaymentId = _payment.id
@@ -95,7 +95,7 @@ handler.post(response(async (req, res) => {
 					data: subscription
 				})
 			}
-		}
+		} */
 	}
 
 	return { response: {} }
