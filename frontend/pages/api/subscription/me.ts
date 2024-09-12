@@ -21,9 +21,12 @@ handler.get(responseAuth(async (req, res, userId) => {
 		}
 	}
 
-	const data = await prisma.subscription.findFirst({
-		where: { userId: userId, canceled: false },
-		include: { license: true }
+	const data = await prisma.subscription.findMany({
+		where: { userId: userId, canceled: false, active: true },
+		include: { license: true },
+		orderBy: {
+			licenseId: 'desc',
+		}
 	})
 
 
