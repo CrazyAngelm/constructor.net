@@ -2,7 +2,7 @@
 
 const { CronJob } = require('cron')
 const { PrismaClient } = require('@prisma/client')
-const { checkout } = require('./yookassa/checkout')     // этап-2
+const { checkout } = require('./yookassa/checkoutjs.js')     // этап-2
 const prisma = new PrismaClient()
 
 class CronService {
