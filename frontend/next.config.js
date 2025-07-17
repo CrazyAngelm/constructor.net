@@ -31,6 +31,8 @@ const withNextEnv = nextEnv()
 
 module.exports = withNextEnv(nextConfig)
 
-const CroneClass = require('./lib/cronejs.js')
+if (process.env.NEXT_PHASE === 'phase-production-server' || process.env.NEXT_PHASE === 'phase-development') {
+	const CroneClass = require('./lib/cronejs.js')
 
-CroneClass.init()
+	CroneClass.init()
+}
