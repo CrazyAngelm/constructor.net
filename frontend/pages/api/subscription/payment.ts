@@ -1,12 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { buffer } from 'micro'
-import { Prisma, PrismaClient, Subscription } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { checkout } from '@/lib/yookassa/checkout'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
 import { Payment } from '@a2seven/yoo-checkout'
-
-export const config = { api: { bodyParser: false } }
 
 const prisma = new PrismaClient()
 const handler = getDefaultHandler();
