@@ -29,7 +29,7 @@ handler.post(response(async (req, res) => {
 	/* 1. читаем «сырое» тело → сразу отдаём 200 */
 		/* const sig = (req.headers['x-content-hmac'] as string) ?? ''
 		if (!checkout.verifyWebhookSignature(raw.toString(), sig)) return */
-
+		console.log(req.body)
 		const n = JSON.parse(req.body) as NotificationPayment
 		console.log(n)
 		if (!n.event.startsWith('payment')) return {}
