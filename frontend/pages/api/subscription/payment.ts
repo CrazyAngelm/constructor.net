@@ -18,16 +18,16 @@ interface NotificationPayment {
 }
 
 handler.post(response(async (req, res) => {
-	console.log(req.body)
 	const n = req.body as NotificationPayment
 
-	console.log(n)
 	if (!n.event.startsWith('payment')) return {}
 
 	const p = n.object
 	const dbPay = await prisma.payment.findUnique({ where: { id: p.id } })
-	console.log(dbPay)
+
 	if (!dbPay || dbPay.confirmed) return {}                    // дубликат/неизвестный
+
+	await prisma.payment.update({ where: { id: dbPay.id }, data: { confirmed: true } })
 
 	const isBindCard = p.amount.value === '1.00'
 
@@ -51,7 +51,7 @@ handler.post(response(async (req, res) => {
 					} else {
 						await handleSucceeded(tx, dbPay, p)
 					}
-					await tx.payment.update({ where: { id: dbPay.id }, data: { confirmed: true } })
+
 					return
 
 				case 'canceled':

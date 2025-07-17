@@ -50,7 +50,7 @@ handler.post(
 					ScopeEnum.developer,
 					user.scopes.map((p) => p.scope.value)
 				)
-				const price = isDev ? 1 : license.price
+				const price = isDev ? 2 : license.price
 				const tariffName = isDev ? `${license.name} (developer)` : license.name
 
 				/* 4. создаём платёж */
