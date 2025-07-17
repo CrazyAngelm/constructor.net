@@ -7,7 +7,7 @@ import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { usePrisma } from "@/lib/api/database";
 import { ChangePaymentMethodReq, ChangePaymentMethodRes } from "@/lib/dto/subscription";
-import { checkout, ICreatePayment } from "@/lib/yookassa/checkout.js";
+import { checkout, ICreatePayment } from "@/lib/yookassa/checkout";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = usePrisma();
