@@ -2,10 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { buffer } from 'micro'
 import { Prisma, PrismaClient, Subscription } from '@prisma/client'
 import { checkout } from '@/lib/yookassa/checkout'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
 
 export const config = { api: { bodyParser: false } }
 
 const prisma = new PrismaClient()
+const handler = getDefaultHandler();
 
 /** Утилита: +1 месяц к дате */
 const addMonth = (d: Date) => new Date(d.setMonth(d.getMonth() + 1))
@@ -21,24 +24,18 @@ interface NotificationPayment {
 	}
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	if (req.method !== 'POST') return res.status(405).end()
+handler.post(response(async (req, res) => {
 
 	/* 1. читаем «сырое» тело → сразу отдаём 200 */
-	const raw = await buffer(req)
-	res.status(200).end()
-
-	/* 2. асинхронная тяжёлая обработка */
-	setImmediate(async () => {
 		/* const sig = (req.headers['x-content-hmac'] as string) ?? ''
 		if (!checkout.verifyWebhookSignature(raw.toString(), sig)) return */
 
-		const n = JSON.parse(raw.toString()) as NotificationPayment
-		if (!n.event.startsWith('payment')) return
+		const n = JSON.parse(req.body.toString()) as NotificationPayment
+		if (!n.event.startsWith('payment')) return {}
 
 		const p = n.object
 		const dbPay = await prisma.payment.findUnique({ where: { id: p.id } })
-		if (!dbPay || dbPay.confirmed) return                     // дубликат/неизвестный
+		if (!dbPay || dbPay.confirmed) return {}                    // дубликат/неизвестный
 
 		const isBindCard = p.amount.value === '1.00'
 
@@ -72,14 +69,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 						})
 						return
 				}
+				return
 			})
 		} catch (err) {
 			console.error('Webhook processing error', err)
 		}
-
-	})
-	return
-}
+		return {}
+}))
 
 /** «Оплачено» — создать/продлить подписку */
 async function handleSucceeded(
@@ -135,3 +131,6 @@ async function getCourses(tx: Prisma.TransactionClient, licenseId: number): Prom
 	})
 	return JSON.stringify(courses.slice(0, lic?.freeCourses ?? 0).map((c) => c.id))
 }
+
+
+export default handler;
