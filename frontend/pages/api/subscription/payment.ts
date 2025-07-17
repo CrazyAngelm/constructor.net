@@ -1,124 +1,137 @@
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { usePrisma } from "@/lib/api/database";
-import { Payment } from "@a2seven/yoo-checkout";
-import { subscribe } from "@/lib/requests/subscription";
-import { License } from "@prisma/client";
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { buffer } from 'micro'
+import { Prisma, PrismaClient, Subscription } from '@prisma/client'
+import { checkout } from '@/lib/yookassa/checkout'
 
-const prisma = usePrisma()
-const handler = getDefaultHandler()
+export const config = { api: { bodyParser: false } }
 
-const addMont = (date: Date): Date => {
-	return new Date(date.setMonth(date.getMonth() + 1))
-}
+const prisma = new PrismaClient()
 
-interface INotification {
-	type: string
-	event: string,
-	object: Payment,
-}
+/** Утилита: +1 месяц к дате */
+const addMonth = (d: Date) => new Date(d.setMonth(d.getMonth() + 1))
 
-handler.post(response(async (req, res) => {
-	const payment = req.body as INotification
-
-	console.log(payment)
-
-	if (payment.event.indexOf('payment') > -1 && payment.object) {
-		const _payment = await prisma.payment.findUnique({
-			where: {
-				id: payment.object.id,
-			}
-		})
-
-		if (_payment == null) {
-			return { response: {} }
-		}
-
-		if (_payment.licenseId == -1) {
-			const subscriptions = await prisma.subscription.findMany({
-				where: { userId: _payment.userId, canceled: false }
-			})
-
-			subscriptions.forEach(async p => {
-				await prisma.subscription.update({
-					where: { id: p.id },
-					data: {
-						paymentToken: payment.object.payment_method.id,
-						paymentTitle: payment.object.payment_method.title
-					}
-				})
-			})
-
-			return { response: {} }
-		}
-
-		const subscription = (await prisma.subscription.findMany({
-			where: { userId: _payment.userId, canceled: false }
-		}))?.find(p => p.licenseId == _payment.licenseId)
-
-		if (payment.object.status === 'succeeded') {
-			if (!subscription) {
-				const cerated = await prisma.subscription.create({
-					data: {
-						userId: _payment.userId,
-						licenseId: _payment.licenseId,
-						active: true,
-						lastPaymentId: _payment.id,
-						startDate: new Date(),
-						endDate: addMont(new Date()),
-						paymentToken: payment.object.payment_method.id,
-						paymentTitle: payment.object.payment_method.title,
-						courses: await getCourses(_payment.licenseId)
-					}
-				})
-			} else {
-				subscription.active = true
-				subscription.lastPaymentId = _payment.id
-				subscription.endDate = addMont(subscription.endDate ?? new Date())
-				await prisma.subscription.update({
-					where: { id: subscription.id },
-					data: subscription
-				})
-			}
-
-			await prisma.payment.update({
-				where: { id: _payment.id },
-				data: { confirmed: true }
-			})
-		}
-		/* if (payment.object.status === 'canceled') {
-			if(subscription) {
-				subscription.active = false
-				subscription.lastPaymentId = _payment.id
-				await prisma.subscription.update({
-					where: { id: subscription.id },
-					data: subscription
-				})
-			}
-		} */
+/** Payload YooKassa */
+interface NotificationPayment {
+	event: string
+	object: {
+		id: string
+		status: 'waiting_for_capture' | 'succeeded' | 'canceled' | string
+		amount: { value: string }
+		payment_method: { id: string; title: string }
 	}
+}
 
-	return { response: {} }
-}))
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+	if (req.method !== 'POST') return res.status(405).end()
 
-const getCourses = async (licenseId: number)
-	: Promise<string> => {
+	/* 1. читаем «сырое» тело → сразу отдаём 200 */
+	const raw = await buffer(req)
+	res.status(200).end()
 
-	const license = await prisma.license.findUnique({ where: { id: licenseId } })
+	/* 2. асинхронная тяжёлая обработка */
+	setImmediate(async () => {
+		/* const sig = (req.headers['x-content-hmac'] as string) ?? ''
+		if (!checkout.verifyWebhookSignature(raw.toString(), sig)) return */
 
-	const licenseCourses = license?.courses ? JSON.parse(license.courses) as number[]
-		: []
+		const n = JSON.parse(raw.toString()) as NotificationPayment
+		if (!n.event.startsWith('payment')) return
 
-	const courses = await prisma.course.findMany({
-		where: {
-			id: {
-				notIn: licenseCourses
-			},
-			deleted: false
+		const p = n.object
+		const dbPay = await prisma.payment.findUnique({ where: { id: p.id } })
+		if (!dbPay || dbPay.confirmed) return                     // дубликат/неизвестный
+
+		const isBindCard = p.amount.value === '1.00'
+
+		try {
+			await prisma.$transaction(async (tx) => {
+				switch (p.status) {
+					case 'waiting_for_capture':
+						await checkout.capturePayment(p.id) // авторизация → capture
+						return
+
+					case 'succeeded':
+						if (isBindCard) {
+							/* обновляем токен оплаты во всех активных подписках */
+							await tx.subscription.updateMany({
+								where: { userId: dbPay.userId, canceled: false },
+								data: {
+									paymentToken: p.payment_method.id,
+									paymentTitle: p.payment_method.title
+								}
+							})
+						} else {
+							await handleSucceeded(tx, dbPay, p)
+						}
+						await tx.payment.update({ where: { id: dbPay.id }, data: { confirmed: true } })
+						return
+
+					case 'canceled':
+						await tx.subscription.updateMany({
+							where: { userId: dbPay.userId, licenseId: dbPay.licenseId, canceled: false },
+							data: { active: false }
+						})
+						return
+				}
+			})
+		} catch (err) {
+			console.error('Webhook processing error', err)
 		}
+
+	})
+	return
+}
+
+/** «Оплачено» — создать/продлить подписку */
+async function handleSucceeded(
+	tx: Prisma.TransactionClient,
+	pay: { userId: string; licenseId: number; id: string },
+	p: NotificationPayment[ 'object' ]
+) {
+	let sub = await tx.subscription.findFirst({
+		where: { userId: pay.userId, licenseId: pay.licenseId, canceled: false }
 	})
 
-	return JSON.stringify(courses.slice(0, license?.freeCourses).map(p => p.id))
+	if (!sub) {
+		sub = await tx.subscription.create({
+			data: {
+				userId: pay.userId,
+				licenseId: pay.licenseId,
+				active: true,
+				startDate: new Date(),
+				endDate: addMonth(new Date()),
+				lastPaymentId: pay.id,
+				paymentToken: p.payment_method.id,
+				paymentTitle: p.payment_method.title,
+				courses: await getCourses(tx, pay.licenseId)
+			}
+		})
+	} else {
+		await tx.subscription.update({
+			where: { id: sub.id },
+			data: {
+				active: true,
+				endDate: addMonth(sub.endDate ?? new Date()),
+				lastPaymentId: pay.id
+			}
+		})
+	}
+
+	await tx.subscription.updateMany({
+		where: {
+			userId: pay.userId,
+			id: { not: sub?.id ?? 0 },
+			canceled: false
+		},
+		data: { active: false, canceled: true }
+	})
 }
 
-export default handler
+/** Получить перечень бесплатных курсов по лицензии */
+async function getCourses(tx: Prisma.TransactionClient, licenseId: number): Promise<string> {
+	const lic = await tx.license.findUnique({ where: { id: licenseId } })
+	const excluded = lic?.courses ? (JSON.parse(lic.courses) as number[]) : []
+	const courses = await tx.course.findMany({
+		where: { id: { notIn: excluded }, deleted: false }
+	})
+	return JSON.stringify(courses.slice(0, lic?.freeCourses ?? 0).map((c) => c.id))
+}

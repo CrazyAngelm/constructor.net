@@ -26,11 +26,11 @@ const nextConfig = {
 	}
 }
 
-const CroneClass = require('./lib/cronejs.js')
-
-CroneClass.Init()
-
 dotenvLoad()
 const withNextEnv = nextEnv()
 
 module.exports = withNextEnv(nextConfig)
+
+const CroneClass = require('./lib/cronejs.js')
+
+CroneClass.init()

@@ -4,6 +4,7 @@ import { usePrisma } from "@/lib/api/database";
 import { Payment } from "@a2seven/yoo-checkout";
 import { subscribe } from "@/lib/requests/subscription";
 import { SubscribeReq } from "@/lib/dto/subscription";
+import { Prisma } from "@prisma/client";
 
 const prisma = usePrisma()
 const handler = getDefaultHandler()
@@ -12,56 +13,64 @@ const addDays = (date: Date, days: number): Date => {
 	return new Date(date.setDate(date.getDate() + days))
 }
 
-handler.post(response(async (req, res) => {
-	const body = JSON.parse(req.body) as SubscribeReq
 
-	if (!body.userId || !body.licenseId) return { error: { code: 400, message: "Неверный запрос" } }
+handler.post(
+	response(async (req) => {
+		const body = JSON.parse(req.body) as SubscribeReq;
+		if (!body.userId) return { error: { code: 400 } };
 
-	const subscription = await prisma.subscription.findFirst({
-		where: { userId: body.userId, canceled: false }
+		const result = await prisma.$transaction(
+			async (tx: Prisma.TransactionClient) => {
+				if (!body.userId) throw{ code: 404, message: "Пользователь не найден" };
+
+				/* 1. уже есть активная/прошлая проба? */
+				const existed = await tx.subscription.findFirst({
+					where: {
+						userId: body.userId,
+					}
+				});
+				if (existed) throw { code: 409, message: "Подписка уже использована" };
+
+				/* 2. лицензия */
+				const license = await tx.license.findUnique({
+					where: { id: 1 }
+				});
+				if (!license) throw { code: 404, message: "Лицензия не найдена" };
+
+				const trialDays = license.duration ?? 14;
+				const end = addDays(new Date(), trialDays);
+
+				/* 3. создаём подписку сразу активной */
+				const sub = await tx.subscription.create({
+					data: {
+						userId: body.userId,
+						licenseId: 1,
+						active: true,
+						startDate: new Date(),
+						endDate: end,
+						paymentToken: null,
+						courses: await getCourses(tx, 1),
+						canceled: false,
+					}
+				});
+
+				return { };
+			}
+		).catch((e) => ({ error: e?.code ? e : { code: 500 } }));
+
+		return "error" in result ? result : { response: result };
 	})
+);
 
-	if (subscription) return { error: { code: 412, message: 'У данного пользователя уже есть активная подписка' } }
-
-	const user = await prisma.user.findUnique({
-		where: { id: body.userId }
-	})
-
-	if (!user) return { error: { code: 400, message: "Такого пользователя не сущетсвует" } }
-
-	const license = await prisma.license.findUnique({
-		where: { id: body.licenseId }
-	})
-
-	if (!license) return { error: { code: 400, message: "Такой лицензии не существует" } }
-
-	const trial = await prisma.subscription.findFirst({
-		where: { userId: user.id, license: { price: 0 } },
-	})
-
-	if (trial) return { error: { code: 413, message: 'Пользователь уже использовал пробный период' } }
-
-	await prisma.subscription.create({
-		data: {
-			licenseId: body.licenseId,
-			userId: user.id,
-			endDate: addDays(new Date(), license.duration),
-			courses: await getCourses(license.id)
-		}
-	})
-
-	return { response: {} }
-}))
-
-const getCourses = async (licenseId: number)
+const getCourses = async (tx: Prisma.TransactionClient, licenseId: number)
 	: Promise<string> => {
 
-	const license = await prisma.license.findUnique({ where: { id: licenseId } })
+	const license = await tx.license.findUnique({ where: { id: licenseId } })
 
 	const licenseCourses = license?.courses ? JSON.parse(license.courses) as number[]
 		: []
 
-	const courses = await prisma.course.findMany({
+	const courses = await tx.course.findMany({
 		where: {
 			id: {
 				notIn: licenseCourses

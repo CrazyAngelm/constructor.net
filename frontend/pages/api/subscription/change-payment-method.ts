@@ -1,65 +1,62 @@
+/* /api/subscription/change-payment-method.ts
+	 • единый сервис checkout
+	 • атомарная $transaction
+*/
+
 import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { usePrisma } from "@/lib/api/database";
-import { ChangePaymentMethodReq, ChangePaymentMethodRes, Subscription } from "@/lib/dto/subscription";
-import { ICreatePayment, YooCheckout } from "@a2seven/yoo-checkout";
-import { v4 } from "uuid";
+import { ChangePaymentMethodReq, ChangePaymentMethodRes } from "@/lib/dto/subscription";
+import { checkout, ICreatePayment } from "@/lib/yookassa/checkout";
+import { Prisma, PrismaClient } from "@prisma/client";
 
-const prisma = usePrisma()
-const handler = getDefaultHandler()
+const prisma = usePrisma();
+const handler = getDefaultHandler();
 
+handler.post(
+	response(async (req) => {
+		const body = JSON.parse(req.body) as ChangePaymentMethodReq;
+		if (!body.userId || !body.subscriptionId) return { error: { code: 400 } };
 
-handler.post(response(async (req, res) => {
-	const body = JSON.parse(req.body) as ChangePaymentMethodReq
+		const result = await prisma.$transaction(
+			async (tx: Prisma.TransactionClient) => {
+				/* валидация */
+				if (!body.userId || !body.subscriptionId) throw { code: 404, message: "Пользователь не найден" };
 
-	if (!body.userId || !body.subscriptionId) return { error: { code: 400 } }
+				const sub = await tx.subscription.findUnique({
+					where: { id: body.subscriptionId }
+				});
+				if (!sub) throw { code: 404, message: "Подписка не найдена" };
 
-	const user = await prisma.user.findUnique({ where: { id: body.userId } })
-	const subscription = await prisma.subscription.findUnique({ where: { id: body.subscriptionId } })
+				/* платёж ₽1 для привязки карты */
+				const payload: ICreatePayment = {
+					amount: { value: "1.00", currency: "RUB" },
+					confirmation: { type: "embedded" },
+					capture: true,
+					description: "Привязка нового способа оплаты",
+					save_payment_method: true
+				};
+				const pay = await checkout.createPayment(payload, checkout.generateKey());
 
-	if (!user || !subscription) return { error: { code: 400 } }
+				/* запись о платеже (licenseId = sub.licenseId для прозрачности) */
+				await tx.payment.create({
+					data: {
+						id: pay.id,
+						userId: body.userId ,
+						amount: 1,
+						licenseId: sub.licenseId
+					}
+				});
 
-	const checkout = new YooCheckout({
-		shopId: process.env.YOOCHECKOUT_SHOP_ID ?? "",
-		secretKey: process.env.YOOCHECKOUT_KEY ?? ""
-	})
-
-	const idempotentKey = v4()
-
-	const createPayload: ICreatePayment = {
-		amount: {
-			value: `1.00`,
-			currency: 'RUB'
-		},
-		confirmation: {
-			type: 'embedded'
-		},
-		capture: true,
-		description: 'Привязка нового способа оплаты',
-		save_payment_method: true
-	}
-	try {
-		const payment = await checkout.createPayment(createPayload, idempotentKey);
-
-		await prisma.payment.create({
-			data: {
-				id: payment.id,
-				userId: user.id,
-				amount: 1,
-				licenseId: -1
+				return {
+					confirmationToken: pay.confirmation.confirmation_token,
+					returnUrl: process.env.YOOCHECKOUT_REDIRECT_URL
+				} as ChangePaymentMethodRes;
 			}
-		})
+		).catch((e) => ({ error: e?.code ? e : { code: 500 } }));
 
-		return {
-			response: {
-				confirmationToken: payment.confirmation.confirmation_token,
-				returnUrl: process.env.YOOCHECKOUT_REDIRECT_URL
-			} as ChangePaymentMethodRes
-		}
-	} catch (err) {
-		console.log(err);
-		return { error: { code: 415, message: JSON.stringify(err) } }
-	}
-}))
+		return "error" in result ? result : { response: result };
+	})
+);
 
-export default handler
+export default handler;
