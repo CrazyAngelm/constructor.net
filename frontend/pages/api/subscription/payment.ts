@@ -30,11 +30,13 @@ handler.post(response(async (req, res) => {
 		/* const sig = (req.headers['x-content-hmac'] as string) ?? ''
 		if (!checkout.verifyWebhookSignature(raw.toString(), sig)) return */
 
-		const n = JSON.parse(req.body.toString()) as NotificationPayment
+		const n = JSON.parse(req.body) as NotificationPayment
+		console.log(n)
 		if (!n.event.startsWith('payment')) return {}
 
 		const p = n.object
 		const dbPay = await prisma.payment.findUnique({ where: { id: p.id } })
+		console.log(dbPay)
 		if (!dbPay || dbPay.confirmed) return {}                    // дубликат/неизвестный
 
 		const isBindCard = p.amount.value === '1.00'
