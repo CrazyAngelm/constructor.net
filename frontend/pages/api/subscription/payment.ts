@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { buffer } from 'micro'
 import { Prisma, PrismaClient, Subscription } from '@prisma/client'
-import { checkout } from '@/lib/yookassa/checkout'
+import { checkout } from '@/lib/yookassa/checkout.js'
 
 export const config = { api: { bodyParser: false } }
 
