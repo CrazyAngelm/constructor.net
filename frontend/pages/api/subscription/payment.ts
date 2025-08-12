@@ -23,8 +23,9 @@ handler.post(response(async (req, res) => {
 	if (!n.event.startsWith('payment')) return {}
 
 	const p = n.object
+	await new Promise(resolve => setTimeout(resolve, 1000))
 	const dbPay = await prisma.payment.findUnique({ where: { id: p.id } })
-
+	if (!dbPay) console.log(`Неизвестный лог от ЮКасса`, p)
 	if (!dbPay || dbPay.confirmed) return {}                    // дубликат/неизвестный
 
 	await prisma.payment.update({ where: { id: dbPay.id }, data: { confirmed: true } })
