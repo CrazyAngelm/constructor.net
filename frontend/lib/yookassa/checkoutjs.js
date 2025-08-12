@@ -20,6 +20,9 @@ class CheckoutService {
 	capturePayment(paymentId, payload = {}) {
 		return this.client.capturePayment(paymentId, payload)
 	}
+	getPayment(paymentId) {
+		return this.client.getPayment(paymentId)
+	}
 }
 
 const checkout = new CheckoutService()

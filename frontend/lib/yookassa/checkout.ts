@@ -25,6 +25,10 @@ class CheckoutService {
   capturePayment(paymentId: string, payload = {}) {
     return this.client.capturePayment(paymentId, payload);
   }
+
+	getPayment(paymentId: string){
+		return this.client.getPayment(paymentId);
+	}
 }
 
 export const checkout = new CheckoutService();
