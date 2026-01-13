@@ -8,7 +8,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 	return (
 		<>
 			<Head>
-				<script crossOrigin='anonymous' src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js" />
+				<script crossOrigin="anonymous" src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js" />
 			</Head>
 			<SessionProvider session={pageProps.session} refetchInterval={0}>
 				<Component {...pageProps} />

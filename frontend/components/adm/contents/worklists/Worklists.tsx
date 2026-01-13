@@ -1,11 +1,11 @@
-import { TaskCategoryDto } from "@/lib/dto/tasks"
-import { useFetchData } from "@/lib/hooks/useFetchData"
-import { getCourses, getTaskCategoriesByIdCategory, getTaskCategoriesByIdCourse } from "@/lib/requests/tasks"
+import { TaskCategoryDto } from '@/lib/dto/tasks'
+import { useFetchData } from '@/lib/hooks/useFetchData'
+import { getCourses, getTaskCategoriesByIdCategory, getTaskCategoriesByIdCourse } from '@/lib/requests/tasks'
 import styles from '@/styles/adm/Content.module.scss'
-import { useState } from "react"
+import { useState } from 'react'
 import arrow from '@/assets/back.svg'
-import Image from "next/image"
-import WorklistsEditor from "./WorklistEditor"
+import Image from 'next/image'
+import WorklistsEditor from './WorklistEditor'
 
 
 interface PropsItem {
@@ -27,8 +27,8 @@ const Item = ({ category, selectCallback, isCourse }: PropsItem) => {
 		<div className={styles.item}>
 			<header>
 				<div onClick={() => setOpen(p => !p)}>
-					{isOpen() &&
-						<div className={`${styles.arrow} ${open && styles.open}`}>
+					{isOpen()
+						&& <div className={`${styles.arrow} ${open && styles.open}`}>
 							<Image src={arrow} />
 						</div>}
 				</div>
@@ -37,8 +37,8 @@ const Item = ({ category, selectCallback, isCourse }: PropsItem) => {
 				</span>
 			</header>
 
-			{open &&
-				<section>
+			{open
+				&& <section>
 					{data?.map(p => <Item key={p.id}
 						category={p} selectCallback={selectCallback} />)}
 				</section>
@@ -66,8 +66,8 @@ const Worklists = () => {
 					selectCallback={selectCategory} />)}
 			</section>
 			<section className={styles.editor}>
-				{selectedCategory &&
-					<WorklistsEditor callbackBack={() => selectCategory(undefined)}
+				{selectedCategory
+					&& <WorklistsEditor callbackBack={() => selectCategory(undefined)}
 						isCourse={isCourseSelected}
 						category={selectedCategory} />
 				}

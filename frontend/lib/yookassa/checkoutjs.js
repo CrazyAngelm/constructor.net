@@ -5,7 +5,7 @@ class CheckoutService {
 	constructor() {
 		this.client = new YooCheckout({
 			shopId: process.env.YOOCHECKOUT_SHOP_ID || '',
-			secretKey: process.env.YOOCHECKOUT_KEY || ''
+			secretKey: process.env.YOOCHECKOUT_KEY || '',
 		})
 	}
 

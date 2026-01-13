@@ -1,12 +1,12 @@
 
-import { VersionType } from '@/lib/dto/versions';
-import { useFetchData } from '@/lib/hooks/useFetchData';
-import { getVersions, updateVersion } from '@/lib/requests/version';
+import { VersionType } from '@/lib/dto/versions'
+import { useFetchData } from '@/lib/hooks/useFetchData'
+import { getVersions, updateVersion } from '@/lib/requests/version'
 import styles from '@/styles/adm/Content.module.scss'
-import { useState } from 'react';
-import List from '../../List';
-import ButtonsList from '../ButtonsList';
-import VersionEditor from './VersionEditor';
+import { useState } from 'react'
+import List from '../../List'
+import ButtonsList from '../ButtonsList'
+import VersionEditor from './VersionEditor'
 
 
 
@@ -16,13 +16,13 @@ const Versions = () => {
 	const { data, update, error } = useFetchData({}, getVersions)
 
 	const createVersion = () => {
-		updateVersion("-1", {
+		updateVersion('-1', {
 			id: '',
-			name: "0.0.0",
-			notes: "Описание",
+			name: '0.0.0',
+			notes: 'Описание',
 			type: VersionType.alpha,
-			archive: "https://"
-		}).then(resp => {
+			archive: 'https://',
+		}).then((resp) => {
 			setVersionId(resp.id)
 			update()
 		})
@@ -31,17 +31,17 @@ const Versions = () => {
 	return (
 		<article className={styles.content}>
 			<section className={styles.list}>
-				{data &&
-					<List name='Версии'
+				{data
+					&& <List name="Версии"
 						length={data.length}
 						rows={[ {
 							header: 'Название',
-							value: i => data[ i ]?.name as string
+							value: i => data[i]?.name as string,
 						}, {
 							header: 'Тип',
-							value: i => data[ i ]?.type as string
+							value: i => data[i]?.type as string,
 						} ]}
-						callback={i => setVersionId(data[ i ]?.id)}
+						callback={i => setVersionId(data[i]?.id)}
 						selected={data.findIndex(p => p.id == versionId)} />
 				}
 				<ButtonsList callbackCreate={createVersion} />
@@ -52,4 +52,4 @@ const Versions = () => {
 		</article >
 	)
 }
-export default Versions;
+export default Versions

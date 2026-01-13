@@ -11,9 +11,9 @@ export const VersionType = {
 			VersionType.beta,
 			VersionType.lts,
 			VersionType.stable,
-			VersionType.unsupported
+			VersionType.unsupported,
 		]
-	}
+	},
 }
 
 export interface Version {

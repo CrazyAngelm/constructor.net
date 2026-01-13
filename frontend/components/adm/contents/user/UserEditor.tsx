@@ -29,7 +29,7 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 
 	const { data: user, update, setData: setUser, error } = useFetchData(id as string, getUserById)
 	const { data: subscription, update: updateSubscription } = useFetchData({ id: user?.id },
-		getSubscription);
+		getSubscription)
 
 
 	const cancelSubscription = async () => {
@@ -38,7 +38,7 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 		try {
 			await makeFetcher(unsubscribe)({
 				userId: user.id,
-				subscriptionId: subscription[ 0 ]?.id
+				subscriptionId: subscription[0]?.id,
 			})
 		} catch (err) {
 			console.log(err)
@@ -54,25 +54,25 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 		}
 		updateUser(id, user)
 			.then(() => callbackUpdate && callbackUpdate())
-			.catch(err => {
+			.catch((err) => {
 				console.log(err)
 				if (err instanceof ApiError) setError(() => err.message)
 				else setError(JSON.stringify(err))
 			})
 		updateScope(id, {
 			scope: ScopeEnum.admin,
-			active: ScopeEnum.Contains(ScopeEnum.admin, user.scopes)
+			active: ScopeEnum.Contains(ScopeEnum.admin, user.scopes),
 		})
 		updateScope(id, {
 			scope: ScopeEnum.editor,
-			active: ScopeEnum.Contains(ScopeEnum.editor, user.scopes)
+			active: ScopeEnum.Contains(ScopeEnum.editor, user.scopes),
 		})
 	}
 
 	const onChangeScope = (scope: string): ((value: boolean) => void) => {
 		return (v) => {
 			console.log(v)
-			setUser(u => {
+			setUser((u) => {
 				if (!u || !u.scopes) return u
 				const index = u?.scopes?.indexOf(scope)
 				if (v && index < 0) u?.scopes?.push(scope)
@@ -82,10 +82,10 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 		}
 	}
 	const changeHandler = (field: 'name' | 'email'): ((value: string) => void) => {
-		return v => {
-			setUser(u => {
+		return (v) => {
+			setUser((u) => {
 				if (!u) return u
-				u[ field ] = v
+				u[field] = v
 				return { ...u }
 			})
 		}
@@ -110,28 +110,27 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 					<section>
 						<img className={styles.avatar} src={user.image} />
 						<div>
-							<Field isHorizontal={true} label='id' type='text' value={user.id} isReadonly />
+							<Field isHorizontal={true} label="id" type="text" value={user.id} isReadonly />
 							<Field onChange={changeHandler('name')}
-								isHorizontal label='Имя' type='text' value={user.name} />
+								isHorizontal label="Имя" type="text" value={user.name} />
 							<Field onChange={changeHandler('email')}
-								isHorizontal label='email' type='email' value={user.email} />
+								isHorizontal label="email" type="email" value={user.email} />
 						</div>
 					</section>
 					<section>
-						<Checkbox isHorizontal label='admin'
+						<Checkbox isHorizontal label="admin"
 							value={ScopeEnum.Contains(ScopeEnum.admin, user.scopes)}
 							onChange={onChangeScope(ScopeEnum.admin)} />
-						<Checkbox isHorizontal label='editor'
+						<Checkbox isHorizontal label="editor"
 							value={ScopeEnum.Contains(ScopeEnum.editor, user.scopes)}
 							onChange={onChangeScope(ScopeEnum.editor)} />
 					</section>
 					<section>
-						{(subscription && subscription.length > 0) &&
-							<article className={styles.subscription}>
-								{!subscription ?
-									<div>Пока нет информации о подписках</div>
-									:
-									<>{subscription.map(p => <>
+						{(subscription && subscription.length > 0)
+							&& <article className={styles.subscription}>
+								{!subscription
+									? <div>Пока нет информации о подписках</div>
+									:									<>{subscription.map(p => <>
 										<Item key={p.id} item={p} update={update} />
 										<br />
 										{/* <button onClick={() => setNot(true)}

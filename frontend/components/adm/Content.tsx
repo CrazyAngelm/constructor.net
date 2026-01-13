@@ -22,12 +22,12 @@ export interface Props {
 
 const getContent = (type?: TypeContent): ReactNode => {
 	switch (type) {
-		case TypeContent.Users: return <UserContent />
-		case TypeContent.HierarchyContent: return <Hierarchy />
-		case TypeContent.Manual: return <Manual />
-		case TypeContent.Versions: return <Versions />
-		case TypeContent.Worklists: return <Worklists />
-		default: return null
+	case TypeContent.Users: return <UserContent />
+	case TypeContent.HierarchyContent: return <Hierarchy />
+	case TypeContent.Manual: return <Manual />
+	case TypeContent.Versions: return <Versions />
+	case TypeContent.Worklists: return <Worklists />
+	default: return null
 	}
 }
 

@@ -1,9 +1,9 @@
 import NextAuth from 'next-auth'
 import YandexProvider from 'next-auth/providers/yandex'
-import CredentialsProvider from "next-auth/providers/credentials"
+import CredentialsProvider from 'next-auth/providers/credentials'
 import { Session } from '@/lib/session'
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { PrismaClient } from '@prisma/client'
 import { usePrisma } from '@/lib/api/database'
 import { compare } from 'bcryptjs'
 import { UserDto } from '@/lib/dto/users'
@@ -14,21 +14,21 @@ export default NextAuth({
 		CredentialsProvider({
 			name: 'Credentials',
 			credentials: {
-				email: { label: "Email", type: "text", placeholder: "email" },
-				password: { label: "Password", type: "password" }
+				email: { label: 'Email', type: 'text', placeholder: 'email' },
+				password: { label: 'Password', type: 'password' },
 			},
 			async authorize(credentials, req) {
-				if (!credentials) throw new Error("credentials is null")
+				if (!credentials) throw new Error('credentials is null')
 				const prisma  = usePrisma()
 				const user = await prisma.user.findUnique({
-					where:{email:credentials.email}
+					where:{email:credentials.email},
 				})
-				if (!user) throw new Error("No user found with the email")
-				const checkPassword = await compare(credentials.password, user.password ?? "")
-				if (!checkPassword) throw new Error("Ivalid password")
+				if (!user) throw new Error('No user found with the email')
+				const checkPassword = await compare(credentials.password, user.password ?? '')
+				if (!checkPassword) throw new Error('Ivalid password')
 				if (!user.emailVerified) throw ConfirmEmailError
 				return {id:user.id}
-			}
+			},
 		}),
 		YandexProvider({
 			clientId: '07c7c53baec648f7a76588fbea8d265a',
@@ -36,10 +36,10 @@ export default NextAuth({
 		}),
 	],
 	theme: {
-		colorScheme: "light"
+		colorScheme: 'light',
 	},
 	session:{
-		strategy:'jwt'
+		strategy:'jwt',
 	},
 	secret:process.env.NEXTAUTH_SECRET,
 	callbacks: {
@@ -47,19 +47,19 @@ export default NextAuth({
 			const _session = session as Session
 			const user = await prisma.user.findUnique({
 				where: {
-					id: token.sub
-				}
+					id: token.sub,
+				},
 			}) as UserDto
-			if (!user) throw new Error("User not found")
+			if (!user) throw new Error('User not found')
 			user.scopes = (await prisma.scopeJoin.findMany({
 				where: { userId: user.id },
-				include: { scope: true }
+				include: { scope: true },
 			})).map(p => p.scope.value)
 			_session.user = user as UserDto
 			_session.scopes = user.scopes
 			_session.address = token.sub
 			return _session
-		}
+		},
 	},
-	adapter: PrismaAdapter(prisma)
+	adapter: PrismaAdapter(prisma),
 })

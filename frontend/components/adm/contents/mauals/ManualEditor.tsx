@@ -5,7 +5,7 @@ import { useFetchData } from '@/lib/hooks/useFetchData'
 import { handleErrorTsx } from '@/lib/requests'
 import {
 	getTaskById, getTaskCategories, getTaskCategoryById, removeTask,
-	updateTask, uploadTaskImage
+	updateTask, uploadTaskImage,
 } from '@/lib/requests/tasks'
 
 import styles from '@/styles/adm/editors/Task.module.scss'
@@ -23,14 +23,14 @@ import { ImageResize } from 'quill-image-resize-module-ts'
 import ReactQuill from 'react-quill'
 import { Quill } from 'react-quill'
 
-Quill.register("modules/imageResize", ImageResize);
+Quill.register('modules/imageResize', ImageResize)
 
 
 const modules = {
 	toolbar: [
 		[ { 'size': [ 'small', false, 'large', 'huge' ] },  // custom dropdown
-		{ 'header': [ 1, 2, 3, 4, 5, 6, false ] },
-		{ 'font': [] }, { 'align': [] } ],
+			{ 'header': [ 1, 2, 3, 4, 5, 6, false ] },
+			{ 'font': [] }, { 'align': [] } ],
 
 		[ 'bold', 'italic', 'underline', 'strike' ],        // toggled buttons
 		[ 'blockquote', 'code-block' ],
@@ -43,19 +43,19 @@ const modules = {
 		[ { 'color': [] }, { 'background': [] } ],          // dropdown with defaults from theme
 
 
-		[ 'video', 'image' ]
+		[ 'video', 'image' ],
 	],
 	imageResize: {
-		modules: [ 'Resize', 'DisplaySize', 'Toolbar' ]
+		modules: [ 'Resize', 'DisplaySize', 'Toolbar' ],
 		// See optional "config" below
-	}
+	},
 }
 
 const formats = [
 	'header',
 	'bold', 'italic', 'underline', 'strike', 'blockquote',
 	'list', 'bullet', 'indent',
-	'link', 'image'
+	'link', 'image',
 ]
 //#endregion
 
@@ -101,9 +101,9 @@ const ManualEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 		callbackSave={save} callbackUpdate={update} error={errorMsg}>
 		{data
 			? <article className={styles.editor}>
-				<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
+				<Field isHorizontal label="id" type="text" value={data.id.toString()} isReadonly />
 				<Field onChange={changeHanderDtoString('name', setData)}
-					isHorizontal label='Название' type='text' value={data.name} />
+					isHorizontal label="Название" type="text" value={data.name} />
 				<ReactQuill className={styles.quillEditor}
 					modules={modules} theme="snow" value={data.html}
 					onChange={changeHanderDtoString('html', setData)} />

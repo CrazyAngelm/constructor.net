@@ -8,7 +8,7 @@ const Auth: NextPage = () => {
 	const session = useSession()
 
 	return (
-		<Layout title='Auth'>
+		<Layout title="Auth">
 			{session === null
 				? <article className={styles.auth}>
 					<section>
@@ -26,7 +26,7 @@ const Auth: NextPage = () => {
 						</div>
 						<button onClick={() => signIn()}>Войти</button>
 						<hr />
-						<button onClick={() => signIn('yandex',{callbackUrl:'/'})} className={`${styles.button} ${styles.primary}`}>
+						<button onClick={() => signIn('yandex', {callbackUrl:'/'})} className={`${styles.button} ${styles.primary}`}>
 							Войти с помощью Yandex
 						</button>
 					</section>

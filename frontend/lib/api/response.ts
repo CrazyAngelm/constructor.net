@@ -1,8 +1,8 @@
-import { compare } from "bcryptjs"
-import { NextApiRequest, NextApiResponse } from "next"
-import { FromBase64 } from "../Base64"
-import { usePrisma } from "./database"
-import { ScopeEnum } from "../dto/users"
+import { compare } from 'bcryptjs'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { FromBase64 } from '../Base64'
+import { usePrisma } from './database'
+import { ScopeEnum } from '../dto/users'
 
 const prisma = usePrisma()
 
@@ -31,7 +31,7 @@ export const response = <T>(getResponse: (req: NextApiRequest, res: NextApiRespo
 			res.status(502).end(JSON.stringify({
 				code: 502,
 				url: req.url,
-				msg: err
+				msg: err,
 			}))
 		}
 	}
@@ -41,24 +41,24 @@ export const responseAuth = <T>(getResponse: (req: NextApiRequest, res: NextApiR
 	=> Promise<Response<T>>)
 	: (req: NextApiRequest, res: NextApiResponse) => Promise<void> => {
 	return async (req, res) => {
-		let userId: string = ''
-		const base64Credentials = req.headers.authorization?.split(' ')[ 1 ];
+		let userId = ''
+		const base64Credentials = req.headers.authorization?.split(' ')[1]
 		if (!req.headers.authorization || !base64Credentials
-			|| req.headers.authorization.indexOf("Basic ") === -1) {
+			|| req.headers.authorization.indexOf('Basic ') === -1) {
 			res.status(401).end('Отсутсвует заголовок авторизации')
 			return
 		}
 		try {
 
 			const auth = FromBase64(base64Credentials)
-			const id = auth.split(':')[ 0 ]
-			const pass = auth.split(':')[ 1 ]
+			const id = auth.split(':')[0]
+			const pass = auth.split(':')[1]
 			const user = await prisma.user.findUnique({ where: { id: id } })
 			if (!pass || !user) {
 				res.status(401).end('Неверные данные авторизации')
 				return
 			}
-			const checkPassword = await compare(pass, user.password ?? "")
+			const checkPassword = await compare(pass, user.password ?? '')
 			if (!checkPassword) {
 				res.status(401).end('Неверный пароль')
 				return
@@ -80,7 +80,7 @@ export const responseAuth = <T>(getResponse: (req: NextApiRequest, res: NextApiR
 			res.status(502).end(JSON.stringify({
 				code: 502,
 				url: req.url,
-				msg: err
+				msg: err,
 			}))
 		}
 	}
@@ -90,33 +90,33 @@ export const responseAdmin = <T>(getResponse: (req: NextApiRequest, res: NextApi
 	=> Promise<Response<T>>)
 	: (req: NextApiRequest, res: NextApiResponse) => Promise<void> => {
 	return async (req, res) => {
-		let userId: string = ''
-		const base64Credentials = req.headers.authorization?.split(' ')[ 1 ];
+		let userId = ''
+		const base64Credentials = req.headers.authorization?.split(' ')[1]
 		if (!req.headers.authorization || !base64Credentials
-			|| req.headers.authorization.indexOf("Basic ") === -1) {
+			|| req.headers.authorization.indexOf('Basic ') === -1) {
 			res.status(401).end('Отсутсвует заголовок авторизации')
 			return
 		}
 		try {
 
 			const auth = FromBase64(base64Credentials)
-			const id = auth.split(':')[ 0 ]
-			const pass = auth.split(':')[ 1 ]
+			const id = auth.split(':')[0]
+			const pass = auth.split(':')[1]
 			const user = await prisma.user.findUnique({
 				where: { id: id },
 				include: {
 					scopes: {
 						include: {
-							scope: true
-						}
-					}
-				}
+							scope: true,
+						},
+					},
+				},
 			})
 			if (!pass || !user) {
 				res.status(401).end('Неверные данные авторизации')
 				return
 			}
-			const checkPassword = await compare(pass, user.password ?? "")
+			const checkPassword = await compare(pass, user.password ?? '')
 			if (!checkPassword) {
 				res.status(401).end('Неверный пароль')
 				return
@@ -143,7 +143,7 @@ export const responseAdmin = <T>(getResponse: (req: NextApiRequest, res: NextApi
 			res.status(502).end(JSON.stringify({
 				code: 502,
 				url: req.url,
-				msg: err
+				msg: err,
 			}))
 		}
 	}

@@ -1,8 +1,8 @@
-import { PrismaClient, User } from "@prisma/client";
-import { UserDto } from "@/lib/dto/users";
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { Error, response } from "@/lib/api/response";
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
+import { PrismaClient, User } from '@prisma/client'
+import { UserDto } from '@/lib/dto/users'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { Error, response } from '@/lib/api/response'
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
 const prisma = new PrismaClient()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
@@ -16,24 +16,24 @@ handler.post(response(async (req, res) => {
 	if (!scopeId) return { error: { code: 400, message: 'Значения не существует' } }
 	const scopes = await prisma.scopeJoin.findMany({
 		where: {
-			userId: id
+			userId: id,
 		},
 		include: {
-			scope: true
-		}
+			scope: true,
+		},
 	})
 	const scope = scopes.find(p => p.scope.value === body.scope)
 	if (body.active && !scope) await prisma.scopeJoin.create({
 		data: {
 			userId: id,
-			scopeId: scopeId.id
-		}
+			scopeId: scopeId.id,
+		},
 	})
 	if (!body.active && scope) await prisma.scopeJoin.deleteMany({
 		where:{
 			userId:id,
-			scopeId:scopeId.id
-		}
+			scopeId:scopeId.id,
+		},
 	})
 	return { response: { status: 'Ok' } }
 }))

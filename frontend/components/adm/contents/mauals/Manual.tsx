@@ -1,12 +1,12 @@
-import { makeFetcher } from "@/lib/fetchers"
-import { useFetchData } from "@/lib/hooks/useFetchData"
-import { createManual, getManualById, getManuals, removeManual, updateManual } from "@/lib/requests/manuals"
-import dynamic from "next/dynamic"
-import { useEffect, useState } from "react"
+import { makeFetcher } from '@/lib/fetchers'
+import { useFetchData } from '@/lib/hooks/useFetchData'
+import { createManual, getManualById, getManuals, removeManual, updateManual } from '@/lib/requests/manuals'
+import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 import styles from '@/styles/adm/Content.module.scss'
 import 'react-quill/dist/quill.snow.css'
-import { WarningDelete } from "../EditorTemplate"
-import Image from "next/image"
+import { WarningDelete } from '../EditorTemplate'
+import Image from 'next/image'
 import arrow from '@/assets/back.svg'
 import menu from '@/assets/menu.png'
 import trash from '@/assets/trash.png'
@@ -71,8 +71,8 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 			{modalDelete && <WarningDelete callbackRemove={remove} cancel={() => setModalDelete(false)} />}
 			<header>
 				<div onClick={() => setOpen(p => !p)}>
-					{isOpen() &&
-						<div className={`${styles.arrow} ${open && styles.open}`}>
+					{isOpen()
+						&& <div className={`${styles.arrow} ${open && styles.open}`}>
 							<Image src={arrow} />
 						</div>}
 				</div>
@@ -82,20 +82,20 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 				}
 				<section className={styles.menu}>
 					<header>
-						<Image layout='fill' objectFit='contain' src={menu} />
+						<Image layout="fill" objectFit="contain" src={menu} />
 					</header>
 					<section>
 						<div onClick={clickCreate} className={styles.icon}>
-							<Image layout='fill' objectFit='contain' src={addFile} />
+							<Image layout="fill" objectFit="contain" src={addFile} />
 						</div>
 						{id != -1 && <div onClick={() => setModalDelete(true)} className={styles.icon}>
-							<Image layout='fill' objectFit='contain' src={trash} />
+							<Image layout="fill" objectFit="contain" src={trash} />
 						</div>}
 					</section>
 				</section>
 			</header>
-			{(open && isOpen()) &&
-				<section>
+			{(open && isOpen())
+				&& <section>
 					{data?.map(p => (
 						<Item parentId={id} setManualId={setter.setManualId} updater={updater}
 							id={p.id} name={p.name} />
@@ -153,11 +153,11 @@ const Manual = () => {
 	return (
 		<article className={styles.content}>
 			<section className={styles.list}>
-				<Item id={-1} name='Manuals' setManualId={setManualId} updater={updater} />
+				<Item id={-1} name="Manuals" setManualId={setManualId} updater={updater} />
 			</section>
 			<section className={styles.editor}>
-				{manualId &&
-					<ManualEditor id={manualId} callbackUpdate={() => updater.update(manualId)}
+				{manualId
+					&& <ManualEditor id={manualId} callbackUpdate={() => updater.update(manualId)}
 						callbackBack={() => setManualId(undefined)} />}
 			</section>
 		</article>

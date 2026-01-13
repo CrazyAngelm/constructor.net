@@ -36,11 +36,11 @@ const ChangeCourse = ({ license, subscription, update }: ChangeCoursesProps) => 
 
 		if (checkedCourses?.filter(p => p === true).length >= license?.freeCourses
 			&& value)
-			return;
+			return
 
-		setCheckedCourses(p => {
+		setCheckedCourses((p) => {
 			if (!p) return p
-			p[ index ] = value
+			p[index] = value
 			return [ ...p ]
 		})
 	}
@@ -49,8 +49,8 @@ const ChangeCourse = ({ license, subscription, update }: ChangeCoursesProps) => 
 
 		await makeFetcher(changeCourses)({
 			userId: subscription?.userId,
-			coursesId: data?.filter((p, i) => checkedCourses && checkedCourses[ i ])
-				.map(p => p.id)
+			coursesId: data?.filter((p, i) => checkedCourses && checkedCourses[i])
+				.map(p => p.id),
 		})
 
 		update && update()
@@ -60,14 +60,14 @@ const ChangeCourse = ({ license, subscription, update }: ChangeCoursesProps) => 
 		<Modal visible={visible} closeCallback={() => setVisible(false)}>
 			<header>{checkedCourses?.filter(p => p === true).length}/
 				{(license?.freeCourses && data) && license.freeCourses < data.length
-				? license?.freeCourses : data?.length} курсов выбрано</header>
+					? license?.freeCourses : data?.length} курсов выбрано</header>
 			{data?.map((p, id) => <section key={p.id} className={styles.courses}>
 				<Checkbox value={licenseCourses.indexOf(p.id) !== -1
 					? true
-					: checkedCourses ? checkedCourses[ id ] : false
+					: checkedCourses ? checkedCourses[id] : false
 				}
-					disabled={licenseCourses.indexOf(p.id) !== -1}
-					onChange={v => onChange(id, v)} />
+				disabled={licenseCourses.indexOf(p.id) !== -1}
+				onChange={v => onChange(id, v)} />
 				<p>{p.name}</p>
 			</section>)}
 			<button onClick={apply}>Применить</button>
@@ -113,7 +113,7 @@ export const Item = ({ item, update }: PropsItem) => {
 					<td>{new Date(item.startDate ?? Date()).toLocaleString('ru-RU', {
 						year: 'numeric',
 						month: 'long',
-						day: 'numeric'
+						day: 'numeric',
 					})}</td>
 				</tr>
 				<tr>
@@ -125,19 +125,19 @@ export const Item = ({ item, update }: PropsItem) => {
 					<td>{new Date(item.endDate ?? Date()).toLocaleString('ru-RU', {
 						year: 'numeric',
 						month: 'long',
-						day: 'numeric'
+						day: 'numeric',
 					})}</td>
 				</tr>
 				<tr>
 					<td className={styles.header}>Активна</td>
 					<td>{item.active ? 'Да'
-					: 'Нет. Оплата не прошла, для возобновления отмените и подпишитесь заново'}</td>
+						: 'Нет. Оплата не прошла, для возобновления отмените и подпишитесь заново'}</td>
 				</tr>
-				{license?.price !== 0 &&
-					<tr>
+				{license?.price !== 0
+					&& <tr>
 						<td className={styles.header}>Способ оплаты</td>
-						<td>{item.paymentTitle ?
-							item.paymentTitle
+						<td>{item.paymentTitle
+							? item.paymentTitle
 							: 'Способ оплаты не привязан'}</td>
 					</tr>
 				}
@@ -161,30 +161,30 @@ const Subscriptions = () => {
 
 	const session = useSession()
 	const { data, update } = useFetchData({ id: (session != 'loading') ? session?.user?.id : undefined },
-		getSubscription);
+		getSubscription)
 
 	const resetPayment = async () => {
-		if (session == 'loading' || !data || data.length === 0) return;
+		if (session == 'loading' || !data || data.length === 0) return
 
 		await makeFetcher(resetPaymentMethod)({
 			userId: session?.user?.id,
-			subscriptionId: data[ 0 ]?.id
+			subscriptionId: data[0]?.id,
 		})
 
 		update()
 	}
 
 	const changePayment = async () => {
-		if (session == 'loading' || !data || data.length === 0) return;
+		if (session == 'loading' || !data || data.length === 0) return
 
 		const res = await makeFetcher(changePaymentMethod)({
 			userId: session?.user?.id,
-			subscriptionId: data[ 0 ]?.id
+			subscriptionId: data[0]?.id,
 		})
 
 		YooCheckoutWidget(res.confirmationToken,
 			res.returnUrl + '/lk',
-			(err) => console.log(err))
+			err => console.log(err))
 	}
 
 	const cancelSubscription = async () => {
@@ -194,7 +194,7 @@ const Subscriptions = () => {
 		try {
 			await makeFetcher(unsubscribe)({
 				userId: session?.user?.id,
-				subscriptionId: data[ 0 ]?.id
+				subscriptionId: data[0]?.id,
 			})
 		} catch (err) {
 			console.log(err)
@@ -219,18 +219,17 @@ const Subscriptions = () => {
 					<button onClick={cancelSubscription}>Все равно отписаться</button>
 				</section>
 			</Modal>
-			{(data && data.length > 0) &&
-				<article className={styles.subscription}>
-					{!data ?
-						<div>Пока нет информации о подписках</div>
-						:
-						<>{data.map(p => <>
+			{(data && data.length > 0)
+				&& <article className={styles.subscription}>
+					{!data
+						? <div>Пока нет информации о подписках</div>
+						:						<>{data.map(p => <>
 							<Item key={p.id} item={p} update={update} />
-							{p.paymentTitle &&
-								<button onClick={resetPayment}>отвязать способ оплаты</button>
+							{p.paymentTitle
+								&& <button onClick={resetPayment}>отвязать способ оплаты</button>
 							}
-							{p.licenseId !== 1 &&
-								< button onClick={changePayment}>привязать способ оплаты</button>
+							{p.licenseId !== 1
+								&& < button onClick={changePayment}>привязать способ оплаты</button>
 							}
 							<br />
 							<button onClick={() => setNot(true)}

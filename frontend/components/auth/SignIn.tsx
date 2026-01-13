@@ -30,7 +30,7 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 
 	const onResendConfirm = async () => {
 		setResendEmail(false)
-		if (!signupDto) return;
+		if (!signupDto) return
 		try {
 			await makeFetcher(resendConfirmEmail)(signupDto)
 		} catch (err) {
@@ -40,7 +40,7 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 
 	const onResetPassword = async () => {
 		if(!signupDto) {
-			onError && onError("Для сброса пароля, введите хотя бы EMail")
+			onError && onError('Для сброса пароля, введите хотя бы EMail')
 			return
 		}
 		try{
@@ -54,12 +54,12 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 
 	const onSubmit = async () => {
 		setResendEmail(false)
-		onError && onError("")
-		const fE = (signupDto?.email.indexOf("@") ?? -1) == -1
+		onError && onError('')
+		const fE = (signupDto?.email.indexOf('@') ?? -1) == -1
 
 
 		if (fE || !signupDto) {
-			onError && onError('Email введен неверно');
+			onError && onError('Email введен неверно')
 			return
 		}
 
@@ -67,7 +67,7 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 			const status = await signIn('credentials', {
 				redirect: false,
 				email: signupDto.email,
-				password: signupDto.password
+				password: signupDto.password,
 			}) as any as SigninError
 
 			if (status.error) {
@@ -114,7 +114,7 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 					<section className={styles.body}>
 						<section className={styles.close}>
 							<div onClick={() => setResetPass(false)}>
-								<Image src={close} layout='fill' objectFit='contain' />
+								<Image src={close} layout="fill" objectFit="contain" />
 							</div>
 						</section>
 						<section className={styles.content}>
@@ -123,7 +123,7 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 							<button onClick={onResetPassword}>Сбросить</button>
 						</section>
 					</section>
-					</article>}
+				</article>}
 			</section>
 		</article>
 	)

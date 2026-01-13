@@ -1,4 +1,4 @@
-import { UpdaetScopeDto, UserDto } from '@/lib/dto/users';
+import { UpdaetScopeDto, UserDto } from '@/lib/dto/users'
 
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
 

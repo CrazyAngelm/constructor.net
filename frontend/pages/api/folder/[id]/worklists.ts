@@ -1,7 +1,7 @@
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { usePrisma } from "@/lib/api/database";
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
+import { usePrisma } from '@/lib/api/database'
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
@@ -19,14 +19,13 @@ handler.get(response(async (req, res) => {
 						select: {
 							id: true,
 							name: true,
-							date: true
-						}
-					}
-				}
-			}
-		}
+							date: true,
+						},
+					},
+				},
+			},
+		},
 	})
 	return { response: data?.FolderToWorklist.map(p => p.worklist) }
-})
-)
+}))
 export default handler

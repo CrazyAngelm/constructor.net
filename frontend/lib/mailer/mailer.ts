@@ -8,23 +8,23 @@ export const getTransport = () => {
 		secure: false,
 		auth: {
 			user: process.env.MAILER_USER,
-			pass: process.env.MAILER_PASS
-		}
+			pass: process.env.MAILER_PASS,
+		},
 	})
 	return transport
 }
 
 export const sendMail = (mailOptions: any) => {
-	getTransport().sendMail(mailOptions, function (err, info) {
+	getTransport().sendMail(mailOptions, function(err, info) {
 		if (err) {
 		} else {
 		}
-	});
+	})
 }
 
 export const optionsWithFrom = (options:any):any => {
 	return {
 		from: 'Lab Studio <' + process.env.MAILER_USER +'>',
-		...options
+		...options,
 	}
 }

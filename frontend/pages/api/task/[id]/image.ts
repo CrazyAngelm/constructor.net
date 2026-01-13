@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client";
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { TaskCategoryDto, TaskDto } from "@/lib/dto/tasks";
+import { PrismaClient } from '@prisma/client'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
+import { TaskCategoryDto, TaskDto } from '@/lib/dto/tasks'
 import multer from 'multer'
 import { v4 } from 'uuid'
-import { usePrisma } from "@/lib/api/database";
+import { usePrisma } from '@/lib/api/database'
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 let fileName = ''
@@ -17,7 +17,7 @@ const upload = multer({
 			cb(null, fileName)
 		},
 	}),
-});
+})
 interface Query extends NextParsedUrlQuery {
 	id?: string
 }
@@ -28,8 +28,8 @@ handler.post(response(async (req, res) => {
 	await prisma.task.update({
 		where: { id },
 		data: {
-			image: `${process.env.DOWNLOAD_IMAGE_TASK}/${fileName}`
-		}
+			image: `${process.env.DOWNLOAD_IMAGE_TASK}/${fileName}`,
+		},
 	})
 	return { response: { status: 'Ok' } }
 }))
@@ -37,5 +37,5 @@ export const config = {
 	api: {
 		bodyParser: false, // Disallow body parsing, consume as stream
 	},
-};
+}
 export default handler

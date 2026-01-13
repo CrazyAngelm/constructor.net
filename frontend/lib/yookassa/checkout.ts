@@ -1,32 +1,32 @@
-import { YooCheckout, ICreatePayment } from "@a2seven/yoo-checkout";
-import { v4 as uuid } from "uuid";
+import { YooCheckout, ICreatePayment } from '@a2seven/yoo-checkout'
+import { v4 as uuid } from 'uuid'
 
 class CheckoutService {
-	private readonly client: YooCheckout;
+	private readonly client: YooCheckout
 
 	constructor() {
 		this.client = new YooCheckout({
-			shopId: process.env.YOOCHECKOUT_SHOP_ID ?? "",
-			secretKey: process.env.YOOCHECKOUT_KEY ?? ""
-		});
+			shopId: process.env.YOOCHECKOUT_SHOP_ID ?? '',
+			secretKey: process.env.YOOCHECKOUT_KEY ?? '',
+		})
 	}
 
 	generateKey(): string {
-		return uuid();
+		return uuid()
 	}
 
 	createPayment(payload: ICreatePayment, key = this.generateKey()) {
-		return this.client.createPayment(payload, key);
+		return this.client.createPayment(payload, key)
 	}
 
 	capturePayment(paymentId: string, payload = {}) {
-		return this.client.capturePayment(paymentId, payload);
+		return this.client.capturePayment(paymentId, payload)
 	}
 
 	getPayment(paymentId: string) {
-		return this.client.getPayment(paymentId);
+		return this.client.getPayment(paymentId)
 	}
 }
 
-export const checkout = new CheckoutService();
-export type { ICreatePayment };
+export const checkout = new CheckoutService()
+export type { ICreatePayment }

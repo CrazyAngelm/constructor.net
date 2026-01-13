@@ -23,16 +23,16 @@ const DropdownCheck = ({ label, button, isHorizontal, list, value, callbackChois
 	}, [ value ])
 
 	const Choise = (index: number) => {
-		choises[ index ] = !choises[ index ]
+		choises[index] = !choises[index]
 		callbackChoise && callbackChoise(choises)
 		setChoises([ ...choises ])
 	}
 
 	return (
 		<section className={`${isHorizontal ? styles.isHorizontal : ''} ${styles.dropdownCheck}`}>
-			{label &&
-				<div className={styles.fieldLabel}><label>{label}</label></div>}
-			<div className={`dropdown ${active && "is-active"} ${styles.fieldBody}`}>
+			{label
+				&& <div className={styles.fieldLabel}><label>{label}</label></div>}
+			<div className={`dropdown ${active && 'is-active'} ${styles.fieldBody}`}>
 				<div className="dropdown-trigger">
 					<button onClick={() => setActive(a => !a)} className="button" aria-haspopup aria-controls="dropdownmenu">
 						<span>{button ? button : 'Выбрать'}</span>
@@ -41,11 +41,11 @@ const DropdownCheck = ({ label, button, isHorizontal, list, value, callbackChois
 						</span>
 					</button>
 				</div>
-				<div className="dropdown-menu" id="dropdownmenu" role='listbox'>
+				<div className="dropdown-menu" id="dropdownmenu" role="listbox">
 					<div className="dropdown-content">
 						{
 							list?.map((p, i) => <a onClick={() => Choise(i)} key={i}
-								className={`dropdown-item ${choises[ i ] && 'is-active'}`}>
+								className={`dropdown-item ${choises[i] && 'is-active'}`}>
 								{p}
 							</a>)
 						}

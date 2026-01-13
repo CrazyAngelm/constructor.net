@@ -139,14 +139,14 @@ export const createTaskCategory = async (
 	parentCourse?: boolean,
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<TaskCategoryDto> => {
-	const res = await fetch(apiUrl + `/task-category/create`, {
+	const res = await fetch(apiUrl + '/task-category/create', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
 		body: JSON.stringify({
 			parentId: parentId,
-			courseParent: parentCourse
+			courseParent: parentCourse,
 		} as CreateCategoryDto),
 	})
 

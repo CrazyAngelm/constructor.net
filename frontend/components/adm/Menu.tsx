@@ -24,7 +24,7 @@ const Avatar = ({ session }: { session: Session }) => {
 			? <img src={session.user?.image} className={styles.img} />
 			: <div className={styles.img}>
 				<span>
-					{session.user?.name ? session.user.name[ 0 ] : 'U'}
+					{session.user?.name ? session.user.name[0] : 'U'}
 				</span>
 			</div>
 		}
@@ -35,12 +35,11 @@ const Avatar = ({ session }: { session: Session }) => {
 const Menu = ({ categories }: Props) => {
 	const session = useSession()
 
-	const getItem = (item: Item) =>
-		<li>
-			<a onClick={item.callback}>{item.label}</a>
-			{(item.items && item.items?.length > 0) &&
-				<ul>{item.items.map(p => getItem(p))}</ul>}
-		</li>
+	const getItem = (item: Item) => <li>
+		<a onClick={item.callback}>{item.label}</a>
+		{(item.items && item.items?.length > 0)
+				&& <ul>{item.items.map(p => getItem(p))}</ul>}
+	</li>
 
 	if (!session || session === 'loading') return null
 	return (

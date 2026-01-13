@@ -27,4 +27,4 @@ const Comment = ({ image, name, status, title, comment }: Props) => {
 	)
 }
 
-export default Comment;
+export default Comment

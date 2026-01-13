@@ -1,7 +1,7 @@
-import styles from '@/styles/auth/Auth.module.scss';
+import styles from '@/styles/auth/Auth.module.scss'
 import close from '@/assets/close.svg'
-import Image from 'next/image';
-import { LicenseDto } from '@/lib/dto/subscription';
+import Image from 'next/image'
+import { LicenseDto } from '@/lib/dto/subscription'
 
 export interface Props {
 	closeCallback: () => void
@@ -16,7 +16,7 @@ const Order = ({ closeCallback, okCallback, license }: Props) => {
 				<section className={styles.body}>
 					<section className={styles.close}>
 						<div onClick={closeCallback}>
-							<Image src={close} layout='fill' objectFit='contain' />
+							<Image src={close} layout="fill" objectFit="contain" />
 						</div>
 					</section>
 					<section className={styles.not}>
@@ -24,7 +24,7 @@ const Order = ({ closeCallback, okCallback, license }: Props) => {
 						<div>
 							Вы собираетесь оформить подписку на тариф
 							"{license?.name}" <br />
-							Оформляя подписку вы соглашаетесь с <a href='/license' target={'_blank'}>лицензионным соглашением</a>
+							Оформляя подписку вы соглашаетесь с <a href="/license" target={'_blank'}>лицензионным соглашением</a>
 							<br />
 							Подписку можно будет отключить в личном кабинете в любой момент
 						</div>
@@ -37,4 +37,4 @@ const Order = ({ closeCallback, okCallback, license }: Props) => {
 		</article>
 	)
 }
-export default Order;
+export default Order

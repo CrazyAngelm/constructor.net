@@ -12,7 +12,7 @@ import { useState } from 'react'
 
 const Navbar = () => {
 	const session = useSession()
-	const [isOpenAvatarMenu, setOpenAvatarMenu] = useState(false)
+	const [ isOpenAvatarMenu, setOpenAvatarMenu ] = useState(false)
 
 	return (
 		<nav className={`${styles.navbar} ${styles.fixed}`} role="navigation" aria-label="main navigation">
@@ -21,7 +21,7 @@ const Navbar = () => {
 					<Link href={'/'}>
 						<section className={styles.about}>
 							<div>
-								<Image src={logo} layout='fill' objectFit='contain' />
+								<Image src={logo} layout="fill" objectFit="contain" />
 							</div>
 							{/* <span>Lab Studio</span> */}
 						</section>
@@ -35,7 +35,7 @@ const Navbar = () => {
 					<Link href={'/#pricing'}>Купить</Link>
 					<Link href={'/#comments'}>Отзывы</Link>
 					<Link href={'/#faq'}>FAQ</Link>
-					<Link href={"/docs"}>Документация</Link>
+					<Link href={'/docs'}>Документация</Link>
 				</section>
 
 				<section className={styles.end}>
@@ -55,14 +55,14 @@ const Navbar = () => {
 									? <img src={session.user?.image} className={styles.rounded} />
 									: <div className={styles.avatar}>
 										<span>
-											{session.user?.name ? session.user.name[ 0 ] : 'U'}
+											{session.user?.name ? session.user.name[0] : 'U'}
 										</span>
 									</div>
 								}
 								<span>{session.user?.name ? session.user.name : 'unknow'}</span>
 							</div>
-							<section className={`${styles.avatarMenu} ${isOpenAvatarMenu ? styles.open : ""}`}>
-								<Link href={"/lk"}>Личный кабинет</Link>
+							<section className={`${styles.avatarMenu} ${isOpenAvatarMenu ? styles.open : ''}`}>
+								<Link href={'/lk'}>Личный кабинет</Link>
 								<hr></hr>
 								<a onClick={() => signOut()} className={styles.exit}>Выход</a>
 							</section>

@@ -79,28 +79,28 @@ const ItemCat = ({ id, parentId: parentId, name: _name, isCourse, updater, ...se
 			{modalDelete && <WarningDelete callbackRemove={remove} cancel={() => setModalDelete(false)} />}
 			<header>
 				<div onClick={() => setOpen(p => !p)}>
-					{isOpen() &&
-						<div className={`${styles.arrow} ${open && styles.open}`}>
+					{isOpen()
+						&& <div className={`${styles.arrow} ${open && styles.open}`}>
 							<Image src={arrow} />
 						</div>}
 				</div>
 				<span onClick={onClick}>{name}</span>
 				<section className={styles.menu}>
 					<header>
-						<Image layout='fill' objectFit='contain' src={menu} />
+						<Image layout="fill" objectFit="contain" src={menu} />
 					</header>
 					<section>
 						<div onClick={create} className={styles.icon}>
-							<Image layout='fill' objectFit='contain' src={addFolder} />
+							<Image layout="fill" objectFit="contain" src={addFolder} />
 						</div>
 						<div onClick={() => setModalDelete(true)} className={styles.icon}>
-							<Image layout='fill' objectFit='contain' src={trash} />
+							<Image layout="fill" objectFit="contain" src={trash} />
 						</div>
 					</section>
 				</section>
 			</header>
-			{(open && isOpen()) &&
-				<section>
+			{(open && isOpen())
+				&& <section>
 					{data?.map(p => (
 						<ItemCat parentId={id} setCat={setter.setCat} updater={updater}
 							setTask={setter.setTask} id={p.id} name={p.name} />
@@ -123,11 +123,10 @@ const List = (props: ListProps) => {
 
 	return (
 		<div>
-			{data?.map(p =>
-				<ItemCat isCourse id={p.id} name={p.name}
-					setCourse={props.setCourse} setCat={props.setCat}
-					setTask={props.setTask}
-					updater={props.updater} />)}
+			{data?.map(p => <ItemCat isCourse id={p.id} name={p.name}
+				setCourse={props.setCourse} setCat={props.setCat}
+				setTask={props.setTask}
+				updater={props.updater} />)}
 			<section className={styles.createCourse}
 				onClick={() => createCourse(props.setCourse, update)}>Создать курс</section>
 		</div>
@@ -135,7 +134,7 @@ const List = (props: ListProps) => {
 }
 
 const createCategory = async (parentId: number, isCourse?: boolean, setter?: (id: number) => void, update?: () => void): Promise<void> => {
-	console.log("create", parentId, isCourse)
+	console.log('create', parentId, isCourse)
 	const response = await createTaskCategory(parentId, isCourse)
 	setter && setter(response.id)
 	update && update()

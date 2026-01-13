@@ -5,7 +5,7 @@ import { useFetchData } from '@/lib/hooks/useFetchData'
 import { handleErrorTsx } from '@/lib/requests'
 import {
 	getTaskById, getTaskCategories, getTaskCategoryById, removeTask,
-	updateTask, uploadTaskImage
+	updateTask, uploadTaskImage,
 } from '@/lib/requests/tasks'
 
 import styles from '@/styles/adm/editors/Task.module.scss'
@@ -32,17 +32,16 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 
 	const { data: categories } = useFetchData({}, getTaskCategories)
 
-	const { data, update, setData, error } = useFetchData(id, getTaskById,
-		id === -1
-			? { id: -1, name: 'Без названия', description: '', categories: categoryId ? [ categoryId ] : [] }
-			: undefined)
+	const { data, update, setData, error } = useFetchData(id, getTaskById, id === -1
+		? { id: -1, name: 'Без названия', description: '', categories: categoryId ? [ categoryId ] : [] }
+		: undefined)
 
 	console.log(data)
 
 	const setChoiseCategory = (values: boolean[]) => {
-		setData(data => {
+		setData((data) => {
 			if (!data) return data
-			data.categories = categories?.filter((p, i) => values[ i ]).map(p => p.id)
+			data.categories = categories?.filter((p, i) => values[i]).map(p => p.id)
 			return { ...data }
 		})
 	}
@@ -73,16 +72,14 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 
 	const copyDescCategory = () => {
 		if (!categoryId) {
-			setError("Невозможно скопировать из категори описание, родительская категория не назначена")
+			setError('Невозможно скопировать из категори описание, родительская категория не назначена')
 			return
 		}
-		makeFetcher(getTaskCategoryById)(categoryId).then(resp =>
-			setData(d => {
-				if (!d) return d
-				d.description = resp.description
-				return { ...d }
-			})
-		)
+		makeFetcher(getTaskCategoryById)(categoryId).then(resp => setData((d) => {
+			if (!d) return d
+			d.description = resp.description
+			return { ...d }
+		}))
 	}
 	return <EditorTemplate callbackBack={callbackBack} callbackRemove={remove} notification={notification}
 		callbackSave={save} callbackUpdate={update} error={errorMsg}>
@@ -90,17 +87,17 @@ const TaskEditor = ({ id, categoryId, callbackUpdate, callbackBack }: Props) => 
 			? <article className={styles.editor}>
 				<section className={styles.row}>
 					<section>
-						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
+						<Field isHorizontal label="id" type="text" value={data.id.toString()} isReadonly />
 
 						<Field onChange={changeHanderDtoString('name', setData)}
-							isHorizontal label='Название' type='text' value={data.name} />
+							isHorizontal label="Название" type="text" value={data.name} />
 						<FieldNumber onChange={changeHanderDtoNumber('complexity', setData)}
-							isHorizontal label='Сложность' value={data.complexity} />
+							isHorizontal label="Сложность" value={data.complexity} />
 						<TextArea onChange={changeHanderDtoString('description', setData)}
-							label='Описание' value={data.description} />
+							label="Описание" value={data.description} />
 						<button onClick={copyDescCategory}>Скопировать из категории</button>
 						<TextArea onChange={changeHanderDtoString('instruction', setData)}
-							label='Инструкция для ребенка' value={data.instruction} />
+							label="Инструкция для ребенка" value={data.instruction} />
 					</section>
 					<section className={styles.image}>
 						<Upload keyChange={id.toString()} preview value={data.image} onChange={p => setFormData(p)} />

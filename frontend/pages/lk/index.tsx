@@ -26,13 +26,13 @@ const navigation = [
 	{
 		label: 'Личные данные',
 		hash: 'account',
-		node: <Account />
+		node: <Account />,
 	},
 	{
 		label: 'Подписки',
 		hash: 'subscription',
-		node: <Subscriptions />
-	}
+		node: <Subscriptions />,
+	},
 ] as NavigationPage[]
 
 const Lk: NextPage<Props> = ({ user }: Props) => {
@@ -42,7 +42,7 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 
 	useEffect(() => {
 		if (window && page?.hash !== window.location.hash) {
-			setPage(navigation.find(p => "#" +p.hash == window.location.hash))
+			setPage(navigation.find(p => '#' +p.hash == window.location.hash))
 		}
 	}, [])
 
@@ -54,34 +54,33 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 	if (session === 'loading') return <article className={styles.loading}>Loading...</article>
 
 	if (!session) {
-		Router.push("/")
-		return null;
+		Router.push('/')
+		return null
 	}
 
 	return (
-		<Layout title='Личный кабинет' navbar={false} footer={false}>
+		<Layout title="Личный кабинет" navbar={false} footer={false}>
 			<article className={styles.lk}>
 				<nav>
 					<section className={styles.info}>
 						<section className={styles.avatar}>
-							<span>{session.user?.name ? session.user.name[ 0 ] : 'unknow'}</span>
+							<span>{session.user?.name ? session.user.name[0] : 'unknow'}</span>
 						</section>
 						<p>{session.user?.name}</p>
 					</section>
 					<hr />
 					<section className={styles.items}>
 						{
-							navigation.map(p =>
-								<a key={p.hash}
-									className={p.hash == page?.hash ? styles.active : ''}
-									onClick={nav(p)}>{p.label}</a>)
+							navigation.map(p => <a key={p.hash}
+								className={p.hash == page?.hash ? styles.active : ''}
+								onClick={nav(p)}>{p.label}</a>)
 						}
 						<hr />
 						<a onClick={() => signOut()} className={styles.danger}>Выход</a>
 					</section>
 					{/* <p>Приложение пока не доступно,<br /> идет настройка магазина</p> */}
-					<a href='https://labstudio-inc.ru/boundles/labstudio_hub_installer.exe'
-						target={'_blank'}>
+					<a href="https://labstudio-inc.ru/boundles/labstudio_hub_installer.exe"
+						target={'_blank'} rel="noreferrer">
 						<button>Скачать приложение</button>
 					</a>
 				</nav>
@@ -100,8 +99,8 @@ interface QueryWithToken extends ParsedUrlQuery {
 export const getServerSideProps = withSession((session, context) => {
 	return {
 		props: {
-			user: session.user
-		}
+			user: session.user,
+		},
 	}
 })
 

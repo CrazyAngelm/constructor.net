@@ -59,10 +59,10 @@ const EditorTemplate = ({ children, error, notification, ...callbacks }: Props) 
 				{children}
 			</section>
 			<section className={styles.status}>
-				<span className={`${notification?.color && styles[ notification?.color ]}`}>{notification?.msg}</span>
+				<span className={`${notification?.color && styles[notification?.color]}`}>{notification?.msg}</span>
 			</section>
-			{error &&
-				<section className={styles.error}>
+			{error
+				&& <section className={styles.error}>
 					<span>Error: </span>
 					{error}
 				</section>

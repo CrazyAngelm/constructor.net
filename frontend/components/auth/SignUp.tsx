@@ -19,7 +19,7 @@ const SignUp = ({ onSucess, onError, auth }: Props) => {
 
 	const onSubmit = async () => {
 
-		const fE = (signupDto?.email.indexOf("@") ?? -1) == -1
+		const fE = (signupDto?.email.indexOf('@') ?? -1) == -1
 		const fP = signupDto?.password != confirmPassword
 
 		fE && onError && onError('Email введен неверно')

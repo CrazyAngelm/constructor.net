@@ -17,17 +17,17 @@ const UserContent = () => {
 	return (
 		<article className={styles.content}>
 			<section className={styles.list}>
-				{data &&
-					<List name='Пользователи'
+				{data
+					&& <List name="Пользователи"
 						length={data.length}
 						rows={[ {
 							header: 'id',
-							value: i => data[ i ]?.id as string,
+							value: i => data[i]?.id as string,
 						}, {
 							header: 'name',
-							value: i => data[ i ]?.name as string
+							value: i => data[i]?.name as string,
 						} ]}
-						callback={i => setUserId(data[ i ]?.id)}
+						callback={i => setUserId(data[i]?.id)}
 						selected={data.findIndex(p => p.id == userId)} />
 				}
 				<ButtonsList />

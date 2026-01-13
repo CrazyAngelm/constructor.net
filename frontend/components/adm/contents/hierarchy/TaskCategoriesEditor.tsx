@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useFetchData } from '@/lib/hooks/useFetchData'
 import {
 	getCourses, getTaskCategoryById, getTasksByIdCategory,
-	removeTaskCategory, updateTask, updateTaskCategory
+	removeTaskCategory, updateTask, updateTaskCategory,
 } from '@/lib/requests/tasks'
 import { handleErrorTsx } from '@/lib/requests'
 import { changeHanderDtoString as changeHanderDto } from '@/lib/changeHandler'
@@ -31,17 +31,16 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack, call
 	const [ errorMsg, setError ] = useState<string | undefined>('')
 	const [ notification, setNotification ] = useState<Notification>()
 
-	const { data, update, setData, error } = useFetchData(id, getTaskCategoryById,
-		id === -1
-			? { id: -1, name: 'Без названия', description: '' }
-			: undefined)
+	const { data, update, setData, error } = useFetchData(id, getTaskCategoryById, id === -1
+		? { id: -1, name: 'Без названия', description: '' }
+		: undefined)
 
 	const { data: tasks, update: updateTasks, error: errorTask } = useFetchData(id, getTasksByIdCategory)
 
 	const { data: courses } = useFetchData({}, getCourses)
 
 	const choiseCourses = (values: boolean[]) => {
-		setData(data => {
+		setData((data) => {
 			if (!data) return data
 			//data.courses = courses?.filter((p, i) => values[ i ]).map(p => p.id)
 			return { ...data }
@@ -83,29 +82,29 @@ const TaskCategoriesEditor = ({ id, courseId, callbackUpdate, callbackBack, call
 		updateTask(-1, { id: -1, categories: [ id ] } as TaskDto).then(p => setTaskId(p.id))
 	}
 
-	return (data ?
-		<EditorTemplate notification={notification} callbackUpdate={updateAll} error={errorMsg}
+	return (data
+		? <EditorTemplate notification={notification} callbackUpdate={updateAll} error={errorMsg}
 			callbackBack={callbackBack} callbackSave={save} callbackRemove={remove} >
 			<article className={`${styles.editor} ${styles.withList}`}>
 				<section className={styles.props}>
-					<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
+					<Field isHorizontal label="id" type="text" value={data.id.toString()} isReadonly />
 					<Field onChange={changeHanderDto('name', setData)}
-						isHorizontal label='Название' type='text' value={data.name} />
+						isHorizontal label="Название" type="text" value={data.name} />
 					<TextArea className={styles.description} onChange={changeHanderDto('description', setData)}
-						label='Описание' value={data.description} />
+						label="Описание" value={data.description} />
 				</section>
 				<section className={styles.list}>
 					{tasks
-						? <List name='Задания'
+						? <List name="Задания"
 							length={tasks.length}
 							rows={[ {
 								header: 'id',
-								value: i => tasks[ i ]?.id.toString() as string,
+								value: i => tasks[i]?.id.toString() as string,
 							}, {
 								header: 'Название',
-								value: i => tasks[ i ]?.name as string
+								value: i => tasks[i]?.name as string,
 							} ]}
-							callback={i => setTaskId(tasks[ i ]?.id)} />
+							callback={i => setTaskId(tasks[i]?.id)} />
 						: errorTask
 					}
 					<ButtonsList callbackCreate={createTask} />

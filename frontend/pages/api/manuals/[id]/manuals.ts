@@ -1,8 +1,8 @@
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { usePrisma } from "@/lib/api/database";
-import { Manual } from "@/lib/dto/manuals";
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
+import { usePrisma } from '@/lib/api/database'
+import { Manual } from '@/lib/dto/manuals'
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
@@ -17,27 +17,26 @@ handler.get(response(async (req, res) => {
 				Children: {
 					where: {
 						children: {
-							deleted: false
-						}
+							deleted: false,
+						},
 					},
 					include: {
-						children: true
-					}
-				}
-			}
+						children: true,
+					},
+				},
+			},
 		}))?.Children.map(p => p.children as Manual) as Manual[]
 		: (await prisma.manual.findMany({
 			where: {
 				AND: {
 					deleted: false,
 					Parent: {
-						none: {}
-					}
-				}
-			}
+						none: {},
+					},
+				},
+			},
 		})) as Manual[]
-	if (data == null) return { error: { code: 402, message: "Неверный запрос" } }
+	if (data == null) return { error: { code: 402, message: 'Неверный запрос' } }
 	return { response: data }
-})
-)
+}))
 export default handler

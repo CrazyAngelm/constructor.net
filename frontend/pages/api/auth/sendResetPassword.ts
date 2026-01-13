@@ -1,23 +1,23 @@
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { usePrisma } from "@/lib/api/database";
-import { getResetPassword } from "@/lib/mailer/registration";
-import { optionsWithFrom, sendMail } from "@/lib/mailer/mailer";
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
+import { usePrisma } from '@/lib/api/database'
+import { getResetPassword } from '@/lib/mailer/registration'
+import { optionsWithFrom, sendMail } from '@/lib/mailer/mailer'
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
 	const { email } = req.body
-	if (!email) return { error: { code: 422, message: "email or password not found" } }
+	if (!email) return { error: { code: 422, message: 'email or password not found' } }
 	const user = await prisma.user.findUnique({
 		where: {
-			email
-		}
+			email,
+		},
 	})
-	if (!user) return { error: { code: 422, message: "Пользователя не сущетсвует" } }
+	if (!user) return { error: { code: 422, message: 'Пользователя не сущетсвует' } }
 	const token = Buffer.from(JSON.stringify({
 		id: user.id,
 		email: user.email,
-		pass: user.password
+		pass: user.password,
 	}), 'binary').toString('base64')
 	const mailOptions = optionsWithFrom({
 		to: email,
@@ -26,10 +26,10 @@ handler.post(response(async (req, res) => {
 		amp: getResetPassword(token),
 		attachments: [ {
 			path: 'assets/logo-512.png',
-			cid: 'logo@nodemailer.com'
-		} ]
-	});
+			cid: 'logo@nodemailer.com',
+		} ],
+	})
 	sendMail(mailOptions)
-	return { response: { status: "User created" } }
+	return { response: { status: 'User created' } }
 }))
 export default handler

@@ -1,13 +1,13 @@
-import { NextPage } from 'next';
+import { NextPage } from 'next'
 
-import { withAdminSession } from '@/lib/session/withSession';
+import { withAdminSession } from '@/lib/session/withSession'
 
 import styles from '@/styles/adm/index.module.scss'
 
-import Menu, { Categories } from '@/components/adm/Menu';
-import Layout from '@/components/Layout';
-import Content, { TypeContent } from '@/components/adm/Content';
-import { useState } from 'react';
+import Menu, { Categories } from '@/components/adm/Menu'
+import Layout from '@/components/Layout'
+import Content, { TypeContent } from '@/components/adm/Content'
+import { useState } from 'react'
 
 
 const Adm: NextPage = () => {
@@ -18,24 +18,24 @@ const Adm: NextPage = () => {
 			label: 'Сайт',
 			items: [ {
 				label: 'Пользователи',
-				callback: () => setType(TypeContent.Users)
-			}, ]
+				callback: () => setType(TypeContent.Users),
+			} ],
 		}, {
 			label: 'Контент',
 			items: [ {
 				label: 'Курсы',
-				callback: () => setType(TypeContent.HierarchyContent)
+				callback: () => setType(TypeContent.HierarchyContent),
 			}, {
 				label: 'Методички',
-				callback: () => setType(TypeContent.Manual)
-			}]
+				callback: () => setType(TypeContent.Manual),
+			} ],
 		}, {
 			label: 'Приложение',
 			items: [ {
 				label: 'Версии',
-				callback: () => setType(TypeContent.Versions)
-			} ]
-		}
+				callback: () => setType(TypeContent.Versions),
+			} ],
+		},
 	] as Categories[]
 
 	return (
@@ -52,9 +52,9 @@ const Adm: NextPage = () => {
 
 export default Adm
 
-export const getServerSideProps = withAdminSession(session => {
+export const getServerSideProps = withAdminSession((session) => {
 	console.log(session)
 	return {
-		props: {}
+		props: {},
 	}
 })

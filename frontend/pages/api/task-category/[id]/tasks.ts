@@ -1,8 +1,8 @@
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { PrismaClient } from "@prisma/client";
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { usePrisma } from "@/lib/api/database";
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
+import { PrismaClient } from '@prisma/client'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
+import { usePrisma } from '@/lib/api/database'
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
@@ -19,12 +19,11 @@ handler.get(response(async (req, res) => {
 					task: { deleted: false },
 				},
 				include: {
-					task: true
-				}
-			}
-		}
+					task: true,
+				},
+			},
+		},
 	})
 	return { response: data?.CategoryToTask.map(p => p.task) }
-})
-)
+}))
 export default handler

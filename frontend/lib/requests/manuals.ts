@@ -1,5 +1,5 @@
-import { CreateManual, Manual } from "../dto/manuals"
-import { defaultRequestContext, handleNonOk, RequestContext, RequestWithContext } from "./shared"
+import { CreateManual, Manual } from '../dto/manuals'
+import { defaultRequestContext, handleNonOk, RequestContext, RequestWithContext } from './shared'
 
 export const getAllManuals: RequestWithContext<unknown, Manual[]> = async (
 	_?: unknown,
@@ -58,7 +58,7 @@ export const createManual = async (
 	dto: CreateManual,
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<Manual> => {
-	const res = await fetch(apiUrl + `/manuals/create`, {
+	const res = await fetch(apiUrl + '/manuals/create', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

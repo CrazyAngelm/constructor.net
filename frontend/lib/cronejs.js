@@ -38,9 +38,9 @@ class CronService {
 				userId: sub.userId,
 				licenseId: sub.licenseId,
 				confirmed: false,
-				createdAt: { gte: since }
+				createdAt: { gte: since },
 			},
-			orderBy: { createdAt: 'desc' }
+			orderBy: { createdAt: 'desc' },
 		})
 
 		if (!last) return { handled: false }
@@ -54,7 +54,7 @@ class CronService {
 				await prisma.$transaction(async (tx) => {
 					await tx.payment.update({
 						where: { id: last.id },
-						data: { confirmed: true }
+						data: { confirmed: true },
 					})
 
 					const freshSub = await tx.subscription.findUnique({ where: { id: sub.id } })
@@ -64,8 +64,8 @@ class CronService {
 						data: {
 							endDate: addDays(base, BILLING_PERIOD_DAYS),
 							lastPaymentId: last.id,
-							active: true
-						}
+							active: true,
+						},
 					})
 				})
 
@@ -92,7 +92,7 @@ class CronService {
 			amount: { value: `${sub.license.price}.00`, currency: 'RUB' },
 			capture: true,
 			payment_method_id: sub.paymentToken,
-			description: `Подписка ${sub.license.name}, user ${sub.userId}`
+			description: `Подписка ${sub.license.name}, user ${sub.userId}`,
 		}
 
 		try {
@@ -103,8 +103,8 @@ class CronService {
 					id: payment.id,
 					userId: sub.userId,
 					amount: sub.license.price,
-					licenseId: sub.licenseId
-				}
+					licenseId: sub.licenseId,
+				},
 			})
 
 			if (payment.status === 'succeeded') {
@@ -118,8 +118,8 @@ class CronService {
 						data: {
 							endDate: addDays(base, BILLING_PERIOD_DAYS),
 							lastPaymentId: payment.id,
-							active: true
-						}
+							active: true,
+						},
 					})
 				})
 			}
@@ -128,7 +128,7 @@ class CronService {
 
 			await prisma.subscription.update({
 				where: { id: sub.id },
-				data: { active: false }
+				data: { active: false },
 			})
 		}
 	}
@@ -136,7 +136,7 @@ class CronService {
 	static async deduplicate() {
 		const dups = await prisma.subscription.findMany({
 			where: { canceled: false },
-			orderBy: [ { userId: 'asc' }, { endDate: 'desc' } ]
+			orderBy: [ { userId: 'asc' }, { endDate: 'desc' } ],
 		})
 
 		let lastKey = ''
@@ -145,7 +145,7 @@ class CronService {
 			if (key === lastKey) {
 				await prisma.subscription.update({
 					where: { id: s.id },
-					data: { active: false, canceled: true }
+					data: { active: false, canceled: true },
 				})
 			} else {
 				lastKey = key
@@ -155,11 +155,11 @@ class CronService {
 
 	static async check() {
 
-		await this.deduplicate();
+		await this.deduplicate()
 
 		const subs = await prisma.subscription.findMany({
 			where: { canceled: false, active: true },
-			include: { license: true }
+			include: { license: true },
 		})
 
 		for (const sub of subs) {
@@ -172,7 +172,7 @@ class CronService {
 					} else {
 						await prisma.subscription.update({
 							where: { id: sub.id },
-							data: { active: false }
+							data: { active: false },
 						})
 					}
 				}

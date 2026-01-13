@@ -8,8 +8,8 @@ const prisma = usePrisma()
 
 const payment = async (license: License, userId: string, paymentId: string) => {
 	const checkout = new YooCheckout({
-		shopId: process.env.YOOCHECKOUT_SHOP_ID ?? "",
-		secretKey: process.env.YOOCHECKOUT_KEY ?? ""
+		shopId: process.env.YOOCHECKOUT_SHOP_ID ?? '',
+		secretKey: process.env.YOOCHECKOUT_KEY ?? '',
 	})
 
 	const idempotentKey = v4()
@@ -17,48 +17,48 @@ const payment = async (license: License, userId: string, paymentId: string) => {
 	const createPayload: ICreatePayment = {
 		amount: {
 			value: `${license.price}.00`,
-			currency: 'RUB'
+			currency: 'RUB',
 		},
 		capture: true,
 		payment_method_id: paymentId,
-		description: 'Подписка, тариф: ' + license.name
+		description: 'Подписка, тариф: ' + license.name,
 	}
-	const payment = await checkout.createPayment(createPayload, idempotentKey);
+	const payment = await checkout.createPayment(createPayload, idempotentKey)
 
 	await prisma.payment.create({
 		data: {
 			id: payment.id,
 			userId: userId,
 			amount: license.price,
-			licenseId: license.id
-		}
+			licenseId: license.id,
+		},
 	})
 }
 
 const CheckSubscribtion = async () => {
 	const subscription = await prisma.subscription.findMany({
 		where: {
-			canceled: false
+			canceled: false,
 		},
 		include: {
 			lastPayment: true,
-			license: true
-		}
+			license: true,
+		},
 	})
 
-	subscription.forEach(async p => {
+	subscription.forEach(async (p) => {
 		if (!p.endDate) return
 		if (new Date() > p.endDate) {
 			await prisma.subscription.update({
 				where: { id: p.id },
 				data: {
-					active: false
-				}
+					active: false,
+				},
 			})
 			if (p.paymentToken)
 				payment(p.license, p.userId, p.paymentToken)
 		}
-	});
+	})
 }
 
 export default class CroneClass {

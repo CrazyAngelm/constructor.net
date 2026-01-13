@@ -1,5 +1,5 @@
-import { WorklistDto } from "../dto/worklist"
-import { defaultRequestContext, handleNonOk, RequestContext, RequestWithContext } from "./shared"
+import { WorklistDto } from '../dto/worklist'
+import { defaultRequestContext, handleNonOk, RequestContext, RequestWithContext } from './shared'
 
 export const getWorklistsByIdCategory: RequestWithContext<number, WorklistDto[]> = async (
 	id: number,

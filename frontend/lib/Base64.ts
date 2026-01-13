@@ -3,5 +3,5 @@ export const ToBase64 = (str:string):string => {
 }
 
 export const FromBase64 = (str: string):string => {
-	return Buffer.from(str,'base64').toString('utf-8')
+	return Buffer.from(str, 'base64').toString('utf-8')
 }

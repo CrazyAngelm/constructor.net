@@ -7,7 +7,7 @@ export const ScopeEnum = {
 		if (!scopes) return false
 		if (scopes.indexOf(value) > -1) return true
 		return false
-	}
+	},
 }
 
 export interface UserDto {

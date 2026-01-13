@@ -1,9 +1,9 @@
-import { Course, PrismaClient } from "@prisma/client";
-import { CourseDto } from "@/lib/dto/tasks";
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { usePrisma } from "@/lib/api/database";
+import { Course, PrismaClient } from '@prisma/client'
+import { CourseDto } from '@/lib/dto/tasks'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
+import { usePrisma } from '@/lib/api/database'
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
@@ -13,12 +13,11 @@ handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	const data = await prisma.course.findUnique({
-		where: { id }
+		where: { id },
 	}) as CourseDto
 	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
 	return { response: data }
-})
-)
+}))
 handler.post(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
@@ -28,13 +27,13 @@ handler.post(response(async (req, res) => {
 		update: {
 			name: data.name,
 			description: data.description,
-			date: new Date().toISOString()
+			date: new Date().toISOString(),
 		},
 		create: {
 			name: data.name ? data.name : 'Новый курс',
 			description: data.description ? data.description : '',
-			date: new Date().toISOString()
-		}
+			date: new Date().toISOString(),
+		},
 	})
 	return { response: upset as CourseDto }
 }))
@@ -43,7 +42,7 @@ handler.put(response(async (req, res) => {
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	await prisma.course.update({
 		where: { id },
-		data: { deleted: true }
+		data: { deleted: true },
 	})
 	return { response: { status: 'Ok' } }
 }))

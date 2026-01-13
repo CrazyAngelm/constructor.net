@@ -18,7 +18,7 @@ interface Props {
 const List = ({ name, rows, callback, length = 0, maxWidth = 20, selected }: Props) => {
 
 	const styleMaxWidth = {
-		maxWidth: maxWidth / (rows ? rows.length : 1) + 'vw'
+		maxWidth: maxWidth / (rows ? rows.length : 1) + 'vw',
 	}
 
 	return (
@@ -32,16 +32,12 @@ const List = ({ name, rows, callback, length = 0, maxWidth = 20, selected }: Pro
 						</tr>
 					</thead>
 					<tbody>
-						{Array.from({ length }).map((u, i) =>
-							<tr className={selected === i ? styles.selected : ''}
-								onClick={() => callback && callback(i)} key={i}>{
-									rows?.map((p, pi) =>
-										p.key
-											? <th key={pi}><div style={styleMaxWidth}>{i}</div></th>
-											: <td key={pi}><div style={styleMaxWidth} >{p.value(i)}</div></td>
-									)
-								}</tr>
-						)}
+						{Array.from({ length }).map((u, i) => <tr className={selected === i ? styles.selected : ''}
+							onClick={() => callback && callback(i)} key={i}>{
+								rows?.map((p, pi) => p.key
+									? <th key={pi}><div style={styleMaxWidth}>{i}</div></th>
+									: <td key={pi}><div style={styleMaxWidth} >{p.value(i)}</div></td>)
+							}</tr>)}
 					</tbody>
 				</table>
 			</section>

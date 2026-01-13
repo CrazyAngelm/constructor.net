@@ -36,26 +36,26 @@ const Auth = ({ button, visible: _visible }: Props) => {
 			<div onClick={() => setVisible(v => !v)}>
 				{button}
 			</div>
-			{regSucess &&
-				<article className={styles.modal}>
-						<section className={styles.notification}>
-							<header>
-								<p>Регистрация прошла успешно!</p>
-								<button onClick={() => setRegSucess(false)}></button>
-							</header>
-							<section>
+			{regSucess
+				&& <article className={styles.modal}>
+					<section className={styles.notification}>
+						<header>
+							<p>Регистрация прошла успешно!</p>
+							<button onClick={() => setRegSucess(false)}></button>
+						</header>
+						<section>
 								Вы успешно зарегистрировались, для подтверждения на почту было отправлено письмо.
 								Подтвердите почту и войдите в аккаунт.
-							</section>
 						</section>
+					</section>
 				</article>
 			}
-			{visible ?
-				<section className={styles.modal}>
+			{visible
+				? <section className={styles.modal}>
 					<section className={styles.body}>
 						<section className={styles.close}>
 							<div onClick={() => setVisible(false)}>
-								<Image src={close} layout='fill' objectFit='contain' />
+								<Image src={close} layout="fill" objectFit="contain" />
 							</div>
 						</section>
 						{isRegistration
@@ -66,8 +66,8 @@ const Auth = ({ button, visible: _visible }: Props) => {
 								onError={setError}
 								registration={() => visibleRegistration(true)} />
 						}
-						{error &&
-							<div className={styles.error}>
+						{error
+							&& <div className={styles.error}>
 								{error}
 							</div>}
 					</section>

@@ -8,12 +8,12 @@ export interface Props {
 const ButtonsList = ({ ...callbacks }: Props) => {
 	return (
 		<section className={styles.buttonsList}>
-			{callbacks.callbackCreate &&
-				<button onClick={callbacks.callbackCreate}
+			{callbacks.callbackCreate
+				&& <button onClick={callbacks.callbackCreate}
 					className={`${styles.primary} ${styles.button}`}>Создать</button>
 			}
-			{callbacks.callbackDelete &&
-				<button onClick={callbacks.callbackDelete}
+			{callbacks.callbackDelete
+				&& <button onClick={callbacks.callbackDelete}
 					className={`${styles.danger} ${styles.button}`}>Удалить</button>
 			}
 		</section>

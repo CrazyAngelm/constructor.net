@@ -8,14 +8,14 @@ const Account = () => {
 
 
 	return (<>
-		{session != 'loading' && session &&
-			<article className={styles.account}>
-				<Field value={session?.user?.id} label='Id' isHorizontal
+		{session != 'loading' && session
+			&& <article className={styles.account}>
+				<Field value={session?.user?.id} label="Id" isHorizontal
 					isReadonly />
-				<Field value={session?.user?.email} label='Email'
+				<Field value={session?.user?.email} label="Email"
 					isHorizontal isReadonly />
-				{session?.scopes.indexOf(ScopeEnum.admin) > -1 &&
-					<a href='../adm'>
+				{session?.scopes.indexOf(ScopeEnum.admin) > -1
+					&& <a href="../adm">
 						<button>В панель администрирования</button>
 					</a>}
 			</article>

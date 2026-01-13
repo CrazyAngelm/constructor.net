@@ -23,18 +23,18 @@ const Layout = ({ children, title, navbar = true, footer = true }: Props) => {
 			<Head>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<title>Lab Studio{title && ` | ${title}`}</title>
-				<link rel="icon" type='image/png' href="/logo.png" />
+				<link rel="icon" type="image/png" href="/logo.png" />
 			</Head>
 			{navbar && <Navbar />}
 			<article className={`${styles.content} ${navbar ?? styles.isNavbar}`}>
 				{children}
 			</article>
-			{footer &&
-				<footer className={styles.footer}>
+			{footer
+				&& <footer className={styles.footer}>
 					<section className={styles.info}>
 						<header>
 							<div>
-								<Image src={logo} layout='fill' objectFit='contain' />
+								<Image src={logo} layout="fill" objectFit="contain" />
 							</div>
 							Lab Studio
 						</header>
@@ -46,8 +46,8 @@ const Layout = ({ children, title, navbar = true, footer = true }: Props) => {
 						</section>
 						<section>
 							<header>Соц сети</header>
-							<a href='https://t.me/labstudio'>Telegramm</a>
-							<a href='https://vk.com/studiolab'>ВКонтакте</a>
+							<a href="https://t.me/labstudio">Telegramm</a>
+							<a href="https://vk.com/studiolab">ВКонтакте</a>
 						</section>
 						<div className={styles.ur}>
 							<div>Индивидуальный предприниматель Калашникова Виктория Владимировна</div>

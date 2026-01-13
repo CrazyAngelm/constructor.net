@@ -1,9 +1,9 @@
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { PrismaClient } from "@prisma/client";
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { usePrisma } from "@/lib/api/database";
-import { TaskCategoryDto } from "@/lib/dto/tasks";
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
+import { PrismaClient } from '@prisma/client'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
+import { usePrisma } from '@/lib/api/database'
+import { TaskCategoryDto } from '@/lib/dto/tasks'
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
@@ -17,13 +17,12 @@ handler.get(response(async (req, res) => {
 		include: {
 			CategoryParent: {
 				where: { children: { deleted: false } },
-				include: { children: true }
-			}
-		}
+				include: { children: true },
+			},
+		},
 	})
-	if (data == null) return { error: { code: 402, message: "Неверный запрос" } }
+	if (data == null) return { error: { code: 402, message: 'Неверный запрос' } }
 	const resp: TaskCategoryDto[] = data.CategoryParent.map(p => p.children)
 	return { response: resp }
-})
-)
+}))
 export default handler

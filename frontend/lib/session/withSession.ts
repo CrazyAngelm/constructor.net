@@ -1,6 +1,6 @@
-import { GetServerSidePropsContext } from "next"
-import { getSession as getSessionReact, GetSessionParams } from "next-auth/react"
-import { Session } from "."
+import { GetServerSidePropsContext } from 'next'
+import { getSession as getSessionReact, GetSessionParams } from 'next-auth/react'
+import { Session } from '.'
 
 const REDIRECT_UNAUTORIZE = '/'
 const REDIRECT_ACCES_DENIED = '/'

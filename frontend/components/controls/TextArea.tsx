@@ -20,10 +20,10 @@ const TextArea = ({className, label, value, placeholder, onChange, isReadonly, i
 				<div>
 					<textarea className={`${isReadonly ? styles.static : ''}
 					${isFixedSize ? styles.fixed : ''}`}
-						value={value?value:''}
-						readOnly={isReadonly}
-						placeholder={placeholder}
-						onChange={v => onChange && onChange(v.target.value)} />
+					value={value?value:''}
+					readOnly={isReadonly}
+					placeholder={placeholder}
+					onChange={v => onChange && onChange(v.target.value)} />
 				</div>
 			</div>
 		</section>

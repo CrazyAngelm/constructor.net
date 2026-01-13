@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Session } from '.'
 
 export const useSession = (): Session | null | 'loading' => {
-	const [ session, setSession ] = useState<Session | null | 'loading'>('loading');
+	const [ session, setSession ] = useState<Session | null | 'loading'>('loading')
 
 	const _session = useSessionHook()
 

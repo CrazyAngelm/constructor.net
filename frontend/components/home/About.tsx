@@ -1,6 +1,6 @@
 import styles from '@/styles/home/About.module.scss'
 import image1 from '@/assets/home/about/happy-kids.png'
-import Image from 'next/image';
+import Image from 'next/image'
 
 const About = () => {
 	return (
@@ -107,7 +107,7 @@ const About = () => {
 				</div>
 				<section>
 					<div>
-						<Image src={image1} layout='responsive' objectFit='contain' />
+						<Image src={image1} layout="responsive" objectFit="contain" />
 					</div>
 				</section>
 			</section>
@@ -115,4 +115,4 @@ const About = () => {
 	)
 }
 
-export default About;
+export default About

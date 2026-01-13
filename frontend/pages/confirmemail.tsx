@@ -20,12 +20,12 @@ const ConfirmEmail: NextPage<Props> = ({ token }: Props) => {
 	const [ status, setStatus ] = useState('Loading...')
 	const [ error, setError ] = useState<string>()
 
-	const router  = useRouter();
+	const router  = useRouter()
 
 	useEffect(() => {
 		if(!router) return
 		console.log(token)
-		confirmEmail(token).then(async p =>  {
+		confirmEmail(token).then(async (p) =>  {
 			setStatus(`${p.status}. Redirect...`)
 			//Toodoo защитить пароль вход через бэкенд
 			const tok = JSON.parse(Buffer.from(token, 'base64').toString('binary')) as Token
@@ -33,18 +33,18 @@ const ConfirmEmail: NextPage<Props> = ({ token }: Props) => {
 				redirect: true,
 				callbackUrl: '/',
 				email: tok.email,
-				password: tok.pass
+				password: tok.pass,
 			}) as any as {error:string}
 
 			if (status.error) {
 				setError(status.error)
 				return
 			}
-		}).catch(err => {
+		}).catch((err) => {
 			if(err instanceof ApiError) setError(err.message)
 			console.log(err)
 		})
-	},[router])
+	}, [ router ])
 
 	return (
 		<article>
@@ -64,8 +64,8 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
 	return {
 		props: {
-			token
-		}
+			token,
+		},
 	}
 }
 

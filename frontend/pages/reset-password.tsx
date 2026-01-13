@@ -39,17 +39,17 @@ const ResetPassword: NextPage<Props> = ({ token }: Props) => {
 		try {
 			setUser(JSON.parse(Buffer.from(token, 'base64').toString('binary')) as Token)
 		} catch (err) {
-			setGloabalError("Неверный токен")
+			setGloabalError('Неверный токен')
 		}
 	}, [])
 
 	const onClose = () => {
-		Router.push("/")
+		Router.push('/')
 	}
 
 	const reset = async () => {
 		if(!user?.id || !user.pass) {
-			setError("Неверный токен")
+			setError('Неверный токен')
 			return
 		}
 		if(!signupDto || signupDto?.password != confirmPassword) {
@@ -58,7 +58,7 @@ const ResetPassword: NextPage<Props> = ({ token }: Props) => {
 		}
 		try {
 			const res = await makeFetcher(resetPassword)({id: user.id, password: user.pass, newPassword: signupDto.password})
-			Router.push("/")
+			Router.push('/')
 		} catch (err) {
 			if(err instanceof ApiError) setError(err.message)
 			console.log(err)
@@ -79,7 +79,7 @@ const ResetPassword: NextPage<Props> = ({ token }: Props) => {
 						<section className={styles.body}>
 							<section className={styles.close}>
 								<div onClick={onClose}>
-									<Image src={close} layout='fill' objectFit='contain' />
+									<Image src={close} layout="fill" objectFit="contain" />
 								</div>
 							</section>
 							<section className={styles.content}>
@@ -119,8 +119,8 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
 	return {
 		props: {
-			token
-		}
+			token,
+		},
 	}
 }
 

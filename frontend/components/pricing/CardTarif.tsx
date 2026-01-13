@@ -21,7 +21,7 @@ interface Props {
 }
 
 const CardTarif = ({ license, img }: Props) => {
-	const [ errorAuth, setErrorAuth ] = useState<boolean>(false);
+	const [ errorAuth, setErrorAuth ] = useState<boolean>(false)
 	const [ error, setError ] = useState<string>()
 	const [ visible, setVisible ] = useState(false)
 	const session = useSession()
@@ -34,26 +34,26 @@ const CardTarif = ({ license, img }: Props) => {
 			if (license.price == 0) {
 				const res = await makeFetcher(freeSubscribe)({
 					userId: session.user?.id,
-					licenseId: license.id
+					licenseId: license.id,
 				})
 
 				Router.push('/subscribe-sucessful')
 			} else{
 				const res = await makeFetcher(subscribe)({
 					userId: session.user?.id,
-					licenseId: license.id
+					licenseId: license.id,
 				}) as SubscribeRes
 
-			YooCheckoutWidget(res.confirmationToken,
-				res.returnUrl + '/subscribe-sucessful',
-				(err) => console.log(err))
+				YooCheckoutWidget(res.confirmationToken,
+					res.returnUrl + '/subscribe-sucessful',
+					err => console.log(err))
 			}
 		} catch (err) {
 			if (err instanceof ApiError) {
 				if (err.status == 412) setError('Вы уже имеете активную подписку, чтобы оформить новую отмените текущую в личном кабинете')
 				else setError(err.message)
 			}
-			console.log("error", err)
+			console.log('error', err)
 		}
 	}
 
@@ -76,7 +76,7 @@ const CardTarif = ({ license, img }: Props) => {
 			<Head>
 				<script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js"></script>
 			</Head>
-			<div id='payment-form'></div>
+			<div id="payment-form"></div>
 			<header>
 				{img && <img src={img}></img>}
 			</header>
@@ -84,9 +84,9 @@ const CardTarif = ({ license, img }: Props) => {
 				<h3>{license.name}</h3>
 				<p className={styles.description}>
 					{license.description?.split('-')
-						.map(p => p != "" && <div className={styles.block}>
+						.map(p => p != '' && <div className={styles.block}>
 							<div>
-								<Image src={ok} objectFit="contain" layout='fill' />
+								<Image src={ok} objectFit="contain" layout="fill" />
 							</div>
 							<span>
 								{p}
@@ -94,8 +94,8 @@ const CardTarif = ({ license, img }: Props) => {
 						</div>)}
 				</p>
 				<p className={styles.price}>{license?.price}₽ / {license.duration} д.</p>
-				{!session || session == 'loading' ?
-					<Auth button={<button className={styles.btn}>
+				{!session || session == 'loading'
+					? <Auth button={<button className={styles.btn}>
 						Купить
 					</button>} />
 					: <button className={styles.btn} onClick={click}>Купить</button>

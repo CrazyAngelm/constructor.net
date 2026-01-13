@@ -7,7 +7,7 @@ export const getSubscription: RequestWithContext<SubscriptionReq, Subscription[]
 ): Promise<Subscription[]> => {
 	const res = await fetch(apiUrl + '/subscription', {
 		method: 'POST',
-		body: JSON.stringify(dto)
+		body: JSON.stringify(dto),
 	})
 	await handleNonOk(res)
 	const json = await res.json()
@@ -31,8 +31,8 @@ export const subscribe: RequestWithContext<SubscribeReq, SubscribeRes> = async (
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<SubscribeRes> => {
 	const res = await fetch(apiUrl + '/subscription/subscribe', {
-		method: "POST",
-		body: JSON.stringify(dto)
+		method: 'POST',
+		body: JSON.stringify(dto),
 	})
 	await handleNonOk(res)
 	const json = await res.json()
@@ -45,8 +45,8 @@ export const freeSubscribe: RequestWithContext<SubscribeReq, SubscribeRes> = asy
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<SubscribeRes> => {
 	const res = await fetch(apiUrl + '/subscription/trial-subscribe', {
-		method: "POST",
-		body: JSON.stringify(dto)
+		method: 'POST',
+		body: JSON.stringify(dto),
 	})
 	await handleNonOk(res)
 	const json = await res.json()
@@ -59,8 +59,8 @@ export const unsubscribe: RequestWithContext<UnsubscribeReq, UnsubscribeRes> = a
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<UnsubscribeRes> => {
 	const res = await fetch(apiUrl + '/subscription/unsubscribe', {
-		method: "POST",
-		body: JSON.stringify(dto)
+		method: 'POST',
+		body: JSON.stringify(dto),
 	})
 	await handleNonOk(res)
 	const json = await res.json()
@@ -73,8 +73,8 @@ export const changePaymentMethod: RequestWithContext<ChangePaymentMethodReq, Cha
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<ChangePaymentMethodRes> => {
 	const res = await fetch(apiUrl + '/subscription/change-payment-method', {
-		method: "POST",
-		body: JSON.stringify(dto)
+		method: 'POST',
+		body: JSON.stringify(dto),
 	})
 	await handleNonOk(res)
 	const json = await res.json()
@@ -87,8 +87,8 @@ export const resetPaymentMethod: RequestWithContext<ChangePaymentMethodReq, Chan
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<ChangePaymentMethodRes> => {
 	const res = await fetch(apiUrl + '/subscription/reset-payment-method', {
-		method: "POST",
-		body: JSON.stringify(dto)
+		method: 'POST',
+		body: JSON.stringify(dto),
 	})
 	await handleNonOk(res)
 	const json = await res.json()
@@ -101,8 +101,8 @@ export const changeCourses: RequestWithContext<ChangeCourseReq, {}> = async (
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<{}> => {
 	const res = await fetch(apiUrl + '/subscription/change-course', {
-		method: "POST",
-		body: JSON.stringify(dto)
+		method: 'POST',
+		body: JSON.stringify(dto),
 	})
 	await handleNonOk(res)
 	const json = await res.json()

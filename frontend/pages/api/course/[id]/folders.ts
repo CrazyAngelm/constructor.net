@@ -1,10 +1,10 @@
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { PrismaClient } from "@prisma/client";
-import { getDefaultHandler } from "@/lib/api/apiHandler";
-import { response } from "@/lib/api/response";
-import { usePrisma } from "@/lib/api/database";
-import { TaskCategoryDto } from "@/lib/dto/tasks";
-import { FolderDto } from "@/lib/dto/worklist";
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
+import { PrismaClient } from '@prisma/client'
+import { getDefaultHandler } from '@/lib/api/apiHandler'
+import { response } from '@/lib/api/response'
+import { usePrisma } from '@/lib/api/database'
+import { TaskCategoryDto } from '@/lib/dto/tasks'
+import { FolderDto } from '@/lib/dto/worklist'
 const prisma = usePrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
@@ -19,20 +19,19 @@ handler.get(response(async (req, res) => {
 			FolderToCourse: {
 				where: {
 					folder: {
-						deleted: false
-					}
+						deleted: false,
+					},
 				},
 				include: {
-					folder: true
-				}
-			}
-		}
+					folder: true,
+				},
+			},
+		},
 	})
-	if (data == null) return { error: { code: 402, message: "Неверный запрос" } }
-	const resp: FolderDto[] = data.FolderToCourse.map(p => {
+	if (data == null) return { error: { code: 402, message: 'Неверный запрос' } }
+	const resp: FolderDto[] = data.FolderToCourse.map((p) => {
 		return { ...p.folder }
 	})
 	return { response: resp }
-})
-)
+}))
 export default handler

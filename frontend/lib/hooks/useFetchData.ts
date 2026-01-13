@@ -21,26 +21,25 @@ export const useFetchData = <T, R>(key: R,
 	const [ lastKey, setLastKey ] = useState<R | undefined>(undefined)
 
 	useEffect(() => {
-		if(compare(lastKey,key)) return
+		if(compare(lastKey, key)) return
 		setLastKey(() => key)
 		if (!setDefault)
 			update()
 		else setData(() => setDefault)
-	}, [key])
+	}, [ key ])
 
 	const update = () => {
 		setError(() => undefined)
-		makeFetcher(req)(key).then(p => {
+		makeFetcher(req)(key).then((p) => {
 			setData(() => p)
-		}).catch(err => {
+		}).catch((err) => {
 			if (setDefault) {
 				setData(() => setDefault)
 				return
 			}
 			if (err instanceof ApiError) {
 				setError(() => err.message)
-			}
-			else {
+			} else {
 				setError(JSON.stringify(err))
 			}
 		})
@@ -50,6 +49,6 @@ export const useFetchData = <T, R>(key: R,
 		data,
 		update,
 		setData,
-		error
+		error,
 	}
 }

@@ -26,8 +26,7 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 	const [ notification, setNotification ] = useState<Notification>()
 	const [ categoryId, setCategoryId ] = useState<number>()
 
-	const { data, update, setData, error } = useFetchData(id, getCourseById,
-		id === -1 ? { id: -1, name: 'Без названия', description: '' } as CourseDto : undefined)
+	const { data, update, setData, error } = useFetchData(id, getCourseById, id === -1 ? { id: -1, name: 'Без названия', description: '' } as CourseDto : undefined)
 
 	const { data: tasks, update: updateCat, error: errorTask } = useFetchData(id, getTaskCategoriesByIdCourse)
 
@@ -66,17 +65,17 @@ const CourseEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 		setCategoryId(undefined)
 		updateAll()
 	}}
-		courseId={data?.id} id={categoryId} />
-		: data ?
-			<EditorTemplate callbackBack={callbackBack} notification={notification} callbackUpdate={updateAll} error={errorMsg}
+	courseId={data?.id} id={categoryId} />
+		: data
+			? <EditorTemplate callbackBack={callbackBack} notification={notification} callbackUpdate={updateAll} error={errorMsg}
 				callbackSave={save} callbackRemove={remove} >
 				<article className={styles.editor}>
 					<section className={styles.props}>
-						<Field isHorizontal label='id' type='text' value={data.id.toString()} isReadonly />
+						<Field isHorizontal label="id" type="text" value={data.id.toString()} isReadonly />
 						<Field onChange={changeHanderDto('name', setData)}
-							isHorizontal label='Название' type='text' value={data.name} />
+							isHorizontal label="Название" type="text" value={data.name} />
 						<TextArea className={styles.description} onChange={changeHanderDto('description', setData)}
-							 label='Описание' value={data.description} />
+							 label="Описание" value={data.description} />
 					</section>
 					{/* <section className={styles.list}>
 						{tasks

@@ -21,9 +21,9 @@ const Dropdown = ({ label, button, isHorizontal, list, value, callbackChoise }: 
 
 	return (
 		<section className={`${isHorizontal ? styles.isHorizontal : ''} ${styles.dropdownCheck}`}>
-			{label &&
-				<div className={styles.fieldLabel}><label>{label}</label></div>}
-			<div className={`dropdown ${active && "is-active"} ${styles.fieldBody}`}>
+			{label
+				&& <div className={styles.fieldLabel}><label>{label}</label></div>}
+			<div className={`dropdown ${active && 'is-active'} ${styles.fieldBody}`}>
 				<div className="dropdown-trigger">
 					<button onClick={() => setActive(a => !a)} className="button" aria-haspopup aria-controls="dropdownmenu">
 						<span>{button ? button : value}</span>
@@ -32,7 +32,7 @@ const Dropdown = ({ label, button, isHorizontal, list, value, callbackChoise }: 
 						</span>
 					</button>
 				</div>
-				<div className="dropdown-menu" id="dropdownmenu" role='listbox'>
+				<div className="dropdown-menu" id="dropdownmenu" role="listbox">
 					<div className="dropdown-content">
 						{
 							list?.map((p, i) => <a onClick={() => choise(p)} key={i}

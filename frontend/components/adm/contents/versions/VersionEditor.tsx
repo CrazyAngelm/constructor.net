@@ -27,8 +27,8 @@ export interface Props {
 const VersionEditor = ({ id, callbackUpdate }: Props) => {
 	const [ errorMsg, setError ] = useState<string | undefined>('')
 
-	const { data, update, setData, error } =
-		useFetchData(id as string, getVersionById)
+	const { data, update, setData, error }
+		= useFetchData(id as string, getVersionById)
 
 
 	const save = () => {
@@ -38,7 +38,7 @@ const VersionEditor = ({ id, callbackUpdate }: Props) => {
 		}
 		updateVersion(id, data)
 			.then(() => callbackUpdate && callbackUpdate())
-			.catch(err => {
+			.catch((err) => {
 				console.log(err)
 				if (err instanceof ApiError) setError(() => err.message)
 				else setError(JSON.stringify(err))
@@ -48,14 +48,14 @@ const VersionEditor = ({ id, callbackUpdate }: Props) => {
 	return data
 		? <EditorTemplate error={errorMsg} callbackSave={save} callbackUpdate={update}>
 			<article className={`${styles.editor}`}>
-				<Field label='id' value={data.id} isReadonly isHorizontal />
-				<Field label='Версия' value={data.name} isHorizontal
+				<Field label="id" value={data.id} isReadonly isHorizontal />
+				<Field label="Версия" value={data.name} isHorizontal
 					onChange={changeHanderDtoString('name', setData)} />
-				<Field label='Путь' value={data.archive} isHorizontal
+				<Field label="Путь" value={data.archive} isHorizontal
 					onChange={changeHanderDtoString('archive', setData)} />
-				<Dropdown label='Тип' value={data.type} list={VersionType.getList()}
+				<Dropdown label="Тип" value={data.type} list={VersionType.getList()}
 					callbackChoise={changeHanderDtoString('type', setData)} isHorizontal />
-				<TextArea label='О выпуске' value={data.notes}
+				<TextArea label="О выпуске" value={data.notes}
 					onChange={changeHanderDtoString('notes', setData)} />
 			</article>
 		</EditorTemplate>

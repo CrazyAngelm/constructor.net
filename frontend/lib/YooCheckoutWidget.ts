@@ -5,9 +5,9 @@ export const YooCheckoutWidget = (token: string, returnUrl?: string,
 		confirmation_token: token,
 		return_url: returnUrl,
 		customization: {
-			modal: true
+			modal: true,
 		},
-		error_callback: errorCallback
+		error_callback: errorCallback,
 	})
 
 	checkout.render()

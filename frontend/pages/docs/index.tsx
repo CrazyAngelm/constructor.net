@@ -1,13 +1,13 @@
-import Layout from "@/components/Layout"
-import { NextPage } from "next"
-import styles from "@/styles/docs/index.module.scss"
-import { useFetchData } from "@/lib/hooks/useFetchData"
-import { getManuals } from "@/lib/requests/manuals"
-import { useState } from "react"
-import { Manual } from "@/lib/dto/manuals"
+import Layout from '@/components/Layout'
+import { NextPage } from 'next'
+import styles from '@/styles/docs/index.module.scss'
+import { useFetchData } from '@/lib/hooks/useFetchData'
+import { getManuals } from '@/lib/requests/manuals'
+import { useState } from 'react'
+import { Manual } from '@/lib/dto/manuals'
 import arrow from '@/assets/arrow.svg'
-import Image from "next/image"
-import dynamic from "next/dynamic"
+import Image from 'next/image'
+import dynamic from 'next/dynamic'
 
 interface PropsItem {
 	manual: Manual
@@ -25,8 +25,8 @@ const Item = ({ manual, selectCallback }: PropsItem) => {
 		<section className={styles.item}>
 			<header>
 				<div onClick={() => setOpen(p => !p)}>
-					{isOpen() &&
-						<div className={`${styles.arrow} ${open && styles.open}`}>
+					{isOpen()
+						&& <div className={`${styles.arrow} ${open && styles.open}`}>
 							<Image src={arrow} />
 						</div>}
 				</div>
@@ -35,8 +35,8 @@ const Item = ({ manual, selectCallback }: PropsItem) => {
 				</span>
 			</header>
 			<section>
-				{open &&
-					data?.map(p => <Item key={p.id}
+				{open
+					&& data?.map(p => <Item key={p.id}
 						manual={p} selectCallback={selectCallback} />)}
 			</section>
 		</section>

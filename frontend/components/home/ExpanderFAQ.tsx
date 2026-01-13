@@ -7,13 +7,13 @@ export interface Props {
 }
 
 const ExpanderFAQ = ({ question, answer }: Props) => {
-	const [ isExpanded, setIsExpanded ] = useState(false);
+	const [ isExpanded, setIsExpanded ] = useState(false)
 
 	return (
 		<article className={styles.expander} onClick={() => setIsExpanded(!isExpanded)}>
 			<header>{question}</header>
 			<section className={`${!isExpanded ? styles.hide : null}`}>{answer}</section>
-			<div className={`${styles.arrow} ${isExpanded ? styles.expand : ""}`}
+			<div className={`${styles.arrow} ${isExpanded ? styles.expand : ''}`}
 			>
 				<div />
 			</div>
@@ -21,4 +21,4 @@ const ExpanderFAQ = ({ question, answer }: Props) => {
 	)
 }
 
-export default ExpanderFAQ;
+export default ExpanderFAQ

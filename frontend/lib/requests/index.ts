@@ -4,5 +4,5 @@ import * as auth from './auth'
 
 export {
 	users,
-	auth
+	auth,
 }
