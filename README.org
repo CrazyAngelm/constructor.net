@@ -1,56 +1,54 @@
-#+title: Монорепозиторий Neurography вуб сервисов
+#+title: constructor.net (MVP)
 
-** Структура репозитория
-  В репозитории хранится код всех сервисов Neurography в соответствующих директориях.
+Минимальная документация для разработки и поддержки.
 
-  | Директория | Описание                       |
-  |------------+--------------------------------|
-  | =/docs=      | Общая документация по сервисам |
-  | =/common=    | Общее для всех сервисов        |
-  | =/frontend=  | Основной сервис frontend       |
+* О проекте
+- Монорепозиторий: =frontend/= (Next.js + API routes) и =common/= (общий TS-пакет).
+- Проект находится на стадии MVP.
+- Бэкенд реализован через Next.js API routes в =frontend/pages/api=.
 
-** Docker
-*** dev
-    При необходимости создайте =docker-compose.override.yml=,
-    =docker-compose.development.override.yml=, если необходимы настройки
-    под вашу машину для соотвествующей сборки.
+* Стек
+- Next.js 12, React 18, TypeScript
+- Prisma ORM + MySQL
+- NextAuth (пароль + Yandex OAuth)
+- YooKassa
+- Nodemailer
 
-    #+begin_src bash
-      # Собрать образы
-      $ make build
+* Структура репозитория
+- =frontend/pages= — страницы и API routes
+- =frontend/components= — UI-компоненты
+- =frontend/lib= — запросы, DTO, mailer, платежи
+- =frontend/prisma/schema.prisma= — схема БД
+- =common/= — общий пакет (минимально используется)
+- =docker-compose*.yml=, =Makefile= — инфраструктура локальной разработки
 
-      # Поднять мир
-      $ make up
-    #+end_src
+* Локальная разработка (Docker)
+Из корня репозитория:
+#+begin_src bash
+make build
+make up
+#+end_src
 
-    Почти для каждой команды можно указать аргумет =c=foo=, чтобы она
-    работала только с сервисом =foo=, например =make up backend= поднимет
-    только =backend=.
+Сервисы:
+- frontend на =127.0.0.1:80=
+- db — MySQL 8 (учетки в =docker-compose.development.yml=)
+- adminer на =http://localhost:8080= (если включить профиль =tools=)
 
-    Теперь для проверки можно зайти на =http://localhost=.
+* Переменные окружения
+Основные переменные:
+- =DATABASE_URL=
+- =NEXTAUTH_URL=
+- =NEXTAUTH_SECRET=
+- =MAILER_USER=, =MAILER_PASS=
+- =YOOCHECKOUT_SHOP_ID=, =YOOCHECKOUT_KEY=
+- =UPLOAD_IMAGE_TASK=, =DOWNLOAD_IMAGE_TASK=
+- =SC_SERVER_SIDE_API_URL= (опционально)
 
-    Если на вашем компьютере работает несколько серверов, можно в
-    =docker-compose.development.override.yml= указать.
+Файл с примером: =env.org=.
 
-    #+begin_src yaml
-      services:
-        gateway:
-          build:
-            args:
-              server_name: skillcity.local # сервер будет доступен только для http://skillcity.local
-          ports:
-            - 8080:80 # сервер будет доступен на порту 8080 вместо 80
-    #+end_src
+* Текущее развертывание
+- На сервере проект запускается не через Docker.
+- Используется =pm2=, запуск напрямую из =frontend/=.
 
-    Для достуа по отдельному домену добавьте его в системный =hosts=.
-
-    Необходимо также развернуть схемы базы данных. Выполняется через
-    Adminer (инструкцию по запуску см. ниже).
-    
-*** Утилиты
-
-**** Adminer
-    Для запуска Adminer:
-    #+begin_src bash
-      $ make up c=adminer
-    #+end_src
+* Документация для поддержки
+См. =docs/HANDOFF.md=.
