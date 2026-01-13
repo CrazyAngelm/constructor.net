@@ -61,9 +61,7 @@ const CheckSubscribtion = async () => {
 	});
 }
 
-
 export default class CroneClass {
 	static Check() {
-		console.log("check")
 	}
 }

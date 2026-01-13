@@ -42,7 +42,6 @@ export const handleNonOk = async (res: Response) => {
 }
 
 export const handleErrorTsx = (err: unknown, setError: ((msg: string) => void)) => {
-	console.log(err)
 	if (err instanceof ApiError) setError(err.message)
 	else setError(JSON.stringify(err))
 }

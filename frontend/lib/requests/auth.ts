@@ -69,7 +69,6 @@ export const resetPassword = async (
 	return await res.json()
 }
 
-
 export const confirmEmail = async (
 	token: string,
 	{ apiUrl }: RequestContext = defaultRequestContext,

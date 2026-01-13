@@ -28,7 +28,6 @@ export const response = <T>(getResponse: (req: NextApiRequest, res: NextApiRespo
 			}
 			res.status(200).json(resp.response)
 		} catch (err) {
-			console.log(err)
 			res.status(502).end(JSON.stringify({
 				code: 502,
 				url: req.url,
@@ -78,7 +77,6 @@ export const responseAuth = <T>(getResponse: (req: NextApiRequest, res: NextApiR
 			}
 			res.status(200).json(resp.response)
 		} catch (err) {
-			console.log(err)
 			res.status(502).end(JSON.stringify({
 				code: 502,
 				url: req.url,
@@ -87,7 +85,6 @@ export const responseAuth = <T>(getResponse: (req: NextApiRequest, res: NextApiR
 		}
 	}
 }
-
 
 export const responseAdmin = <T>(getResponse: (req: NextApiRequest, res: NextApiResponse, userId: string)
 	=> Promise<Response<T>>)
@@ -135,8 +132,6 @@ export const responseAdmin = <T>(getResponse: (req: NextApiRequest, res: NextApi
 			return
 		}
 
-
-
 		try {
 			const resp = await getResponse(req, res, userId)
 			if (resp.error) {
@@ -145,7 +140,6 @@ export const responseAdmin = <T>(getResponse: (req: NextApiRequest, res: NextApi
 			}
 			res.status(200).json(resp.response)
 		} catch (err) {
-			console.log(err)
 			res.status(502).end(JSON.stringify({
 				code: 502,
 				url: req.url,

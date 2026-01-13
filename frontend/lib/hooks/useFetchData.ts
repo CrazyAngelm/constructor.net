@@ -38,11 +38,9 @@ export const useFetchData = <T, R>(key: R,
 				return
 			}
 			if (err instanceof ApiError) {
-				console.error(`ApiError: method: ${req.name}, msg: ${err.message}`)
 				setError(() => err.message)
 			}
 			else {
-				console.error(`OtherError: method: ${req.name}, err: ${err}`)
 				setError(JSON.stringify(err))
 			}
 		})

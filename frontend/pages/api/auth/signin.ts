@@ -5,28 +5,19 @@ import { encodeBase64, hash } from 'bcryptjs';
 import { compare } from 'bcryptjs'
 import { getRegistrationHtml } from "@/lib/mailer/registration";
 import { optionsWithFrom, sendMail } from "@/lib/mailer/mailer";
-
 const prisma = usePrisma()
 const handler = getDefaultHandler()
-
 handler.post(response(async (req, res) => {
     const { email, password } = req.body
-
     if (!email || !password) return { error: { code: 422, message: "email or password not found"+JSON.stringify(req.body) } }
-
     const user = await prisma.user.findUnique({
         where: {
             email
         }
     })
-
     if (!user) return { error: { code: 422, message: "Invalid password or email" } }
-
     const checkPassword = await compare(password, user.password ?? "")
-
     if (!checkPassword) return { error: { code: 422, message: "Invalid password or email" } }
-
     return { response: user }
 }))
-
 export default handler

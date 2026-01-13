@@ -1,22 +1,16 @@
 import { CreateCategoryDto, TaskCategoryDto } from "@/lib/dto/tasks";
-
 import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { usePrisma } from "@/lib/api/database";
 import { CreateFolderDto, FolderDto } from "@/lib/dto/worklist";
-
-
 const prisma = usePrisma()
 const handler = getDefaultHandler()
-
 interface Query extends NextParsedUrlQuery {
 	id?: string
 }
-
 handler.post(response(async (req, res) => {
 	const data = req.body as CreateFolderDto
-
 	const upset = await prisma.folder.create({
 		data: {
 			name: "Новая папка",
@@ -24,7 +18,6 @@ handler.post(response(async (req, res) => {
 			deleted: false
 		}
 	})
-
 	if (data.parentCourseId) {
 		await prisma.folderToCourse.create({
 			data: {
@@ -33,7 +26,6 @@ handler.post(response(async (req, res) => {
 			}
 		})
 	}
-
 	if (data.parentFolderId) {
 		await prisma.folderToFolder.create({
 			data: {
@@ -42,8 +34,6 @@ handler.post(response(async (req, res) => {
 			}
 		})
 	}
-
 	return { response: upset as FolderDto }
 }))
-
 export default handler

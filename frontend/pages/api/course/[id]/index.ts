@@ -1,20 +1,14 @@
 import { Course, PrismaClient } from "@prisma/client";
-
 import { CourseDto } from "@/lib/dto/tasks";
-
 import { getDefaultHandler } from "@/lib/api/apiHandler";
 import { response } from "@/lib/api/response";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { usePrisma } from "@/lib/api/database";
-
-
 const prisma = usePrisma()
 const handler = getDefaultHandler()
-
 interface Query extends NextParsedUrlQuery {
 	id?: string
 }
-
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
@@ -22,18 +16,13 @@ handler.get(response(async (req, res) => {
 		where: { id }
 	}) as CourseDto
 	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
-
-
 	return { response: data }
 })
 )
-
 handler.post(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
-
 	const data = req.body as CourseDto
-
 	const upset = await prisma.course.upsert({
 		where: { id },
 		update: {
@@ -47,21 +36,15 @@ handler.post(response(async (req, res) => {
 			date: new Date().toISOString()
 		}
 	})
-
 	return { response: upset as CourseDto }
 }))
-
 handler.put(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
-
 	await prisma.course.update({
 		where: { id },
 		data: { deleted: true }
 	})
-
 	return { response: { status: 'Ok' } }
-
 }))
-
 export default handler

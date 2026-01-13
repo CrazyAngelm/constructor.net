@@ -11,7 +11,6 @@ export const getDefaultHandler = (): NextConnect<NextApiRequest, NextApiResponse
 			});
 		},
 		onError(err, req, res, next) {
-			console.error(err.stack);
 			res.status(500).end("Something broke!");
 		}
 	})

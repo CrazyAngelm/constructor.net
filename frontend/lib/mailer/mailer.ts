@@ -11,16 +11,13 @@ export const getTransport = () => {
 			pass: process.env.MAILER_PASS
 		}
 	})
-	console.log(transport)
 	return transport
 }
 
 export const sendMail = (mailOptions: any) => {
 	getTransport().sendMail(mailOptions, function (err, info) {
 		if (err) {
-			console.log(err)
 		} else {
-			console.log(info);
 		}
 	});
 }

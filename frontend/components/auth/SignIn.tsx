@@ -1,4 +1,4 @@
-import { FormEvent, ReactNode, useState } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 
 import { signIn } from 'next-auth/react'
@@ -32,11 +32,9 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 		setResendEmail(false)
 		if (!signupDto) return;
 		try {
-			const res = await makeFetcher(resendConfirmEmail)(signupDto)
-
+			await makeFetcher(resendConfirmEmail)(signupDto)
 		} catch (err) {
 			if (err instanceof ApiError) onError && onError(err.message)
-			console.log(err);
 		}
 	}
 
@@ -51,7 +49,6 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 		}catch(err){
 			if (err instanceof ApiError) onError && onError(err.message)
 			else onError && onError(JSON.stringify(err))
-			console.log(err)
 		}
 	}
 
@@ -83,7 +80,6 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 		} catch (err) {
 			if (err instanceof ApiError) onError && onError(err.message)
 			else onError && onError(JSON.stringify(err))
-			console.log(err)
 		}
 	}
 
@@ -133,63 +129,6 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 	)
 }
 
-const SignIn1 = ({ onSucess, onError }: Props) => {
-	const [ signupDto, setSignupDto ] = useState<SignUpDto>()
-	const [ failedEmail, setFailedEmail ] = useState<Boolean>()
-	const [ error, setError ] = useState<string>()
-
-	const onSubmit = async (e: FormEvent) => {
-		e.preventDefault()
-
-		const fE = (signupDto?.email.indexOf("@") ?? -1) == -1
-		setFailedEmail(fE)
-
-		if (fE || !signupDto) return
-
-		try {
-			const status = await signIn('credentials', {
-				redirect: false,
-				email: signupDto.email,
-				password: signupDto.password
-			}) as any as SigninError
-
-			if (status.error) {
-				setError(status.error)
-				return
-			}
-			onSucess && onSucess()
-		} catch (err) {
-			if (err instanceof ApiError) console.log(err)
-			console.log(err)
-		}
-	}
-
-	return (
-		<article className={styles.signupModal}>
-			<section className={styles.background}></section>
-			<section className={styles.body}>
-				<header>
-					<p>Вход</p>
-				</header>
-				<section>
-					<section>
-						<label>Электронная почта:</label>
-						<input className={failedEmail ? styles.danger : ''} type={'email'} onChange={onChangeDto('email', setSignupDto)} />
-						{failedEmail && <p>Invalid email</p>}
-					</section>
-					<section>
-						<label>Пароль:</label>
-						<input type='password' onChange={onChangeDto('password', setSignupDto)} />
-						<p>{error}</p>
-					</section>
-				</section>
-				<footer>
-					<button onClick={onSubmit} className={styles.submit}>Войти</button>
-					{/* <p>Нет аккаунта <a>Зарегистрироваться</a></p> */}
-				</footer>
-			</section>
-		</article>
-	)
-}
 
 export default SignIn
+

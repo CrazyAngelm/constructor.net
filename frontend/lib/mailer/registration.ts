@@ -2,7 +2,6 @@ import template from '@/assets/mailer/Registration.html'
 import templateReset from '@/assets/mailer/ResetPassword.html'
 import buildUrl from 'build-url-ts'
 
-
 export const getRegistrationHtml = (token:string) => {
 	var html = template as string
 	const link = buildUrl(process.env.NEXTAUTH_URL ?? "http://localhost", {

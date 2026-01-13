@@ -1,4 +1,3 @@
-// /scripts/cronejs.js   (оставляем CommonJS, чтобы не ломать существующий require)
 
 const { CronJob } = require('cron')
 const { PrismaClient } = require('@prisma/client')
@@ -16,13 +15,11 @@ function addDays(date, days) {
 }
 
 function periodKeyFromSub(sub) {
-	// Идемпотентный ключ «подписка + дата периода»
 	const tag = sub.endDate ? sub.endDate.toISOString().slice(0, 10) : 'initial'
 	return `sub:${sub.id}:${tag}`
 }
 
 class CronService {
-	/** Запуск cron-задачи каждые сутки в 00:00 (Europe/Moscow) */
 	static init() {
 		new CronJob(
 			'0 0 0 * * *',
@@ -31,10 +28,8 @@ class CronService {
 			true,
 			'Europe/Moscow'
 		)
-		console.log('[Cron] subscription check scheduled')
 	}
 
-	/** Быстрая сверка последнего незакрытого платежа перед новым списанием */
 	static async preflightReconcile(sub) {
 		const since = new Date(Date.now() - PENDING_LOOKBACK_HRS * 60 * 60 * 1000)
 
@@ -56,14 +51,12 @@ class CronService {
 			if (!remote || !remote.status) return { handled: false }
 
 			if (remote.status === 'succeeded') {
-				// отмечаем локально как подтверждённый и продлеваем период (если вебхук потерялся)
 				await prisma.$transaction(async (tx) => {
 					await tx.payment.update({
 						where: { id: last.id },
 						data: { confirmed: true }
 					})
 
-					// актуальная подписка пользователя под эту лицензию
 					const freshSub = await tx.subscription.findUnique({ where: { id: sub.id } })
 					const base = freshSub.endDate && freshSub.endDate > new Date() ? freshSub.endDate : new Date()
 					await tx.subscription.update({
@@ -76,32 +69,23 @@ class CronService {
 					})
 				})
 
-				console.log(`[Cron] preflight: confirmed lost webhook pay:${last.id} sub:${sub.id}`)
 				return { handled: true } // уже всё продлили — новый платёж не нужен
 			}
 
 			if (remote.status === 'pending' || remote.status === 'waiting_for_capture') {
-				// ждём — новый платёж не создаём
-				console.log(`[Cron] preflight: pending pay:${last.id} sub:${sub.id}, skip charge`)
 				return { handled: true }
 			}
 
-			// canceled/failed — ничего не делаем, позволяем создать новый платёж
 			return { handled: false }
 		} catch (e) {
-			console.warn('[Cron] preflight retrievePayment failed', last.id, e?.message || e)
-			// при ошибке не блокируем чардж
 			return { handled: false }
 		}
 	}
 
-	/** Создать и захватить платёж */
 	static async charge(sub) {
-		// быстрая сверка: если вчерашний платёж уже успешен/в процессе — не чарджим
 		const pre = await this.preflightReconcile(sub)
 		if (pre.handled) return
 
-		// детерминированный идемпотентный ключ на период
 		const idempotenceKey = periodKeyFromSub(sub)
 
 		const payload = {
@@ -114,7 +98,6 @@ class CronService {
 		try {
 			const payment = await checkout.createPayment(payload, idempotenceKey)
 
-			// сохраняем платёж (await важно, иначе дубликаты)
 			await prisma.payment.create({
 				data: {
 					id: payment.id,
@@ -124,7 +107,6 @@ class CronService {
 				}
 			})
 
-			// если ЮKassa вернула сразу succeeded (бывает при capture=true) — сразу фиксируем и продлеваем
 			if (payment.status === 'succeeded') {
 				await prisma.$transaction(async (tx) => {
 					await tx.payment.update({ where: { id: payment.id }, data: { confirmed: true } })
@@ -140,14 +122,10 @@ class CronService {
 						}
 					})
 				})
-				console.log(`[Cron] payment succeeded`)
 			}
 
-			console.log(`[Cron] charge OK sub:${sub.id} pay:${payment.id}`)
 		} catch (err) {
-			console.error('[Cron] charge FAILED', err)
 
-			// карта отклонена → блокируем подписку
 			await prisma.subscription.update({
 				where: { id: sub.id },
 				data: { active: false }
@@ -156,7 +134,6 @@ class CronService {
 	}
 
 	static async deduplicate() {
-		// все незакрытые подписки, отсортированы по endDate (новая первая)
 		const dups = await prisma.subscription.findMany({
 			where: { canceled: false },
 			orderBy: [ { userId: 'asc' }, { endDate: 'desc' } ]
@@ -166,7 +143,6 @@ class CronService {
 		for (const s of dups) {
 			const key = s.userId
 			if (key === lastKey) {
-				// дубликат => переводим в canceled
 				await prisma.subscription.update({
 					where: { id: s.id },
 					data: { active: false, canceled: true }
@@ -177,9 +153,7 @@ class CronService {
 		}
 	}
 
-	/** Проверка всех активных подписок */
 	static async check() {
-		console.log('[Cron] start check')
 
 		await this.deduplicate();
 
@@ -196,7 +170,6 @@ class CronService {
 					if (sub.paymentToken) {
 						await this.charge(sub)
 					} else {
-						// нет привязанной карты → выключаем
 						await prisma.subscription.update({
 							where: { id: sub.id },
 							data: { active: false }
@@ -204,11 +177,9 @@ class CronService {
 					}
 				}
 			} catch (err) {
-				console.error('[Cron] sub error', sub.id, err)
 			}
 		}
 
-		console.log('[Cron] check finished')
 	}
 }
 

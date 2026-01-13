@@ -8,9 +8,7 @@ import { usePrisma } from '@/lib/api/database'
 import { compare } from 'bcryptjs'
 import { UserDto } from '@/lib/dto/users'
 import { ConfirmEmailError } from '@/lib/api/error'
-
 const prisma = new PrismaClient()
-
 export default NextAuth({
 	providers: [
 		CredentialsProvider({
@@ -20,21 +18,15 @@ export default NextAuth({
 				password: { label: "Password", type: "password" }
 			},
 			async authorize(credentials, req) {
-
 				if (!credentials) throw new Error("credentials is null")
 				const prisma  = usePrisma()
-
 				const user = await prisma.user.findUnique({
 					where:{email:credentials.email}
 				})
-
 				if (!user) throw new Error("No user found with the email")
-
 				const checkPassword = await compare(credentials.password, user.password ?? "")
-
 				if (!checkPassword) throw new Error("Ivalid password")
 				if (!user.emailVerified) throw ConfirmEmailError
-
 				return {id:user.id}
 			}
 		}),
@@ -58,15 +50,11 @@ export default NextAuth({
 					id: token.sub
 				}
 			}) as UserDto
-
-
 			if (!user) throw new Error("User not found")
-
 			user.scopes = (await prisma.scopeJoin.findMany({
 				where: { userId: user.id },
 				include: { scope: true }
 			})).map(p => p.scope.value)
-
 			_session.user = user as UserDto
 			_session.scopes = user.scopes
 			_session.address = token.sub

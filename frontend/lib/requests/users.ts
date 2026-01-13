@@ -44,7 +44,6 @@ export const updateUser = async (
 	return await res.json()
 }
 
-
 export const updateScope = async (
 	id: string,
 	dto: UpdaetScopeDto,

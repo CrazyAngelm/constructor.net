@@ -2,8 +2,6 @@ import { CourseDto, CreateCategoryDto, RequestIds, Status, TaskCategoryDto, Task
 
 import { RequestWithContext, RequestContext, defaultRequestContext, handleNonOk } from './shared'
 
-//#region courses
-
 export const getCourses: RequestWithContext<unknown, CourseDto[]> = async (
 	_?: unknown,
 	{ apiUrl }: RequestContext = defaultRequestContext,
@@ -58,10 +56,6 @@ export const removeCourse = async (
 
 	return await res.json()
 }
-//#endregion
-
-//#region categories
-
 
 export const getTaskCategories: RequestWithContext<unknown, TaskCategoryDto[]> = async (
 	_?: unknown,
@@ -160,10 +154,6 @@ export const createTaskCategory = async (
 
 	return await res.json()
 }
-//#endregion
-
-//#region tasks
-
 
 export const getTasks: RequestWithContext<unknown, TaskDto[]> = async (
 	_?: unknown,
@@ -175,7 +165,6 @@ export const getTasks: RequestWithContext<unknown, TaskDto[]> = async (
 
 	return json
 }
-
 
 export const getTasksByIdCategory: RequestWithContext<number, TaskDto[]> = async (
 	id: number,
@@ -234,7 +223,6 @@ export const removeTask = async (
 	return await res.json()
 }
 
-
 export const updateCategoriesForTask = async (
 	id: number,
 	dto: RequestIds,
@@ -252,7 +240,6 @@ export const updateCategoriesForTask = async (
 
 	return await res.json()
 }
-
 
 export const getTaskCategoriesByIdTask: RequestWithContext<number, TaskCategoryDto[]> = async (
 	id: number,
@@ -280,4 +267,3 @@ export const uploadTaskImage = async (
 	return await res.json()
 }
 
-//#endregion
