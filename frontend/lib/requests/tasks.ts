@@ -47,7 +47,7 @@ export const updateCourse = async (
 export const removeCourse = async (
 	id: number,
 	{ apiUrl }: RequestContext = defaultRequestContext,
-): Promise<{}> => {
+): Promise<Record<string, unknown>> => {
 	const res = await fetch(apiUrl + `/course/${encodeURIComponent(id)}`, {
 		method: 'PUT',
 	})
@@ -124,7 +124,7 @@ export const updateTaskCategory = async (
 export const removeTaskCategory = async (
 	id: number,
 	{ apiUrl }: RequestContext = defaultRequestContext,
-): Promise<{}> => {
+): Promise<Record<string, unknown>> => {
 	const res = await fetch(apiUrl + `/task-category/${encodeURIComponent(id)}`, {
 		method: 'PUT',
 	})
@@ -213,7 +213,7 @@ export const updateTask = async (
 export const removeTask = async (
 	id: number,
 	{ apiUrl }: RequestContext = defaultRequestContext,
-): Promise<{}> => {
+): Promise<Record<string, unknown>> => {
 	const res = await fetch(apiUrl + `/task/${encodeURIComponent(id)}`, {
 		method: 'PUT',
 	})
@@ -266,4 +266,5 @@ export const uploadTaskImage = async (
 
 	return await res.json()
 }
+
 

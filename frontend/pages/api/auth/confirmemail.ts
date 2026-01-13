@@ -1,7 +1,7 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
-const prisma = usePrisma()
+import { getPrisma } from '@/lib/api/database'
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 interface Token{
 	id?:string,

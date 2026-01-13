@@ -8,7 +8,8 @@ import { useSession } from '@/lib/session/hooks'
 import { YooCheckoutWidget } from '@/lib/YooCheckoutWidget'
 import styles from '@/styles/lk/Subscription.module.scss'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import Script from 'next/script'
+import { Fragment, useEffect, useState } from 'react'
 import Checkbox from '../controls/Checkbox'
 import Modal from '../controls/Modal'
 
@@ -88,7 +89,7 @@ export const Item = ({ item, update }: PropsItem) => {
 	const { data } = useFetchData({}, getLicenses)
 	const { data: courses } = useFetchData({}, getCourses)
 
-	const license = data?.find(p => p.id == item.licenseId)
+	const license = data?.find(p => p.id === item.licenseId)
 
 	const getAvialableCourses = (): CourseDto[] => {
 		const licenseCourses = license?.courses ? JSON.parse(license?.courses) as number[] : []
@@ -145,7 +146,7 @@ export const Item = ({ item, update }: PropsItem) => {
 					<td className={styles.header}>Доступные курсы</td>
 					<td>
 						<section>
-							{getAvialableCourses().map(p => <div>{p.name}<br /></div>)}
+							{getAvialableCourses().map(p => <div key={p.id}>{p.name}<br /></div>)}
 							<ChangeCourse subscription={item} license={license}
 								update={update} />
 						</section>
@@ -160,11 +161,11 @@ const Subscriptions = () => {
 	const [ not, setNot ] = useState(false)
 
 	const session = useSession()
-	const { data, update } = useFetchData({ id: (session != 'loading') ? session?.user?.id : undefined },
+	const { data, update } = useFetchData({ id: (session !== 'loading') ? session?.user?.id : undefined },
 		getSubscription)
 
 	const resetPayment = async () => {
-		if (session == 'loading' || !data || data.length === 0) return
+		if (session === 'loading' || !data || data.length === 0) return
 
 		await makeFetcher(resetPaymentMethod)({
 			userId: session?.user?.id,
@@ -175,7 +176,7 @@ const Subscriptions = () => {
 	}
 
 	const changePayment = async () => {
-		if (session == 'loading' || !data || data.length === 0) return
+		if (session === 'loading' || !data || data.length === 0) return
 
 		const res = await makeFetcher(changePaymentMethod)({
 			userId: session?.user?.id,
@@ -188,7 +189,7 @@ const Subscriptions = () => {
 	}
 
 	const cancelSubscription = async () => {
-		if (session == 'loading' || !data) return
+		if (session === 'loading' || !data) return
 		setNot(false)
 
 		try {
@@ -204,9 +205,8 @@ const Subscriptions = () => {
 	}
 	return (
 		<>
-			<Head>
-				<script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js"></script>
-			</Head>
+			<Head />
+			<Script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js" strategy="afterInteractive" />
 			<Modal closeCallback={() => setNot(false)}
 				visible={not}>
 				<section className={styles.notification}>
@@ -223,20 +223,21 @@ const Subscriptions = () => {
 				&& <article className={styles.subscription}>
 					{!data
 						? <div>Пока нет информации о подписках</div>
-						:						<>{data.map(p => <>
-							<Item key={p.id} item={p} update={update} />
-							{p.paymentTitle
+						:						<>{data.map(p => (
+							<Fragment key={p.id}>
+								<Item item={p} update={update} />
+								{p.paymentTitle
 								&& <button onClick={resetPayment}>отвязать способ оплаты</button>
-							}
-							{p.licenseId !== 1
+								}
+								{p.licenseId !== 1
 								&& < button onClick={changePayment}>привязать способ оплаты</button>
-							}
-							<br />
-							<button onClick={() => setNot(true)}
-								className={styles.danger}>
+								}
+								<br />
+								<button onClick={() => setNot(true)}
+									className={styles.danger}>
 								Отписаться
-							</button>
-						</>)}
+								</button>
+							</Fragment>))}
 
 						</>
 					}
@@ -247,3 +248,8 @@ const Subscriptions = () => {
 }
 
 export default Subscriptions
+
+
+
+
+

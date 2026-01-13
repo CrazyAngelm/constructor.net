@@ -36,7 +36,7 @@ const Dropdown = ({ label, button, isHorizontal, list, value, callbackChoise }: 
 					<div className="dropdown-content">
 						{
 							list?.map((p, i) => <a onClick={() => choise(p)} key={i}
-								className={`dropdown-item ${p == value && 'is-active'}`}>
+								className={`dropdown-item ${p === value && 'is-active'}`}>
 								{p}
 							</a>)
 						}

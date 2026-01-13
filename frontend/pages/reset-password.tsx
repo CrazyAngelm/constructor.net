@@ -52,7 +52,7 @@ const ResetPassword: NextPage<Props> = ({ token }: Props) => {
 			setError('Неверный токен')
 			return
 		}
-		if(!signupDto || signupDto?.password != confirmPassword) {
+		if(!signupDto || signupDto?.password !== confirmPassword) {
 			setError('Данные в полях "пароль" и "повторите пароль" не совпадают')
 			return
 		}

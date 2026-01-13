@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import type { SendMailOptions } from 'nodemailer'
 
 export const getTransport = () => {
 
@@ -14,15 +15,13 @@ export const getTransport = () => {
 	return transport
 }
 
-export const sendMail = (mailOptions: any) => {
-	getTransport().sendMail(mailOptions, function(err, info) {
-		if (err) {
-		} else {
-		}
+export const sendMail = (mailOptions: SendMailOptions) => {
+	getTransport().sendMail(mailOptions, function(err) {
+		if (err) return
 	})
 }
 
-export const optionsWithFrom = (options:any):any => {
+export const optionsWithFrom = (options: SendMailOptions): SendMailOptions => {
 	return {
 		from: 'Lab Studio <' + process.env.MAILER_USER +'>',
 		...options,

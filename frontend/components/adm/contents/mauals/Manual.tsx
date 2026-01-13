@@ -40,7 +40,7 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 		updater?.registery(id, callbackUpdate)
 	}, [ updater ])
 
-	const isOpen = (): boolean => data != null && data.length != 0
+	const isOpen = (): boolean => data !== null && data !== undefined && data.length !== 0
 
 	const onClick = () => {
 		setter.setManualId && setter.setManualId(id)
@@ -76,7 +76,7 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 							<Image src={arrow} />
 						</div>}
 				</div>
-				{id != -1
+				{id !== -1
 					? <span onClick={onClick}>{name}</span>
 					: <span className={styles.uninteractable}>{name}</span>
 				}
@@ -88,7 +88,7 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 						<div onClick={clickCreate} className={styles.icon}>
 							<Image layout="fill" objectFit="contain" src={addFile} />
 						</div>
-						{id != -1 && <div onClick={() => setModalDelete(true)} className={styles.icon}>
+						{id !== -1 && <div onClick={() => setModalDelete(true)} className={styles.icon}>
 							<Image layout="fill" objectFit="contain" src={trash} />
 						</div>}
 					</section>
@@ -97,7 +97,7 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 			{(open && isOpen())
 				&& <section>
 					{data?.map(p => (
-						<Item parentId={id} setManualId={setter.setManualId} updater={updater}
+						<Item key={p.id} parentId={id} setManualId={setter.setManualId} updater={updater}
 							id={p.id} name={p.name} />
 					))}
 				</section>
@@ -133,7 +133,7 @@ class Updater {
 	}
 
 	update(id: number) {
-		this.callbacks.find(p => p.id == id)?.callback()
+		this.callbacks.find(p => p.id === id)?.callback()
 	}
 
 	registery(id: number, callback: () => void) {

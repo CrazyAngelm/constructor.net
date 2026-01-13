@@ -46,7 +46,7 @@ const ItemCat = ({ id, parentId: parentId, name: _name, isCourse, updater, ...se
 		updater?.registery(id, callbackUpdate)
 	}, [ updater ])
 
-	const isOpen = (): boolean => data != null && data.length != 0
+	const isOpen = (): boolean => data !== null && data !== undefined && data.length !== 0
 
 	const onClick = () => {
 		if (isCourse && setter.setCourse) setter.setCourse(id)
@@ -102,7 +102,7 @@ const ItemCat = ({ id, parentId: parentId, name: _name, isCourse, updater, ...se
 			{(open && isOpen())
 				&& <section>
 					{data?.map(p => (
-						<ItemCat parentId={id} setCat={setter.setCat} updater={updater}
+						<ItemCat key={p.id} parentId={id} setCat={setter.setCat} updater={updater}
 							setTask={setter.setTask} id={p.id} name={p.name} />
 					))}
 				</section>
@@ -123,7 +123,7 @@ const List = (props: ListProps) => {
 
 	return (
 		<div>
-			{data?.map(p => <ItemCat isCourse id={p.id} name={p.name}
+			{data?.map(p => <ItemCat key={p.id} isCourse id={p.id} name={p.name}
 				setCourse={props.setCourse} setCat={props.setCat}
 				setTask={props.setTask}
 				updater={props.updater} />)}
@@ -165,7 +165,7 @@ class Updater {
 	}
 
 	update(id: number) {
-		this.callbacks.find(p => p.id == id)?.callback()
+		this.callbacks.find(p => p.id === id)?.callback()
 	}
 
 	registery(id: number, callback: () => void) {
@@ -204,11 +204,11 @@ const Hierarchy = () => {
 					updater={updater} />
 			</section>
 			<section className={styles.editor}>
-				{courseId != undefined && <CourseEditor id={courseId} callbackUpdate={() => updater.update(courseId)} />}
-				{(categoryId != undefined && taskId == undefined) && <TaskCategoriesEditor id={categoryId}
+				{courseId !== undefined && <CourseEditor id={courseId} callbackUpdate={() => updater.update(courseId)} />}
+				{(categoryId !== undefined && taskId === undefined) && <TaskCategoriesEditor id={categoryId}
 					callbackUpdate={() => updater.update(categoryId)}
 					callbackSelectTask={selectTask}/>}
-				{taskId != undefined && <TaskEditor id={taskId} categoryId={categoryId}
+				{taskId !== undefined && <TaskEditor id={taskId} categoryId={categoryId}
 					 callbackBack={() => setTaskId(undefined)}/>}
 			</section>
 		</article>

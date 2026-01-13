@@ -1,10 +1,10 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { ChangePaymentMethodReq, ChangePaymentMethodRes, Subscription } from '@/lib/dto/subscription'
 import { ICreatePayment, YooCheckout } from '@a2seven/yoo-checkout'
 import { v4 } from 'uuid'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
 	const body = JSON.parse(req.body) as ChangePaymentMethodReq

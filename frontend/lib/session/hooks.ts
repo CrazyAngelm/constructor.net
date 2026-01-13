@@ -8,7 +8,7 @@ export const useSession = (): Session | null | 'loading' => {
 	const _session = useSessionHook()
 
 	useEffect(() => {
-		if (_session.status == 'loading') setSession('loading')
+		if (_session.status === 'loading') setSession('loading')
 		else setSession(_session.data as Session)
 	}, [ _session ])
 

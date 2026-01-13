@@ -3,10 +3,10 @@ import { TaskCategoryDto } from '@/lib/dto/tasks'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response, responseAuth } from '@/lib/api/response'
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { ScopeEnum } from '@/lib/dto/users'
 import { WorklistDto } from '@/lib/dto/worklist'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
 	id?: string
@@ -27,7 +27,7 @@ handler.post(responseAuth(async (req, res, userId) => {
 		where: { id: userId },
 		include: { scopes: { include: { scope: true } } },
 	})
-	if (user?.scopes.find(p => p.scope.value == ScopeEnum.admin)) {
+	if (user?.scopes.find(p => p.scope.value === ScopeEnum.admin)) {
 		const data = req.body as WorklistDto
 		const upset = await prisma.worklist.upsert({
 			where: { id },
@@ -52,7 +52,7 @@ handler.delete(responseAuth(async (req, res, userId) => {
 		where: { id: userId },
 		include: { scopes: { include: { scope: true } } },
 	})
-	if (user?.scopes.find(p => p.scope.value == ScopeEnum.admin)) {
+	if (user?.scopes.find(p => p.scope.value === ScopeEnum.admin)) {
 		const id = (req.query as Query).id
 		if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 		await prisma.folderToWorklist.deleteMany({
@@ -74,3 +74,4 @@ handler.delete(responseAuth(async (req, res, userId) => {
 	}
 }))
 export default handler
+

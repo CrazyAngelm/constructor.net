@@ -1,4 +1,5 @@
 
+/* eslint-disable @typescript-eslint/no-var-requires -- Node cron script */
 const { CronJob } = require('cron')
 const { PrismaClient } = require('@prisma/client')
 const { checkout } = require('./yookassa/checkoutjs.js')     // этап-2
@@ -176,8 +177,8 @@ class CronService {
 						})
 					}
 				}
-			} catch (err) {
-			}
+			// eslint-disable-next-line no-empty -- keep cron loop resilient
+			} catch (err) {}
 		}
 
 	}

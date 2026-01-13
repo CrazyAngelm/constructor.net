@@ -44,9 +44,7 @@ export interface UnsubscribeReq {
 	userId?: string
 }
 
-export interface UnsubscribeRes {
-
-}
+export type UnsubscribeRes = Record<string, never>
 
 export interface ChangePaymentMethodReq {
 	userId?: string,

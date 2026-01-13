@@ -28,7 +28,7 @@ const UserContent = () => {
 							value: i => data[i]?.name as string,
 						} ]}
 						callback={i => setUserId(data[i]?.id)}
-						selected={data.findIndex(p => p.id == userId)} />
+						selected={data.findIndex(p => p.id === userId)} />
 				}
 				<ButtonsList />
 			</section>

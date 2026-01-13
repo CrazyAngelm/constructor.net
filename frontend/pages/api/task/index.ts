@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
-const prisma = usePrisma()
+import { getPrisma } from '@/lib/api/database'
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.get(response(async () => {
 	const tasks = await prisma.task.findMany({ where: { deleted: false } })

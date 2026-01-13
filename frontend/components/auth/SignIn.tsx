@@ -1,7 +1,8 @@
+/* eslint-disable react/no-unescaped-entities -- legacy localized copy */
 import { useState } from 'react'
 import Image from 'next/image'
 
-import { signIn } from 'next-auth/react'
+import { signIn, SignInResponse } from 'next-auth/react'
 
 import styles from '@/styles/auth/Auth.module.scss'
 
@@ -55,7 +56,7 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 	const onSubmit = async () => {
 		setResendEmail(false)
 		onError && onError('')
-		const fE = (signupDto?.email.indexOf('@') ?? -1) == -1
+		const fE = (signupDto?.email.indexOf('@') ?? -1) === -1
 
 
 		if (fE || !signupDto) {
@@ -68,10 +69,10 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 				redirect: false,
 				email: signupDto.email,
 				password: signupDto.password,
-			}) as any as SigninError
+			}) as SignInResponse | undefined
 
-			if (status.error) {
-				if (status.error == ConfirmEmailError.message)
+			if (status?.error) {
+				if (status.error === ConfirmEmailError.message)
 					setResendEmail(true)
 				else onError && onError(status.error)
 				return

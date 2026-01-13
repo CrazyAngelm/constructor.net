@@ -1,9 +1,9 @@
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { Manual } from '@/lib/dto/manuals'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
 	id?: string
@@ -36,7 +36,8 @@ handler.get(response(async (req, res) => {
 				},
 			},
 		})) as Manual[]
-	if (data == null) return { error: { code: 402, message: 'Неверный запрос' } }
+	if (data === null) return { error: { code: 402, message: 'Неверный запрос' } }
 	return { response: data }
 }))
 export default handler
+

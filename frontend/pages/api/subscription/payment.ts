@@ -57,8 +57,8 @@ handler.post(
 				}
 				return
 			})
-		} catch (err) {
-		}
+		// eslint-disable-next-line no-empty -- webhook should not throw
+		} catch (err) {}
 		return {}
 	})
 )

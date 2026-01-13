@@ -4,7 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { Session } from '@/lib/session'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { PrismaClient } from '@prisma/client'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { compare } from 'bcryptjs'
 import { UserDto } from '@/lib/dto/users'
 import { ConfirmEmailError } from '@/lib/api/error'
@@ -19,7 +19,7 @@ export default NextAuth({
 			},
 			async authorize(credentials, req) {
 				if (!credentials) throw new Error('credentials is null')
-				const prisma  = usePrisma()
+				const prisma  = getPrisma()
 				const user = await prisma.user.findUnique({
 					where:{email:credentials.email},
 				})

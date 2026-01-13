@@ -19,8 +19,8 @@ const SignUp = ({ onSucess, onError, auth }: Props) => {
 
 	const onSubmit = async () => {
 
-		const fE = (signupDto?.email.indexOf('@') ?? -1) == -1
-		const fP = signupDto?.password != confirmPassword
+		const fE = (signupDto?.email.indexOf('@') ?? -1) === -1
+		const fP = signupDto?.password !== confirmPassword
 
 		fE && onError && onError('Email введен неверно')
 		fP && onError && onError('Пароль повторен невено попробуйте еще раз')

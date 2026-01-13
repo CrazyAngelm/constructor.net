@@ -96,10 +96,10 @@ export const resetPaymentMethod: RequestWithContext<ChangePaymentMethodReq, Chan
 	return json
 }
 
-export const changeCourses: RequestWithContext<ChangeCourseReq, {}> = async (
+export const changeCourses: RequestWithContext<ChangeCourseReq, Record<string, unknown>> = async (
 	dto: ChangeCourseReq,
 	{ apiUrl }: RequestContext = defaultRequestContext,
-): Promise<{}> => {
+): Promise<Record<string, unknown>> => {
 	const res = await fetch(apiUrl + '/subscription/change-course', {
 		method: 'POST',
 		body: JSON.stringify(dto),

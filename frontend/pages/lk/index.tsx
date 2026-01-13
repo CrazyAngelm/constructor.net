@@ -42,7 +42,7 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 
 	useEffect(() => {
 		if (window && page?.hash !== window.location.hash) {
-			setPage(navigation.find(p => '#' +p.hash == window.location.hash))
+			setPage(navigation.find(p => '#' +p.hash === window.location.hash))
 		}
 	}, [])
 
@@ -72,7 +72,7 @@ const Lk: NextPage<Props> = ({ user }: Props) => {
 					<section className={styles.items}>
 						{
 							navigation.map(p => <a key={p.hash}
-								className={p.hash == page?.hash ? styles.active : ''}
+								className={p.hash === page?.hash ? styles.active : ''}
 								onClick={nav(p)}>{p.label}</a>)
 						}
 						<hr />

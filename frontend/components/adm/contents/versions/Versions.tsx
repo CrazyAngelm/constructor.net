@@ -42,7 +42,7 @@ const Versions = () => {
 							value: i => data[i]?.type as string,
 						} ]}
 						callback={i => setVersionId(data[i]?.id)}
-						selected={data.findIndex(p => p.id == versionId)} />
+						selected={data.findIndex(p => p.id === versionId)} />
 				}
 				<ButtonsList callbackCreate={createVersion} />
 			</section>

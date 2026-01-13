@@ -1,8 +1,8 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { UnsubscribeReq } from '@/lib/dto/subscription'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
 	const body = JSON.parse(req.body) as UnsubscribeReq
@@ -10,7 +10,8 @@ handler.post(response(async (req, res) => {
 		where: { id: body.subscriptionId, userId: body.userId },
 		data: { canceled: true },
 	})
-	if (!data || data.count == 0) return { error: { code: 415, message: 'Подписки не найдено' } }
+	if (!data || data.count === 0) return { error: { code: 415, message: 'Подписки не найдено' } }
 	return { response: {} }
 }))
 export default handler
+

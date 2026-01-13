@@ -8,7 +8,7 @@ const Account = () => {
 
 
 	return (<>
-		{session != 'loading' && session
+		{session !== 'loading' && session
 			&& <article className={styles.account}>
 				<Field value={session?.user?.id} label="Id" isHorizontal
 					isReadonly />

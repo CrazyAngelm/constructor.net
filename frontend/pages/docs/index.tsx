@@ -19,7 +19,7 @@ const Item = ({ manual, selectCallback }: PropsItem) => {
 
 	const { data } = useFetchData(manual.id, getManuals)
 
-	const isOpen = (): boolean => data != null && data.length != 0
+	const isOpen = (): boolean => data !== null && data !== undefined && data.length !== 0
 
 	return (
 		<section className={styles.item}>

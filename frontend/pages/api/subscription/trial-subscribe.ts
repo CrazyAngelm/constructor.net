@@ -1,9 +1,9 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { SubscribeReq } from '@/lib/dto/subscription'
 import { Prisma } from '@prisma/client'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 const addDays = (date: Date, days: number): Date => {
 	return new Date(date.setDate(date.getDate() + days))

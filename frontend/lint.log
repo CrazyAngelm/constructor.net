@@ -1,0 +1,642 @@
+./pages/adm/index.tsx
+56:2  Warning: Unexpected console statement.  no-console
+
+./pages/api/auth/confirmemail.ts
+4:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+11:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/auth/resendConfirm.ts
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+9:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/auth/resetPassword.ts
+5:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+7:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+18:8  Warning: 'newPass' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/auth/sendResetPassword.ts
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+8:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/auth/signin.ts
+4:10  Warning: 'encodeBase64' is defined but never used.  @typescript-eslint/no-unused-vars
+4:24  Warning: 'hash' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'getRegistrationHtml' is defined but never used.  @typescript-eslint/no-unused-vars
+7:10  Warning: 'optionsWithFrom' is defined but never used.  @typescript-eslint/no-unused-vars
+7:27  Warning: 'sendMail' is defined but never used.  @typescript-eslint/no-unused-vars
+8:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+10:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/auth/signup.ts
+4:10  Warning: 'encodeBase64' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+9:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/auth/[...nextauth].ts
+20:33  Warning: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+22:21  Error: React Hook "usePrisma" is called in function "authorize" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use".  react-hooks/rules-of-hooks
+
+./pages/api/course/index.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+
+./pages/api/course/me.ts
+4:10  Warning: 'Subscription' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+13:43  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./pages/api/course/[id]/categories.ts
+2:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+12:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/course/[id]/folders.ts
+2:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+8:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+13:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/course/[id]/index.ts
+1:10  Warning: 'Course' is defined but never used.  @typescript-eslint/no-unused-vars
+1:18  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+12:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+21:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+40:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/course/[id]/worklists.ts
+5:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+10:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/folder/create.ts
+1:10  Warning: 'CreateCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+1:29  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+9:11  Warning: 'Query' is defined but never used.  @typescript-eslint/no-unused-vars
+12:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/folder/[id]/folders.ts
+2:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+8:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+13:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/folder/[id]/index.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+2:10  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+4:20  Warning: 'responseAuth' is defined but never used.  @typescript-eslint/no-unused-vars
+8:10  Warning: 'ScopeEnum' is defined but never used.  @typescript-eslint/no-unused-vars
+9:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+14:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+23:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+37:37  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/folder/[id]/worklists.ts
+5:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+10:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/manuals/create.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+2:10  Warning: 'CreateCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+2:29  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'NextParsedUrlQuery' is defined but never used.  @typescript-eslint/no-unused-vars
+8:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+10:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/manuals/index.ts
+5:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+
+./pages/api/manuals/[id]/index.ts
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+11:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+20:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+34:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/manuals/[id]/manuals.ts
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+11:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/subscription/change-course.ts
+5:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+7:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/subscription/change-payment-method.ts
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+26:6  Warning: Identifier 'save_payment_method' is not in camel case.  camelcase
+
+./pages/api/subscription/index.ts
+5:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+7:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/subscription/license/index.ts
+4:10  Warning: 'Manual' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'LicenseDto' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+
+./pages/api/subscription/me.ts
+5:10  Warning: 'License' is defined but never used.  @typescript-eslint/no-unused-vars
+5:19  Warning: 'Subscription' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+
+./pages/api/subscription/payment.ts
+15:23  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+21:15  Warning: Unexpected console statement.  no-console
+60:17  Error: Empty block statement.  no-empty
+
+./pages/api/subscription/reset-payment-method.ts
+4:34  Warning: 'ChangePaymentMethodRes' is defined but never used.  @typescript-eslint/no-unused-vars
+4:58  Warning: 'Subscription' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'ICreatePayment' is defined but never used.  @typescript-eslint/no-unused-vars
+5:26  Warning: 'YooCheckout' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'v4' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+9:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/subscription/subscribe.ts
+8:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+11:23  Warning: '_res' is defined but never used.  @typescript-eslint/no-unused-vars
+44:6  Warning: Identifier 'save_payment_method' is not in camel case.  camelcase
+
+./pages/api/subscription/trial-subscribe.ts
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+
+./pages/api/subscription/unsubscribe.ts
+5:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+7:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+13:26  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./pages/api/task/index.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+5:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+
+./pages/api/task/[id]/category.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+5:22  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+5:39  Warning: 'TaskDto' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+12:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+22:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+32:9  Warning: 'upset' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+34:5  Warning: Identifier 'taskId_categoryId' is not in camel case.  camelcase
+
+./pages/api/task/[id]/image.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+5:27  Warning: 'TaskDto' is defined but never used.  @typescript-eslint/no-unused-vars
+9:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+25:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/task/[id]/index.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+12:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+30:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+58:9  Warning: 'a' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+66:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/task-category/create.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+9:11  Warning: 'Query' is defined but never used.  @typescript-eslint/no-unused-vars
+12:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/task-category/index.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+2:10  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+
+./pages/api/task-category/[id]/categories.ts
+2:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+12:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/task-category/[id]/index.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+12:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+26:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+45:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/task-category/[id]/tasks.ts
+2:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+11:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/users/[id]/index.ts
+1:24  Warning: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+4:10  Warning: 'Error' is defined but never used.  @typescript-eslint/no-unused-vars
+11:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+24:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/users/[id]/scope.ts
+1:24  Warning: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+2:10  Warning: 'UserDto' is defined but never used.  @typescript-eslint/no-unused-vars
+4:10  Warning: 'Error' is defined but never used.  @typescript-eslint/no-unused-vars
+11:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/versions/all.ts
+4:19  Warning: 'VersionType' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/versions/[id]/index.ts
+1:24  Warning: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+2:10  Warning: 'UserDto' is defined but never used.  @typescript-eslint/no-unused-vars
+4:10  Warning: 'Error' is defined but never used.  @typescript-eslint/no-unused-vars
+11:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+20:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+24:14  Warning: '_' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/worklist/create-in-course.ts
+3:10  Warning: 'NextParsedUrlQuery' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+8:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/worklist/create-in-folder.ts
+3:10  Warning: 'NextParsedUrlQuery' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+8:35  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/api/worklist/upload-premission.ts
+4:10  Warning: 'Subscription' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+13:43  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./pages/api/worklist/[id]/index.ts
+1:10  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+2:10  Warning: 'TaskCategoryDto' is defined but never used.  @typescript-eslint/no-unused-vars
+9:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+14:34  Warning: 'res' is defined but never used.  @typescript-eslint/no-unused-vars
+30:43  Error: Expected '===' and instead saw '=='.  eqeqeq
+32:9  Warning: 'upset' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+55:43  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./pages/confirmemail.tsx
+27:3  Warning: Unexpected console statement.  no-console
+37:10  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+45:4  Warning: Unexpected console statement.  no-console
+47:5  Warning: React Hook useEffect has a missing dependency: 'token'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./pages/docs/index.tsx
+22:60  Error: Expected '!==' and instead saw '!='.  eqeqeq
+30:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./pages/index.tsx
+1:8  Warning: 'SignUp' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'getRegistrationHtml' is defined but never used.  @typescript-eslint/no-unused-vars
+7:10  Warning: 'signOut' is defined but never used.  @typescript-eslint/no-unused-vars
+9:8  Warning: 'Image' is defined but never used.  @typescript-eslint/no-unused-vars
+10:8  Warning: 'background' is defined but never used.  @typescript-eslint/no-unused-vars
+12:8  Warning: 'Comments' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/lk/index.tsx
+38:32  Warning: 'user' is defined but never used.  @typescript-eslint/no-unused-vars
+40:8  Warning: 'router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+45:45  Error: Expected '===' and instead saw '=='.  eqeqeq
+47:5  Warning: React Hook useEffect has a missing dependency: 'page?.hash'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+75:27  Error: Expected '===' and instead saw '=='.  eqeqeq
+95:11  Warning: 'QueryWithToken' is defined but never used.  @typescript-eslint/no-unused-vars
+99:57  Warning: 'context' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./pages/reset-password.tsx
+18:18  Warning: 'useRouter' is defined but never used.  @typescript-eslint/no-unused-vars
+44:5  Warning: React Hook useEffect has a missing dependency: 'token'. Either include it or remove the dependency array. If 'setUser' needs the current value of 'token', you can also switch to useReducer instead of useState and read 'token' in the reducer.  react-hooks/exhaustive-deps
+55:40  Error: Expected '!==' and instead saw '!='.  eqeqeq
+60:10  Warning: 'res' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+64:4  Warning: Unexpected console statement.  no-console
+82:10  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./pages/subscribe-sucessful.tsx
+13:6  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./pages/_app.tsx
+11:5  Error: External synchronous scripts are forbidden. See: https://nextjs.org/docs/messages/no-sync-scripts  @next/next/no-sync-scripts
+
+./components/adm/contents/EditorTemplate.tsx
+2:8  Warning: 'Image' is defined but never used.  @typescript-eslint/no-unused-vars
+6:8  Warning: 'back' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/adm/contents/hierarchy/CourseEditor.tsx
+31:16  Warning: 'tasks' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+31:49  Warning: 'errorTask' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+43:11  Warning: 'p' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/adm/contents/hierarchy/Hierarchy.tsx
+4:186  Warning: 'updateTaskCategory' is defined but never used.  @typescript-eslint/no-unused-vars
+47:5  Warning: React Hook useEffect has missing dependencies: 'callbackUpdate' and 'id'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+49:60  Error: Expected '!==' and instead saw '!='.  eqeqeq
+84:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+90:7  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+94:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+97:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+105:7  Error: Missing "key" prop for element in iterator  react/jsx-key
+126:20  Error: Missing "key" prop for element in iterator  react/jsx-key
+137:2  Warning: Unexpected console statement.  no-console
+168:33  Error: Expected '===' and instead saw '=='.  eqeqeq
+207:15  Error: Expected '!==' and instead saw '!='.  eqeqeq
+208:18  Error: Expected '!==' and instead saw '!='.  eqeqeq
+208:41  Error: Expected '===' and instead saw '=='.  eqeqeq
+211:13  Error: Expected '!==' and instead saw '!='.  eqeqeq
+
+./components/adm/contents/hierarchy/TaskCategoriesEditor.tsx
+1:10  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+18:8  Warning: 'TaskEditor' is defined but never used.  @typescript-eslint/no-unused-vars
+30:37  Warning: 'courseId' is defined but never used.  @typescript-eslint/no-unused-vars
+40:16  Warning: 'courses' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+42:8  Warning: 'choiseCourses' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+42:25  Warning: 'values' is defined but never used.  @typescript-eslint/no-unused-vars
+56:11  Warning: 'p' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/adm/contents/hierarchy/TaskEditor.tsx
+13:8  Warning: 'DropdownCheck' is defined but never used.  @typescript-eslint/no-unused-vars
+39:2  Warning: Unexpected console statement.  no-console
+41:8  Warning: 'setChoiseCategory' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+57:51  Warning: Unexpected console statement.  no-console
+
+./components/adm/contents/mauals/Manual.tsx
+3:65  Warning: 'updateManual' is defined but never used.  @typescript-eslint/no-unused-vars
+28:20  Warning: 'setDelete' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+41:5  Warning: React Hook useEffect has missing dependencies: 'callbackUpdate' and 'id'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+43:60  Error: Expected '!==' and instead saw '!='.  eqeqeq
+63:3  Warning: Unexpected console statement.  no-console
+76:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+79:9  Error: Expected '!==' and instead saw '!='.  eqeqeq
+85:7  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+89:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+91:11  Error: Expected '!==' and instead saw '!='.  eqeqeq
+92:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+100:7  Error: Missing "key" prop for element in iterator  react/jsx-key
+109:11  Warning: 'ListProps' is defined but never used.  @typescript-eslint/no-unused-vars
+136:33  Error: Expected '===' and instead saw '=='.  eqeqeq
+149:10  Warning: 'value' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+149:17  Warning: 'setValue' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./components/adm/contents/mauals/ManualEditor.tsx
+1:10  Warning: 'ComponentClass' is defined but never used.  @typescript-eslint/no-unused-vars
+1:26  Warning: 'FunctionComponent' is defined but never used.  @typescript-eslint/no-unused-vars
+1:55  Warning: 'ComponentProps' is defined but never used.  @typescript-eslint/no-unused-vars
+7:2  Warning: 'getTaskById' is defined but never used.  @typescript-eslint/no-unused-vars
+7:15  Warning: 'getTaskCategories' is defined but never used.  @typescript-eslint/no-unused-vars
+7:34  Warning: 'getTaskCategoryById' is defined but never used.  @typescript-eslint/no-unused-vars
+7:55  Warning: 'removeTask' is defined but never used.  @typescript-eslint/no-unused-vars
+8:2  Warning: 'updateTask' is defined but never used.  @typescript-eslint/no-unused-vars
+8:14  Warning: 'uploadTaskImage' is defined but never used.  @typescript-eslint/no-unused-vars
+13:8  Warning: 'DropdownCheck' is defined but never used.  @typescript-eslint/no-unused-vars
+15:8  Warning: 'TextArea' is defined but never used.  @typescript-eslint/no-unused-vars
+16:8  Warning: 'Upload' is defined but never used.  @typescript-eslint/no-unused-vars
+18:10  Warning: 'makeFetcher' is defined but never used.  @typescript-eslint/no-unused-vars
+20:19  Warning: 'DynamicOptions' is defined but never used.  @typescript-eslint/no-unused-vars
+54:7  Warning: 'formats' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+72:10  Warning: 'loaded' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+72:18  Warning: 'setLoaded' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+73:10  Warning: 'html' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+73:16  Warning: 'setHtml' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+84:11  Warning: 'resp' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/adm/contents/user/UserContent.tsx
+15:16  Warning: 'error' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+31:42  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./components/adm/contents/user/UserEditor.tsx
+44:4  Warning: Unexpected console statement.  no-console
+58:5  Warning: Unexpected console statement.  no-console
+74:4  Warning: Unexpected console statement.  no-console
+111:7  Warning: Do not use <img>. Use Image from 'next/image' instead. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+111:7  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/adm/contents/versions/VersionEditor.tsx
+3:10  Warning: 'getUserById' is defined but never used.  @typescript-eslint/no-unused-vars
+3:23  Warning: 'updateScope' is defined but never used.  @typescript-eslint/no-unused-vars
+3:36  Warning: 'updateUser' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'ScopeEnum' is defined but never used.  @typescript-eslint/no-unused-vars
+12:8  Warning: 'Checkbox' is defined but never used.  @typescript-eslint/no-unused-vars
+15:8  Warning: 'DropdownCheck' is defined but never used.  @typescript-eslint/no-unused-vars
+42:5  Warning: Unexpected console statement.  no-console
+
+./components/adm/contents/versions/Versions.tsx
+16:24  Warning: 'error' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+45:42  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./components/adm/contents/worklists/WorklistEditor.tsx
+39:27  Error: Expected '===' and instead saw '=='.  eqeqeq
+41:22  Error: Missing "key" prop for element in iterator  react/jsx-key
+
+./components/adm/contents/worklists/Worklists.tsx
+24:60  Error: Expected '!==' and instead saw '!='.  eqeqeq
+32:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/adm/Menu.tsx
+24:6  Warning: Do not use <img>. Use Image from 'next/image' instead. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+24:6  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+50:6  Error: Missing "key" prop for element in iterator  react/jsx-key
+
+./components/auth/Auth.tsx
+58:9  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/auth/SignIn.tsx
+58:52  Error: Expected '===' and instead saw '=='.  eqeqeq
+71:10  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+74:22  Error: Expected '===' and instead saw '=='.  eqeqeq
+109:30  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+109:59  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+117:9  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/auth/SignUp.tsx
+22:52  Error: Expected '===' and instead saw '=='.  eqeqeq
+23:34  Error: Expected '!==' and instead saw '!='.  eqeqeq
+
+./components/controls/Dropdown.tsx
+2:10  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+39:39  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./components/controls/DropdownCheck.tsx
+18:22  Warning: 'p' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/controls/Modal.tsx
+19:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/controls/Upload.tsx
+19:21  Error: Expected '!==' and instead saw '!='.  eqeqeq
+24:5  Warning: React Hook useEffect has missing dependencies: 'keyChange' and 'lastKeyChange'. Either include them or remove the dependency array. If 'setLastKeyChange' needs the current value of 'keyChange', you can also switch to useReducer instead of useState and read 'keyChange' in the reducer.  react-hooks/exhaustive-deps
+27:3  Warning: Unexpected console statement.  no-console
+30:5  Warning: React Hook useEffect has a missing dependency: 'value'. Either include it or remove the dependency array. If 'setImgPreview' needs the current value of 'value', you can also switch to useReducer instead of useState and read 'value' in the reducer.  react-hooks/exhaustive-deps
+51:8  Warning: Do not use <img>. Use Image from 'next/image' instead. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+51:8  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/home/About.tsx
+106:201  Error: Irregular whitespace not allowed.  no-irregular-whitespace
+106:267  Error: Irregular whitespace not allowed.  no-irregular-whitespace
+110:7  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/home/Comment.tsx
+17:10  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/home/Comments.tsx
+20:7  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+25:7  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/home/Tarifs.tsx
+2:8  Warning: 'f1' is defined but never used.  @typescript-eslint/no-unused-vars
+3:8  Warning: 'f2' is defined but never used.  @typescript-eslint/no-unused-vars
+4:8  Warning: 'f3' is defined but never used.  @typescript-eslint/no-unused-vars
+7:38  Warning: 'subscribe' is defined but never used.  @typescript-eslint/no-unused-vars
+11:10  Warning: 'SubscribeRes' is defined but never used.  @typescript-eslint/no-unused-vars
+12:10  Warning: 'YooCheckoutWidget' is defined but never used.  @typescript-eslint/no-unused-vars
+21:10  Warning: 'errorAuth' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+21:21  Warning: 'setErrorAuth' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+25:16  Warning: 'update' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+29:34  Error: Expected '===' and instead saw '=='.  eqeqeq
+32:10  Warning: 'res' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+39:20  Error: Expected '===' and instead saw '=='.  eqeqeq
+42:4  Warning: Unexpected console statement.  no-console
+51:20  Error: Expected '!==' and instead saw '!='.  eqeqeq
+63:21  Error: Missing "key" prop for element in iterator  react/jsx-key
+70:26  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./components/home/TittlePanel.tsx
+20:6  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/Layout.tsx
+9:8  Warning: 'Script' is defined but never used.  @typescript-eslint/no-unused-vars
+37:9  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/lk/Account.tsx
+11:12  Error: Expected '!==' and instead saw '!='.  eqeqeq
+
+./components/lk/Subscription.tsx
+29:5  Warning: React Hook useEffect has a missing dependency: 'subscriptionCourses'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+91:39  Error: Expected '===' and instead saw '=='.  eqeqeq
+148:40  Error: Missing "key" prop for element in iterator  react/jsx-key
+163:55  Error: Expected '!==' and instead saw '!='.  eqeqeq
+167:15  Error: Expected '===' and instead saw '=='.  eqeqeq
+178:15  Error: Expected '===' and instead saw '=='.  eqeqeq
+187:11  Warning: Unexpected console statement.  no-console
+191:15  Error: Expected '===' and instead saw '=='.  eqeqeq
+200:4  Warning: Unexpected console statement.  no-console
+208:5  Error: External synchronous scripts are forbidden. See: https://nextjs.org/docs/messages/no-sync-scripts  @next/next/no-sync-scripts
+
+./components/Navbar.tsx
+24:9  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+42:28  Error: Expected '!==' and instead saw '!='.  eqeqeq
+55:12  Warning: Do not use <img>. Use Image from 'next/image' instead. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+55:12  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/pricing/CardTarif.tsx
+9:8  Warning: 'Script' is defined but never used.  @typescript-eslint/no-unused-vars
+24:10  Warning: 'errorAuth' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+24:21  Warning: 'setErrorAuth' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+31:34  Error: Expected '===' and instead saw '=='.  eqeqeq
+34:22  Error: Expected '===' and instead saw '=='.  eqeqeq
+35:11  Warning: 'res' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+49:13  Warning: Unexpected console statement.  no-console
+53:20  Error: Expected '===' and instead saw '=='.  eqeqeq
+56:4  Warning: Unexpected console statement.  no-console
+67:20  Error: Expected '!==' and instead saw '!='.  eqeqeq
+77:5  Error: External synchronous scripts are forbidden. See: https://nextjs.org/docs/messages/no-sync-scripts  @next/next/no-sync-scripts
+81:13  Warning: Do not use <img>. Use Image from 'next/image' instead. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+81:13  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+87:19  Error: Expected '!==' and instead saw '!='.  eqeqeq
+89:9  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+97:26  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./components/pricing/Order.tsx
+19:8  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+26:8  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+26:24  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+27:44  Error: Do not use the HTML <a> tag to navigate to /license/. Use Link from 'next/link' instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+./lib/api/apiHandler.ts
+13:26  Warning: 'next' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./lib/api/database.ts
+2:10  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+2:21  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./lib/api/response.ts
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+125:45  Error: Expected '!==' and instead saw '!='.  eqeqeq
+
+./lib/changeHandler.ts
+1:33  Warning: 'EventHandler' is defined but never used.  @typescript-eslint/no-unused-vars
+8:15  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+20:15  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/crone.ts
+2:19  Warning: 'Subscription' is defined but never used.  @typescript-eslint/no-unused-vars
+3:10  Warning: 'CronJob' is defined but never used.  @typescript-eslint/no-unused-vars
+7:16  Error: React Hook "usePrisma" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function.  react-hooks/rules-of-hooks
+23:3  Warning: Identifier 'payment_method_id' is not in camel case.  camelcase
+38:7  Warning: 'CheckSubscribtion' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+65:17  Error: Unexpected empty static method 'Check'.  @typescript-eslint/no-empty-function
+
+./lib/cronejs.js
+2:21  Error: Require statement not part of import statement.  @typescript-eslint/no-var-requires
+3:26  Error: Require statement not part of import statement.  @typescript-eslint/no-var-requires
+4:22  Error: Require statement not part of import statement.  @typescript-eslint/no-var-requires
+7:7  Warning: 'GRACE_MS' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+94:4  Warning: Identifier 'payment_method_id' is not in camel case.  camelcase
+179:18  Error: Empty block statement.  no-empty
+
+./lib/dto/subscription.ts
+47:18  Error: An empty interface is equivalent to `{}`.  @typescript-eslint/no-empty-interface
+
+./lib/hooks/useFetchData.ts
+12:23  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+12:33  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+29:5  Warning: React Hook useEffect has missing dependencies: 'lastKey', 'setDefault', and 'update'. Either include them or remove the dependency array. If 'setData' needs the current value of 'setDefault', you can also switch to useReducer instead of useState and read 'setDefault' in the reducer.  react-hooks/exhaustive-deps
+
+./lib/mailer/mailer.ts
+17:39  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+18:53  Warning: 'info' is defined but never used.  @typescript-eslint/no-unused-vars
+19:12  Error: Empty block statement.  no-empty
+20:10  Error: Empty block statement.  no-empty
+25:41  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+25:46  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/requests/auth.ts
+2:39  Warning: 'UserDto' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./lib/requests/manuals.ts
+77:12  Error: Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+- If you want a type meaning "any object", you probably want `Record<string, unknown>` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead.
+- If you want a type meaning "empty object", you probably want `Record<string, never>` instead.  @typescript-eslint/ban-types
+
+./lib/requests/subscription.ts
+99:65  Error: Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+- If you want a type meaning "any object", you probably want `Record<string, unknown>` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead.
+- If you want a type meaning "empty object", you probably want `Record<string, never>` instead.  @typescript-eslint/ban-types
+102:12  Error: Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+- If you want a type meaning "any object", you probably want `Record<string, unknown>` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead.
+- If you want a type meaning "empty object", you probably want `Record<string, never>` instead.  @typescript-eslint/ban-types
+
+./lib/requests/tasks.ts
+50:12  Error: Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+- If you want a type meaning "any object", you probably want `Record<string, unknown>` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead.
+- If you want a type meaning "empty object", you probably want `Record<string, never>` instead.  @typescript-eslint/ban-types
+127:12  Error: Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+- If you want a type meaning "any object", you probably want `Record<string, unknown>` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead.
+- If you want a type meaning "empty object", you probably want `Record<string, never>` instead.  @typescript-eslint/ban-types
+216:12  Error: Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+- If you want a type meaning "any object", you probably want `Record<string, unknown>` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead.
+- If you want a type meaning "empty object", you probably want `Record<string, never>` instead.  @typescript-eslint/ban-types
+
+./lib/session/hooks.ts
+1:10  Warning: 'SessionContextValue' is defined but never used.  @typescript-eslint/no-unused-vars
+1:61  Warning: 'UseSessionOptions' is defined but never used.  @typescript-eslint/no-unused-vars
+11:23  Error: Expected '===' and instead saw '=='.  eqeqeq
+
+./lib/YooCheckoutWidget.ts
+2:26  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+4:34  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+5:3  Warning: Identifier 'confirmation_token' is not in camel case.  camelcase
+6:3  Warning: Identifier 'return_url' is not in camel case.  camelcase
+10:3  Warning: Identifier 'error_callback' is not in camel case.  camelcase
+
+./lib/yookassa/checkoutjs.js
+1:25  Error: Require statement not part of import statement.  @typescript-eslint/no-var-requires
+2:22  Error: Require statement not part of import statement.  @typescript-eslint/no-var-requires

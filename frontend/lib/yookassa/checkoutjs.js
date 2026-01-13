@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires -- Node checkout helper */
 const { YooCheckout } = require('@a2seven/yoo-checkout')
 const { v4: uuid } = require('uuid')
 

@@ -35,10 +35,10 @@ const Avatar = ({ session }: { session: Session }) => {
 const Menu = ({ categories }: Props) => {
 	const session = useSession()
 
-	const getItem = (item: Item) => <li>
+	const getItem = (item: Item, key: string) => <li key={key}>
 		<a onClick={item.callback}>{item.label}</a>
 		{(item.items && item.items?.length > 0)
-				&& <ul>{item.items.map(p => getItem(p))}</ul>}
+				&& <ul>{item.items.map((p, index) => getItem(p, `${key}-${index}`))}</ul>}
 	</li>
 
 	if (!session || session === 'loading') return null
@@ -46,10 +46,10 @@ const Menu = ({ categories }: Props) => {
 		<menu className={`${styles.menu} ${styles.hide}`}>
 			<Avatar session={session} />
 			<section className={styles.content}>
-				{categories?.map(c => (
-					<div>
+				{categories?.map((c, index) => (
+					<div key={c.label ?? index}>
 						<header>{c.label}</header>
-						<ul>{c.items?.map(p => getItem(p))}</ul>
+						<ul>{c.items?.map((p, itemIndex) => getItem(p, `${c.label ?? index}-${itemIndex}`))}</ul>
 					</div>
 				))}
 			</section>

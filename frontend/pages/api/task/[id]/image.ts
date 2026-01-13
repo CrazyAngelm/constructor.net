@@ -5,8 +5,8 @@ import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
 import { TaskCategoryDto, TaskDto } from '@/lib/dto/tasks'
 import multer from 'multer'
 import { v4 } from 'uuid'
-import { usePrisma } from '@/lib/api/database'
-const prisma = usePrisma()
+import { getPrisma } from '@/lib/api/database'
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 let fileName = ''
 const upload = multer({

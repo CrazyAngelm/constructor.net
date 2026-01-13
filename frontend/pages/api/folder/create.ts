@@ -2,9 +2,9 @@ import { CreateCategoryDto, TaskCategoryDto } from '@/lib/dto/tasks'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { CreateFolderDto, FolderDto } from '@/lib/dto/worklist'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
 	id?: string

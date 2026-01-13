@@ -4,7 +4,6 @@ import { freeSubscribe, subscribe } from '@/lib/requests/subscription'
 import { useSession } from '@/lib/session/hooks'
 import { YooCheckoutWidget } from '@/lib/YooCheckoutWidget'
 import styles from '@/styles/pricing/CardTarif.module.scss'
-import Head from 'next/head'
 import Image from 'next/image'
 import Script from 'next/script'
 import { useState } from 'react'
@@ -28,10 +27,10 @@ const CardTarif = ({ license, img }: Props) => {
 
 	const onSubmit = async () => {
 		setVisible(false)
-		if (session == null || session == 'loading') return
+		if (session === null || session === undefined || session === 'loading') return
 
 		try {
-			if (license.price == 0) {
+			if (license.price === 0) {
 				const res = await makeFetcher(freeSubscribe)({
 					userId: session.user?.id,
 					licenseId: license.id,
@@ -50,7 +49,7 @@ const CardTarif = ({ license, img }: Props) => {
 			}
 		} catch (err) {
 			if (err instanceof ApiError) {
-				if (err.status == 412) setError('Вы уже имеете активную подписку, чтобы оформить новую отмените текущую в личном кабинете')
+				if (err.status === 412) setError('Вы уже имеете активную подписку, чтобы оформить новую отмените текущую в личном кабинете')
 				else setError(err.message)
 			}
 			console.log('error', err)
@@ -64,7 +63,7 @@ const CardTarif = ({ license, img }: Props) => {
 	return (
 		<article className={styles.cardTarifs}>
 			<Modal closeCallback={() => setError(undefined)}
-				visible={error != undefined}>
+				visible={error !== undefined}>
 				<section className={styles.error}>
 					<header>Ошибка!</header>
 					<div>{error}</div>
@@ -73,9 +72,7 @@ const CardTarif = ({ license, img }: Props) => {
 			{visible && <Order okCallback={onSubmit}
 				closeCallback={() => setVisible(false)}
 				license={license} />}
-			<Head>
-				<script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js"></script>
-			</Head>
+			<Script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js" strategy="afterInteractive" />
 			<div id="payment-form"></div>
 			<header>
 				{img && <img src={img}></img>}
@@ -84,7 +81,7 @@ const CardTarif = ({ license, img }: Props) => {
 				<h3>{license.name}</h3>
 				<p className={styles.description}>
 					{license.description?.split('-')
-						.map(p => p != '' && <div className={styles.block}>
+						.map(p => p !== '' && <div className={styles.block}>
 							<div>
 								<Image src={ok} objectFit="contain" layout="fill" />
 							</div>
@@ -94,7 +91,7 @@ const CardTarif = ({ license, img }: Props) => {
 						</div>)}
 				</p>
 				<p className={styles.price}>{license?.price}₽ / {license.duration} д.</p>
-				{!session || session == 'loading'
+				{!session || session === 'loading'
 					? <Auth button={<button className={styles.btn}>
 						Купить
 					</button>} />
@@ -107,3 +104,5 @@ const CardTarif = ({ license, img }: Props) => {
 }
 
 export default CardTarif
+
+

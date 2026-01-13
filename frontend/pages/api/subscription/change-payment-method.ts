@@ -1,10 +1,10 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { ChangePaymentMethodReq, ChangePaymentMethodRes } from '@/lib/dto/subscription'
 import { checkout, ICreatePayment } from '@/lib/yookassa/checkout'
 import { Prisma } from '@prisma/client'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.post(
 	response(async (req) => {

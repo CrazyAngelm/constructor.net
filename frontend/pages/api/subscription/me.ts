@@ -1,9 +1,9 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { responseAuth } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { ScopeEnum } from '@/lib/dto/users'
 import { License, Subscription } from '@prisma/client'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.get(responseAuth(async (req, res, userId) => {
 	const user = await prisma.user.findUnique({

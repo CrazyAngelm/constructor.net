@@ -39,7 +39,7 @@ const Navbar = () => {
 				</section>
 
 				<section className={styles.end}>
-					{!(session && session != 'loading')
+					{!(session && session !== 'loading')
 						? <div>
 							<div className={styles.buttons}>
 								<Auth button={

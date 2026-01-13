@@ -9,7 +9,7 @@ export interface Response<T> {
 	setData: Dispatch<SetStateAction<T | undefined>>
 }
 
-const compare = (key1:any, key2:any) : boolean => {
+const compare = (key1: unknown, key2: unknown): boolean => {
 	return JSON.stringify(key1) === JSON.stringify(key2)
 }
 

@@ -74,7 +74,7 @@ export const createManual = async (
 export const removeManual = async (
 	id: number,
 	{ apiUrl }: RequestContext = defaultRequestContext,
-): Promise<{}> => {
+): Promise<Record<string, unknown>> => {
 	const res = await fetch(apiUrl + `/manuals/${encodeURIComponent(id)}`, {
 		method: 'PUT',
 	})

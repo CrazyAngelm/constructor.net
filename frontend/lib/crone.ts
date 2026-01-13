@@ -2,9 +2,9 @@ import { ICreatePayment, YooCheckout } from '@a2seven/yoo-checkout'
 import { License, Subscription } from '@prisma/client'
 import { CronJob } from 'cron'
 import { v4 } from 'uuid'
-import { usePrisma } from './api/database'
+import { getPrisma } from './api/database'
 
-const prisma = usePrisma()
+const prisma = getPrisma()
 
 const payment = async (license: License, userId: string, paymentId: string) => {
 	const checkout = new YooCheckout({
@@ -62,6 +62,7 @@ const CheckSubscribtion = async () => {
 }
 
 export default class CroneClass {
+	// eslint-disable-next-line @typescript-eslint/no-empty-function -- placeholder entrypoint
 	static Check() {
 	}
 }

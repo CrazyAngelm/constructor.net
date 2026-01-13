@@ -1,10 +1,10 @@
 import { compare } from 'bcryptjs'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { FromBase64 } from '../Base64'
-import { usePrisma } from './database'
+import { getPrisma } from './database'
 import { ScopeEnum } from '../dto/users'
 
-const prisma = usePrisma()
+const prisma = getPrisma()
 
 export interface Error {
 	code: number
@@ -122,7 +122,7 @@ export const responseAdmin = <T>(getResponse: (req: NextApiRequest, res: NextApi
 				return
 			}
 			userId = user.id
-			if (user?.scopes.find(p => p.scope.value != ScopeEnum.admin)) {
+			if (user?.scopes.find(p => p.scope.value !== ScopeEnum.admin)) {
 				res.status(403).end('Недостаточно прав пользователя')
 				return
 			}

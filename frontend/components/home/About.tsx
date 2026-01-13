@@ -1,5 +1,6 @@
 import styles from '@/styles/home/About.module.scss'
 import image1 from '@/assets/home/about/happy-kids.png'
+/* eslint-disable no-irregular-whitespace -- legacy localized copy */
 import Image from 'next/image'
 
 const About = () => {

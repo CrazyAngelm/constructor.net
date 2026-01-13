@@ -21,7 +21,7 @@ const Item = ({ category, selectCallback, isCourse }: PropsItem) => {
 		? getTaskCategoriesByIdCourse
 		: getTaskCategoriesByIdCategory)
 
-	const isOpen = (): boolean => data != null && data.length != 0
+	const isOpen = (): boolean => data !== null && data !== undefined && data.length !== 0
 
 	return (
 		<div className={styles.item}>

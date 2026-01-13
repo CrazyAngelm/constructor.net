@@ -3,9 +3,9 @@ import { CreateCategoryDto, TaskCategoryDto } from '@/lib/dto/tasks'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { CreateManual, Manual } from '@/lib/dto/manuals'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
 	const data = req.body as CreateManual

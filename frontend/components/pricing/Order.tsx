@@ -1,6 +1,7 @@
 import styles from '@/styles/auth/Auth.module.scss'
 import close from '@/assets/close.svg'
 import Image from 'next/image'
+import Link from 'next/link'
 import { LicenseDto } from '@/lib/dto/subscription'
 
 export interface Props {
@@ -23,8 +24,8 @@ const Order = ({ closeCallback, okCallback, license }: Props) => {
 						<header>Оформление подписки</header>
 						<div>
 							Вы собираетесь оформить подписку на тариф
-							"{license?.name}" <br />
-							Оформляя подписку вы соглашаетесь с <a href="/license" target={'_blank'}>лицензионным соглашением</a>
+							&quot;{license?.name}&quot; <br />
+							Оформляя подписку вы соглашаетесь с <Link href="/license" target={'_blank'}>лицензионным соглашением</Link>
 							<br />
 							Подписку можно будет отключить в личном кабинете в любой момент
 						</div>
@@ -38,3 +39,5 @@ const Order = ({ closeCallback, okCallback, license }: Props) => {
 	)
 }
 export default Order
+
+

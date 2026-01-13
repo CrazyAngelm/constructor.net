@@ -1,10 +1,10 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { usePrisma } from '@/lib/api/database'
+import { getPrisma } from '@/lib/api/database'
 import { encodeBase64, hash } from 'bcryptjs'
 import { getRegistrationHtml } from '@/lib/mailer/registration'
 import { optionsWithFrom, sendMail } from '@/lib/mailer/mailer'
-const prisma = usePrisma()
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
 	const { email, password } = req.body
