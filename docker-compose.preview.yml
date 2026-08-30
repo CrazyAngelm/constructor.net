@@ -1,0 +1,67 @@
+name: labstudio-preview
+
+services:
+  app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.preview
+    env_file:
+      - ${PREVIEW_ENV_FILE:?Set PREVIEW_ENV_FILE to the untracked preview environment file}
+    environment:
+      DATABASE_URL: mysql://${PREVIEW_DB_USER:?Set PREVIEW_DB_USER}:${PREVIEW_DB_PASSWORD:?Set PREVIEW_DB_PASSWORD}@db:3306/${PREVIEW_DB_NAME:?Set PREVIEW_DB_NAME}
+      PREVIEW_DB_HOST: ${PREVIEW_DB_HOST:?Set PREVIEW_DB_HOST}
+      PREVIEW_DB_NAME: ${PREVIEW_DB_NAME:?Set PREVIEW_DB_NAME}
+      PREVIEW_DEPLOYMENT_MODE: ${PREVIEW_DEPLOYMENT_MODE:?Set PREVIEW_DEPLOYMENT_MODE}
+      PREVIEW_RESTRICT_EXTERNAL_FLOWS: ${PREVIEW_RESTRICT_EXTERNAL_FLOWS:?Set PREVIEW_RESTRICT_EXTERNAL_FLOWS}
+      BILLING_CRON_ENABLED: "false"
+      YOOCHECKOUT_SHOP_ID: ""
+      YOOCHECKOUT_KEY: ""
+      YOOCHECKOUT_REDIRECT_URL: ""
+      NEXTAUTH_URL: ${PREVIEW_NEXTAUTH_URL:?Set PREVIEW_NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${PREVIEW_NEXTAUTH_SECRET:?Set PREVIEW_NEXTAUTH_SECRET}
+      UPLOAD_IMAGE_TASK: /app/frontend/public/uploads/task
+      DOWNLOAD_IMAGE_TASK: /uploads/task
+      CATALOG_SNAPSHOT_DIR: /preview/catalog
+      CATALOG_UPLOADS_DIR: /preview/catalog/uploads/task
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 127.0.0.1:${PREVIEW_APP_PORT:?Set PREVIEW_APP_PORT}:3000
+    volumes:
+      - labstudio_preview_uploads:/app/frontend/public/uploads
+      - ${PREVIEW_CATALOG_SNAPSHOT_DIR:?Set PREVIEW_CATALOG_SNAPSHOT_DIR}:/preview/catalog:ro
+    networks:
+      - preview
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${PREVIEW_DB_NAME:?Set PREVIEW_DB_NAME}
+      MYSQL_USER: ${PREVIEW_DB_USER:?Set PREVIEW_DB_USER}
+      MYSQL_PASSWORD: ${PREVIEW_DB_PASSWORD:?Set PREVIEW_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${PREVIEW_DB_ROOT_PASSWORD:?Set PREVIEW_DB_ROOT_PASSWORD}
+    ports:
+      - 127.0.0.1:${PREVIEW_DB_PORT:?Set PREVIEW_DB_PORT}:3306
+    volumes:
+      - labstudio_preview_mysql_data:/var/lib/mysql
+    networks:
+      - preview
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+networks:
+  preview:
+    name: labstudio_preview_network
+
+volumes:
+  labstudio_preview_mysql_data:
+    name: labstudio_preview_mysql_data
+  labstudio_preview_uploads:
+    name: labstudio_preview_uploads
