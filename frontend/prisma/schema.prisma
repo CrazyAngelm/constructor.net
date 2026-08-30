@@ -1,267 +1,293 @@
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? @db.Text
-    access_token      String? @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? @db.Text
-    session_state     String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id            String         @id @default(cuid())
-    name          String?
-    email         String?        @unique
-    password      String?
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    scopes        ScopeJoin[]
-    Subcription   Subscription[]
-    Payment       Payment[]
+  id              String           @id @default(cuid())
+  name            String?
+  email           String?          @unique
+  password        String?
+  emailVerified   DateTime?
+  image           String?
+  accounts        Account[]
+  sessions        Session[]
+  scopes          ScopeJoin[]
+  Subcription     Subscription[]
+  Payment         Payment[]
+  studioWorklists StudioWorklist[]
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
 }
 
 model Scope {
-    id         Int         @id @default(autoincrement())
-    value      String      @unique
-    scopeJoins ScopeJoin[]
+  id         Int         @id @default(autoincrement())
+  value      String      @unique
+  scopeJoins ScopeJoin[]
 }
 
 model ScopeJoin {
-    id      Int    @id @default(autoincrement())
-    userId  String
-    scopeId Int
-    scope   Scope  @relation(fields: [scopeId], references: [id], onDelete: Cascade)
-    user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      Int    @id @default(autoincrement())
+  userId  String
+  scopeId Int
+  scope   Scope  @relation(fields: [scopeId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 //Tasks
 
 model Course {
-    id               Int                @id @default(autoincrement())
-    name             String
-    description      String             @db.LongText
-    date             DateTime?
-    deleted          Boolean            @default(false)
-    taskCategories   TaskCategory[]
-    CourseToCategory CourseToCategory[]
-    CourseToWorklist CourseToWorklist[]
-    FolderToCourse   FolderToCourse[]
+  id               Int                @id @default(autoincrement())
+  name             String
+  description      String             @db.LongText
+  date             DateTime?
+  deleted          Boolean            @default(false)
+  visible          Boolean            @default(true)
+  taskCategories   TaskCategory[]
+  CourseToCategory CourseToCategory[]
+  CourseToWorklist CourseToWorklist[]
+  FolderToCourse   FolderToCourse[]
+  studioWorklists  StudioWorklist[]
 }
 
 model TaskCategory {
-    id               Int                  @id @default(autoincrement())
-    name             String
-    description      String               @db.LongText
-    date             DateTime?
-    deleted          Boolean              @default(false)
-    tasks            Task[]
-    Course           Course[]
-    CourseToCategory CourseToCategory[]
-    CategoryToTask   CategoryToTask[]
-    CategoryChildren CategoryToCategory[] @relation(name: "children")
-    CategoryParent   CategoryToCategory[] @relation(name: "parent")
+  id               Int                  @id @default(autoincrement())
+  name             String
+  description      String               @db.LongText
+  date             DateTime?
+  deleted          Boolean              @default(false)
+  tasks            Task[]
+  Course           Course[]
+  CourseToCategory CourseToCategory[]
+  CategoryToTask   CategoryToTask[]
+  CategoryChildren CategoryToCategory[] @relation(name: "children")
+  CategoryParent   CategoryToCategory[] @relation(name: "parent")
 }
 
 model CourseToCategory {
-    categoryId Int
-    courseId   Int
-    category   TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-    course     Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  categoryId Int
+  courseId   Int
+  category   TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  course     Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-    @@id([courseId, categoryId])
+  @@id([courseId, categoryId])
 }
 
 model Task {
-    id             Int              @id @default(autoincrement())
-    name           String
-    description    String           @db.LongText
-    instruction    String           @db.LongText
-    image          String
-    complexity     Int              @default(1)
-    date           DateTime?
-    deleted        Boolean          @default(false)
-    TaskCategory   TaskCategory[]
-    CategoryToTask CategoryToTask[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  description    String           @db.LongText
+  instruction    String           @db.LongText
+  image          String
+  complexity     Int              @default(1)
+  date           DateTime?
+  deleted        Boolean          @default(false)
+  TaskCategory   TaskCategory[]
+  CategoryToTask CategoryToTask[]
 }
 
 model CategoryToTask {
-    taskId     Int
-    categoryId Int
-    task       Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
-    category   TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  taskId     Int
+  categoryId Int
+  task       Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  category   TaskCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-    @@id([taskId, categoryId])
+  @@id([taskId, categoryId])
 }
 
 model CategoryToCategory {
-    parentId   Int
-    childrenId Int
-    parent     TaskCategory @relation(name: "parent", fields: [parentId], references: [id], onDelete: Cascade)
-    children   TaskCategory @relation(name: "children", fields: [childrenId], references: [id], onDelete: Cascade)
+  parentId   Int
+  childrenId Int
+  parent     TaskCategory @relation(name: "parent", fields: [parentId], references: [id], onDelete: Cascade)
+  children   TaskCategory @relation(name: "children", fields: [childrenId], references: [id], onDelete: Cascade)
 
-    @@id([parentId, childrenId])
+  @@id([parentId, childrenId])
 }
 
 model Manual {
-    id       Int              @id @default(autoincrement())
-    name     String
-    html     String           @db.LongText
-    date     DateTime?
-    deleted  Boolean          @default(false)
-    Parent   ManualToManula[] @relation(name: "manualchildren")
-    Children ManualToManula[] @relation(name: "manualParent")
+  id       Int              @id @default(autoincrement())
+  name     String
+  html     String           @db.LongText
+  date     DateTime?
+  deleted  Boolean          @default(false)
+  Parent   ManualToManula[] @relation(name: "manualchildren")
+  Children ManualToManula[] @relation(name: "manualParent")
 }
 
 model ManualToManula {
-    parentId   Int
-    childrenId Int
+  parentId   Int
+  childrenId Int
 
-    parent   Manual @relation(name: "manualParent", fields: [parentId], references: [id], onDelete: Cascade)
-    children Manual @relation(name: "manualchildren", fields: [childrenId], references: [id], onDelete: Cascade)
+  parent   Manual @relation(name: "manualParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children Manual @relation(name: "manualchildren", fields: [childrenId], references: [id], onDelete: Cascade)
 
-    @@id([parentId, childrenId])
+  @@id([parentId, childrenId])
 }
 
 model Version {
-    id      String @id @default(uuid())
-    name    String
-    type    String
-    notes   String
-    archive String
+  id      String @id @default(uuid())
+  name    String
+  type    String
+  notes   String
+  archive String
 }
 
 model License {
-    id          Int            @id @default(autoincrement())
-    name        String
-    description String?        @db.MediumText
-    price       Int            @default(0)
-    duration    Int
-    freeCourses Int
-    courses     String?        @db.LongText
-    Subcription Subscription[]
+  id          Int            @id @default(autoincrement())
+  name        String
+  description String?        @db.MediumText
+  price       Int            @default(0)
+  duration    Int
+  freeCourses Int
+  courses     String?        @db.LongText
+  Subcription Subscription[]
 }
 
 model Subscription {
-    id            String    @id @default(uuid())
-    userId        String
-    licenseId     Int
-    startDate     DateTime  @default(now())
-    endDate       DateTime?
-    active        Boolean   @default(true)
-    lastPaymentId String?
-    canceled      Boolean   @default(false)
-    paymentToken  String?
-    paymentTitle  String?
-    courses       String?
+  id            String    @id @default(uuid())
+  userId        String
+  licenseId     Int
+  startDate     DateTime  @default(now())
+  endDate       DateTime?
+  active        Boolean   @default(true)
+  lastPaymentId String?
+  canceled      Boolean   @default(false)
+  paymentToken  String?
+  paymentTitle  String?
+  courses       String?
 
-    user        User     @relation(fields: [userId], references: [id])
-    license     License  @relation(fields: [licenseId], references: [id])
-    lastPayment Payment? @relation(fields: [lastPaymentId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  license     License  @relation(fields: [licenseId], references: [id])
+  lastPayment Payment? @relation(fields: [lastPaymentId], references: [id])
 }
 
 model Payment {
-    id        String   @id @default(uuid())
-    amount    Int
-    userId    String
-    licenseId Int
-    createdAt DateTime @default(now())
-    confirmed Boolean  @default(false)
+  id        String   @id @default(uuid())
+  amount    Int
+  userId    String
+  licenseId Int
+  createdAt DateTime @default(now())
+  confirmed Boolean  @default(false)
 
-    user        User           @relation(fields: [userId], references: [id])
-    Subcription Subscription[]
+  user        User           @relation(fields: [userId], references: [id])
+  Subcription Subscription[]
 }
 
 model Worklist {
-    id   String    @id @default(uuid())
-    name String?
-    json String?   @db.LongText
-    date DateTime?
+  id   String    @id @default(uuid())
+  name String?
+  json String?   @db.LongText
+  date DateTime?
 
-    CourseToWorklist CourseToWorklist[]
-    FolderToWorklist FolderToWorklist[]
+  CourseToWorklist CourseToWorklist[]
+  FolderToWorklist FolderToWorklist[]
 }
 
 model Folder {
-    id      String   @id @default(uuid())
-    name    String
-    date    DateTime
-    deleted Boolean
+  id      String   @id @default(uuid())
+  name    String
+  date    DateTime
+  deleted Boolean
+  visible Boolean  @default(true)
 
-    FolderToCourse   FolderToCourse[]
-    FolderToWorklist FolderToWorklist[]
-    FolderChildren   FolderToFolder[]   @relation(name: "childrenFolder")
-    FolderParent     FolderToFolder[]   @relation(name: "parentFolder")
+  FolderToCourse   FolderToCourse[]
+  FolderToWorklist FolderToWorklist[]
+  FolderChildren   FolderToFolder[]   @relation(name: "childrenFolder")
+  FolderParent     FolderToFolder[]   @relation(name: "parentFolder")
+  studioWorklists  StudioWorklist[]
 }
 
 model FolderToCourse {
-    folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-    course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-    folderId String
-    courseId Int
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  folderId String
+  courseId Int
 
-    @@id([folderId, courseId])
+  @@id([folderId, courseId])
 }
 
 model FolderToFolder {
-    parentId   String
-    childrenId String
-    parent     Folder @relation(name: "parentFolder", fields: [parentId], references: [id], onDelete: Cascade)
-    children   Folder @relation(name: "childrenFolder", fields: [childrenId], references: [id], onDelete: Cascade)
+  parentId   String
+  childrenId String
+  parent     Folder @relation(name: "parentFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  children   Folder @relation(name: "childrenFolder", fields: [childrenId], references: [id], onDelete: Cascade)
 
-    @@id([parentId, childrenId])
+  @@id([parentId, childrenId])
 }
 
 model FolderToWorklist {
-    worklist   Worklist @relation(fields: [worklistId], references: [id], onDelete: Cascade)
-    Folder     Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
-    worklistId String
-    folderId   String
+  worklist   Worklist @relation(fields: [worklistId], references: [id], onDelete: Cascade)
+  Folder     Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  worklistId String
+  folderId   String
 
-    @@id([worklistId, folderId])
+  @@id([worklistId, folderId])
 }
 
 model CourseToWorklist {
-    courseId   Int
-    worklistId String
+  courseId   Int
+  worklistId String
 
-    worklist Worklist @relation(fields: [worklistId], references: [id], onDelete: Cascade)
-    course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  worklist Worklist @relation(fields: [worklistId], references: [id], onDelete: Cascade)
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-    @@id([courseId, worklistId])
+  @@id([courseId, worklistId])
+}
+
+model StudioWorklist {
+  id           String   @id @default(uuid())
+  ownerId      String
+  courseId     Int?
+  folderId     String?
+  name         String
+  teacherSheet String   @db.LongText
+  studentSheet String   @db.LongText
+  position     Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  owner  User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  folder Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId, position])
+  @@index([courseId])
+  @@index([folderId])
 }

@@ -26,6 +26,9 @@ const Adm: NextPage = () => {
 				label: 'Курсы',
 				callback: () => setType(TypeContent.HierarchyContent),
 			}, {
+				label: 'Видимость каталога',
+				callback: () => setType(TypeContent.Visibility),
+			}, {
 				label: 'Методички',
 				callback: () => setType(TypeContent.Manual),
 			} ],

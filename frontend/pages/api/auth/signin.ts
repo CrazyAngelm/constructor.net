@@ -1,15 +1,13 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
 import { getPrisma } from '@/lib/api/database'
-import { encodeBase64, hash } from 'bcryptjs'
 import { compare } from 'bcryptjs'
-import { getRegistrationHtml } from '@/lib/mailer/registration'
-import { optionsWithFrom, sendMail } from '@/lib/mailer/mailer'
+import { isEmail, isNonEmptyString, isObject } from '@/lib/auth/verificationTokens'
 const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
-	const { email, password } = req.body
-	if (!email || !password) return { error: { code: 422, message: 'email or password not found'+JSON.stringify(req.body) } }
+	const { email, password } = isObject(req.body) ? req.body : {}
+	if (!isEmail(email) || !isNonEmptyString(password)) return { error: { code: 422, message: 'Invalid credentials' } }
 	const user = await prisma.user.findUnique({
 		where: {
 			email,

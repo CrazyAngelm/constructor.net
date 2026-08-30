@@ -1,76 +1,86 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { checkout } from '@/lib/yookassa/checkout'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
-import { Payment } from '@a2seven/yoo-checkout'
-const prisma = new PrismaClient()
+import { Payment } from '@/lib/yookassa/checkout'
+import { getPrisma } from '@/lib/api/database'
+import { previewExternalFlowError, previewExternalFlowsRestricted } from '@/lib/preview'
+const prisma = getPrisma()
 const handler = getDefaultHandler()
 const addMonth = (d: Date) => new Date(d.setMonth(d.getMonth() + 1))
 interface NotificationPayment {
 	type: string;
 	event: string;
-	object: Payment;
+	object: { id?: string };
 }
 handler.post(
-	response(async (req, res) => {
+	response(async (req) => {
+		if (previewExternalFlowsRestricted()) return { error: previewExternalFlowError }
 		const n = req.body as NotificationPayment
-		if (!n.event.startsWith('payment')) return {}
-		const p = n.object
-		await new Promise(resolve => setTimeout(resolve, 1000))
+		if (!n?.event?.startsWith('payment') || !n.object?.id) {
+			return { error: { code: 400, message: 'Invalid payment notification' } }
+		}
+		const p = await checkout.getPayment(n.object.id)
 		const dbPay = await prisma.payment.findUnique({ where: { id: p.id } })
-		if (!dbPay) console.warn('YooKassa payment not found', p.id)
-		if (!dbPay || dbPay.confirmed) return {}
-		await prisma.payment.update({
-			where: { id: dbPay.id },
-			data: { confirmed: true },
-		})
+		if (!dbPay) return { error: { code: 404, message: 'Payment not found' } }
+		if (dbPay.confirmed) return { response: {} }
+		if (p.amount.currency !== 'RUB' || Number(p.amount.value) !== dbPay.amount) {
+			return { error: { code: 400, message: 'Payment amount mismatch' } }
+		}
 		const isBindCard = p.amount.value === '1.00'
-		try {
-			await prisma.$transaction(async (tx) => {
-				switch (p.status) {
-				case 'waiting_for_capture':
-					await checkout.capturePayment(p.id)
-					return
-				case 'succeeded':
-					if (isBindCard) {
-						await tx.subscription.updateMany({
-							where: { userId: dbPay.userId, canceled: false },
-							data: {
-								paymentToken: p.payment_method.id,
-								paymentTitle: p.payment_method.title,
-							},
-						})
-					} else {
-						await handleSucceeded(tx, dbPay, p)
-					}
-					return
-				case 'canceled':
+		if (p.status === 'waiting_for_capture') {
+			await checkout.capturePayment(p.id)
+			return { response: {} }
+		}
+		if (p.status !== 'succeeded' && p.status !== 'canceled') return { response: {} }
+
+		await prisma.$transaction(async (tx) => {
+			await tx.$queryRaw(Prisma.sql`SELECT id FROM Payment WHERE id = ${dbPay.id} FOR UPDATE`)
+			const lockedPayment = await tx.payment.findUnique({ where: { id: dbPay.id } })
+			if (!lockedPayment || lockedPayment.confirmed) return
+
+			if (p.status === 'succeeded') {
+				if (!p.payment_method?.id) throw new Error('YooKassa payment method is missing')
+				if (isBindCard) {
 					await tx.subscription.updateMany({
-						where: {
-							userId: dbPay.userId,
-							licenseId: dbPay.licenseId,
-							canceled: false,
+						where: { userId: lockedPayment.userId, canceled: false },
+						data: {
+							paymentToken: p.payment_method.id,
+							paymentTitle: p.payment_method.title,
 						},
-						data: { active: false },
 					})
-					return
+				} else {
+					await handleSucceeded(tx, lockedPayment, p)
 				}
-				return
+			} else {
+				await tx.subscription.updateMany({
+					where: {
+						userId: lockedPayment.userId,
+						licenseId: lockedPayment.licenseId,
+						canceled: false,
+					},
+					data: { active: false },
+				})
+			}
+
+			await tx.payment.update({
+				where: { id: lockedPayment.id },
+				data: { confirmed: true },
 			})
-		// eslint-disable-next-line no-empty -- webhook should not throw
-		} catch (err) {}
-		return {}
+		})
+		return { response: {} }
 	})
 )
 async function handleSucceeded(
 	tx: Prisma.TransactionClient,
 	pay: { userId: string; licenseId: number; id: string },
-	p: NotificationPayment['object']
+	p: Payment
 ) {
 	let sub = await tx.subscription.findFirst({
 		where: { userId: pay.userId, licenseId: pay.licenseId, canceled: false },
 	})
 	if (!sub) {
+		if (!p.payment_method?.id) throw new Error('YooKassa payment method is missing')
 		sub = await tx.subscription.create({
 			data: {
 				userId: pay.userId,

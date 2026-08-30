@@ -20,7 +20,36 @@
 		}
 	}
 
-	.quillEditor{
-		height: 60vh;
+	.manualEditorLabel {
+		display: grid;
+		gap: .5rem;
+		margin-top: 1rem;
+		font-weight: 600;
+	}
+
+	.manualHtmlEditor {
+		width: 100%;
+		min-height: 18rem;
+		resize: vertical;
+		padding: .9rem;
+		border: 1px solid #c8c8c8;
+		border-radius: .4rem;
+		font: 400 .9rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+	}
+
+	.manualPreview {
+		margin-top: 1rem;
+		padding: 1.25rem;
+		border: 1px solid #e1e1e1;
+		border-radius: .4rem;
+		background: #fff;
+		line-height: 1.6;
+		word-break: break-word;
+
+		img,
+		video {
+			max-width: 100%;
+			height: auto;
+		}
 	}
 }

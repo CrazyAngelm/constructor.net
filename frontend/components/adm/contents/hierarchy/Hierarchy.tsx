@@ -81,20 +81,20 @@ const ItemCat = ({ id, parentId: parentId, name: _name, isCourse, updater, ...se
 				<div onClick={() => setOpen(p => !p)}>
 					{isOpen()
 						&& <div className={`${styles.arrow} ${open && styles.open}`}>
-							<Image src={arrow} />
+							<Image src={arrow} alt="" />
 						</div>}
 				</div>
 				<span onClick={onClick}>{name}</span>
 				<section className={styles.menu}>
 					<header>
-						<Image layout="fill" objectFit="contain" src={menu} />
+						<Image layout="fill" objectFit="contain" src={menu} alt="" />
 					</header>
 					<section>
 						<div onClick={create} className={styles.icon}>
-							<Image layout="fill" objectFit="contain" src={addFolder} />
+							<Image layout="fill" objectFit="contain" src={addFolder} alt="" />
 						</div>
 						<div onClick={() => setModalDelete(true)} className={styles.icon}>
-							<Image layout="fill" objectFit="contain" src={trash} />
+							<Image layout="fill" objectFit="contain" src={trash} alt="" />
 						</div>
 					</section>
 				</section>

@@ -10,7 +10,7 @@ const SubscribeSucessful: NextPage = () => {
 		<Layout navbar={false} footer={false}>
 			<article className={styles.index}>
 				<div className={styles.image}>
-					<Image src={sucessful} objectFit="contain"
+					<Image src={sucessful} alt="" objectFit="contain"
 						layout="fill" />
 				</div>
 				<section>Подписка совершена успешно!<br />

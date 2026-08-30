@@ -4,7 +4,6 @@ import { createManual, getManualById, getManuals, removeManual, updateManual } f
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import styles from '@/styles/adm/Content.module.scss'
-import 'react-quill/dist/quill.snow.css'
 import { WarningDelete } from '../EditorTemplate'
 import Image from 'next/image'
 import arrow from '@/assets/back.svg'
@@ -73,7 +72,7 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 				<div onClick={() => setOpen(p => !p)}>
 					{isOpen()
 						&& <div className={`${styles.arrow} ${open && styles.open}`}>
-							<Image src={arrow} />
+							<Image src={arrow} alt="" />
 						</div>}
 				</div>
 				{id !== -1
@@ -82,14 +81,14 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 				}
 				<section className={styles.menu}>
 					<header>
-						<Image layout="fill" objectFit="contain" src={menu} />
+						<Image layout="fill" objectFit="contain" src={menu} alt="" />
 					</header>
 					<section>
 						<div onClick={clickCreate} className={styles.icon}>
-							<Image layout="fill" objectFit="contain" src={addFile} />
+							<Image layout="fill" objectFit="contain" src={addFile} alt="" />
 						</div>
 						{id !== -1 && <div onClick={() => setModalDelete(true)} className={styles.icon}>
-							<Image layout="fill" objectFit="contain" src={trash} />
+							<Image layout="fill" objectFit="contain" src={trash} alt="" />
 						</div>}
 					</section>
 				</section>

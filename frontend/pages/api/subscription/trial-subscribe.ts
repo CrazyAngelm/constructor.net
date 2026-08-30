@@ -1,22 +1,20 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response } from '@/lib/api/response'
+import { responseAuth } from '@/lib/api/response'
 import { getPrisma } from '@/lib/api/database'
-import { SubscribeReq } from '@/lib/dto/subscription'
 import { Prisma } from '@prisma/client'
+import { previewExternalFlowError, previewExternalFlowsRestricted } from '@/lib/preview'
 const prisma = getPrisma()
 const handler = getDefaultHandler()
 const addDays = (date: Date, days: number): Date => {
 	return new Date(date.setDate(date.getDate() + days))
 }
 handler.post(
-	response(async (req) => {
-		const body = JSON.parse(req.body) as SubscribeReq
-		if (!body.userId) return { error: { code: 400 } }
+	responseAuth(async (_req, _res, userId) => {
+		if (previewExternalFlowsRestricted()) return { error: previewExternalFlowError }
 		const result = await prisma
 			.$transaction(async (tx: Prisma.TransactionClient) => {
-				if (!body.userId) throw { code: 404, message: 'User not found' }
 				const existed = await tx.subscription.findFirst({
-					where: { userId: body.userId },
+					where: { userId },
 				})
 				if (existed)
 					throw { code: 409, message: 'Trial subscription already exists' }
@@ -24,11 +22,10 @@ handler.post(
 					where: { id: 1 },
 				})
 				if (!license) throw { code: 404, message: 'License not found' }
-				const trialDays = license.duration ?? 14
-				const end = addDays(new Date(), trialDays)
+				const end = addDays(new Date(), license.duration)
 				await tx.subscription.create({
 					data: {
-						userId: body.userId,
+						userId,
 						licenseId: 1,
 						active: true,
 						startDate: new Date(),

@@ -1,0 +1,25 @@
+.manualHtml {
+	max-width: 56rem;
+	padding: 1.5rem;
+	line-height: 1.65;
+	word-break: break-word;
+
+	h1,
+	h2,
+	h3 {
+		line-height: 1.2;
+	}
+
+	img,
+	video,
+	iframe {
+		max-width: 100%;
+		height: auto;
+	}
+
+	pre {
+		overflow-x: auto;
+		padding: 1rem;
+		background: #f4f4f4;
+	}
+}

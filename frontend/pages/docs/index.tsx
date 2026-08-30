@@ -27,7 +27,7 @@ const Item = ({ manual, selectCallback }: PropsItem) => {
 				<div onClick={() => setOpen(p => !p)}>
 					{isOpen()
 						&& <div className={`${styles.arrow} ${open && styles.open}`}>
-							<Image src={arrow} />
+							<Image src={arrow} alt="" />
 						</div>}
 				</div>
 				<span onClick={() => selectCallback(manual)}>

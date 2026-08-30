@@ -1,16 +1,19 @@
 import styles from '@/styles/auth/Auth.module.scss'
 import Image from 'next/image'
 import { ReactNode, useState } from 'react'
+import { useRouter } from 'next/router'
 import SignIn from './SignIn'
 import close from '@/assets/close.svg'
 import SignUp from './SignUp'
 
 export interface Props {
 	button?: ReactNode,
-	visible?: boolean
+	visible?: boolean,
+	redirectTo?: string
 }
 
-const Auth = ({ button, visible: _visible }: Props) => {
+const Auth = ({ button, visible: _visible, redirectTo }: Props) => {
+	const router = useRouter()
 	const [ visible, setVisible ] = useState(_visible)
 	const [ isRegistration, setRegistration ] = useState(false)
 	const [ regSucess, setRegSucess ] = useState(false)
@@ -19,10 +22,12 @@ const Auth = ({ button, visible: _visible }: Props) => {
 	const onSucess = () => {
 		setError(undefined)
 		setVisible(false)
+		if (redirectTo) void router.push(redirectTo)
 	}
 
 	const onRegSucess = () => {
-		onSucess()
+		setError(undefined)
+		setVisible(false)
 		setRegSucess(true)
 	}
 
@@ -55,7 +60,7 @@ const Auth = ({ button, visible: _visible }: Props) => {
 					<section className={styles.body}>
 						<section className={styles.close}>
 							<div onClick={() => setVisible(false)}>
-								<Image src={close} layout="fill" objectFit="contain" />
+								<Image src={close} alt="" layout="fill" objectFit="contain" />
 							</div>
 						</section>
 						{isRegistration

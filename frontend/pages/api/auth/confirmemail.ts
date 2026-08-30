@@ -1,21 +1,18 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
 import { getPrisma } from '@/lib/api/database'
+import { consumeVerificationToken, isNonEmptyString, isObject } from '@/lib/auth/verificationTokens'
 const prisma = getPrisma()
 const handler = getDefaultHandler()
-interface Token{
-	id?:string,
-	email?:string,
-	pass?:string
-}
 handler.post(response(async (req, res) => {
-	const { token } = req.body
-	const userToken = JSON.parse(Buffer.from(token, 'base64').toString('binary')) as Token
-	if(!userToken || !userToken.id || !userToken.email) return {error:{code:422, message: 'Неверный токен'}}
+	const { token } = isObject(req.body) ? req.body : {}
+	if (!isNonEmptyString(token)) return { error: { code: 422, message: 'Неверный токен' } }
+	const userId = await consumeVerificationToken(prisma, 'confirm-email', token)
+	if (!userId) return { error: { code: 422, message: 'Неверный токен' } }
 	const user = await prisma.user.findUnique({where:{
-		id: userToken.id,
+		id: userId,
 	}})
-	if(!user || user.email !== userToken.email) return {error:{code:422, message: 'Пользователь с такими данными не найден, возможно ссылка сильно устарела'}}
+	if(!user) return {error:{code:422, message: 'Неверный токен'}}
 	if(user.emailVerified) return {response:{status: 'Пользователь уже подтвержден'}}
 	await prisma.user.update({
 		where:{

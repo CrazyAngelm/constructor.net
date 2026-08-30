@@ -3,12 +3,13 @@ import YandexProvider from 'next-auth/providers/yandex'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { Session } from '@/lib/session'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { PrismaClient } from '@prisma/client'
 import { getPrisma } from '@/lib/api/database'
 import { compare } from 'bcryptjs'
 import { UserDto } from '@/lib/dto/users'
 import { ConfirmEmailError } from '@/lib/api/error'
-const prisma = new PrismaClient()
+const prisma = getPrisma()
+const yandexClientId = process.env.YANDEX_CLIENT_ID
+const yandexClientSecret = process.env.YANDEX_CLIENT_SECRET
 export default NextAuth({
 	providers: [
 		CredentialsProvider({
@@ -18,22 +19,21 @@ export default NextAuth({
 				password: { label: 'Password', type: 'password' },
 			},
 			async authorize(credentials, req) {
-				if (!credentials) throw new Error('credentials is null')
-				const prisma  = getPrisma()
+				if (!credentials?.email || !credentials.password) throw new Error('Invalid credentials')
 				const user = await prisma.user.findUnique({
 					where:{email:credentials.email},
 				})
-				if (!user) throw new Error('No user found with the email')
+				if (!user) throw new Error('Invalid credentials')
 				const checkPassword = await compare(credentials.password, user.password ?? '')
-				if (!checkPassword) throw new Error('Ivalid password')
+				if (!checkPassword) throw new Error('Invalid credentials')
 				if (!user.emailVerified) throw ConfirmEmailError
 				return {id:user.id}
 			},
 		}),
-		YandexProvider({
-			clientId: '07c7c53baec648f7a76588fbea8d265a',
-			clientSecret: 'd07ed54a3f3b41efadd05ca7baa6f4c6',
-		}),
+		...(yandexClientId && yandexClientSecret ? [YandexProvider({
+			clientId: yandexClientId,
+			clientSecret: yandexClientSecret,
+		})] : []),
 	],
 	theme: {
 		colorScheme: 'light',

@@ -2,14 +2,12 @@ import '@/styles/globals.css'
 import 'bulma/bulma.sass'
 import type { AppProps } from 'next/app'
 import { SessionProvider } from 'next-auth/react'
-import Head from 'next/head'
+import Script from 'next/script'
 
 function MyApp({ Component, pageProps }: AppProps) {
 	return (
 		<>
-			<Head>
-				<script crossOrigin="anonymous" src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js" />
-			</Head>
+			<Script strategy="afterInteractive" src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js" />
 			<SessionProvider session={pageProps.session} refetchInterval={0}>
 				<Component {...pageProps} />
 			</SessionProvider>

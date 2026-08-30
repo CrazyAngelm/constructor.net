@@ -2,7 +2,7 @@ import { GetServerSidePropsContext } from 'next'
 import { getSession as getSessionReact, GetSessionParams } from 'next-auth/react'
 import { Session } from '.'
 
-const REDIRECT_UNAUTORIZE = '/'
+const REDIRECT_UNAUTORIZE = '/studio/auth'
 const REDIRECT_ACCES_DENIED = '/'
 
 export const getSession = async (params?: GetSessionParams | undefined)

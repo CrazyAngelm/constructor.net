@@ -17,12 +17,12 @@ const Comments = () => {
 			<section className={styles.buttons}>
 				<button >
 					<div className={styles.left}>
-						<Image src={arrow} objectFit="contain" layout="fill" />
+						<Image src={arrow} alt="" objectFit="contain" layout="fill" />
 					</div>
 				</button>
 				<button >
 					<div className={styles.right}>
-						<Image src={arrow} objectFit="contain" layout="fill" />
+						<Image src={arrow} alt="" objectFit="contain" layout="fill" />
 					</div>
 				</button>
 			</section>

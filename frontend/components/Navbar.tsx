@@ -21,7 +21,7 @@ const Navbar = () => {
 					<Link href={'/'}>
 						<section className={styles.about}>
 							<div>
-								<Image src={logo} layout="fill" objectFit="contain" />
+								<Image src={logo} alt="" layout="fill" objectFit="contain" />
 							</div>
 							{/* <span>Lab Studio</span> */}
 						</section>

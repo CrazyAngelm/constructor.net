@@ -1,63 +1,15 @@
-import { ComponentClass, FunctionComponent, useState, ComponentProps } from 'react'
+import { useState } from 'react'
 
 import { changeHanderDtoString } from '@/lib/changeHandler'
 import { useFetchData } from '@/lib/hooks/useFetchData'
 import { handleErrorTsx } from '@/lib/requests'
-import {
-	getTaskById, getTaskCategories, getTaskCategoryById, removeTask,
-	updateTask, uploadTaskImage,
-} from '@/lib/requests/tasks'
-
 import styles from '@/styles/adm/editors/Task.module.scss'
 
-import DropdownCheck from '@/components/controls/DropdownCheck'
 import Field from '@/components/controls/Fields'
-import TextArea from '@/components/controls/TextArea'
-import Upload from '@/components/controls/Upload'
 import EditorTemplate, { Notification } from '../EditorTemplate'
-import { makeFetcher } from '@/lib/fetchers'
 import { getManualById, removeManual, updateManual } from '@/lib/requests/manuals'
-import dynamic, { DynamicOptions } from 'next/dynamic'
-import 'react-quill/dist/quill.snow.css'
-import { ImageResize } from 'quill-image-resize-module-ts'
-import ReactQuill from 'react-quill'
-import { Quill } from 'react-quill'
-
-Quill.register('modules/imageResize', ImageResize)
-
-
-const modules = {
-	toolbar: [
-		[ { 'size': [ 'small', false, 'large', 'huge' ] },  // custom dropdown
-			{ 'header': [ 1, 2, 3, 4, 5, 6, false ] },
-			{ 'font': [] }, { 'align': [] } ],
-
-		[ 'bold', 'italic', 'underline', 'strike' ],        // toggled buttons
-		[ 'blockquote', 'code-block' ],
-
-		[ { 'list': 'ordered' }, { 'list': 'bullet' } ],
-		[ { 'script': 'sub' }, { 'script': 'super' } ],      // superscript/subscript
-		[ { 'indent': '-1' }, { 'indent': '+1' } ],          // outdent/indent
-		[ { 'direction': 'rtl' } ],                         // text direction
-
-		[ { 'color': [] }, { 'background': [] } ],          // dropdown with defaults from theme
-
-
-		[ 'video', 'image' ],
-	],
-	imageResize: {
-		modules: [ 'Resize', 'DisplaySize', 'Toolbar' ],
-		// See optional "config" below
-	},
-}
-
-const formats = [
-	'header',
-	'bold', 'italic', 'underline', 'strike', 'blockquote',
-	'list', 'bullet', 'indent',
-	'link', 'image',
-]
-//#endregion
+import dynamic from 'next/dynamic'
+import { sanitizeManualHtml } from '@/lib/manuals/sanitize'
 
 
 export interface Props {
@@ -69,9 +21,6 @@ export interface Props {
 const ManualEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 	const [ errorMsg, setError ] = useState<string | undefined>('')
 	const [ notification, setNotification ] = useState<Notification>()
-	const [ loaded, setLoaded ] = useState(false)
-	const [ html, setHtml ] = useState('')
-
 	const { data, update, setData, error } = useFetchData(id, getManualById)
 
 
@@ -104,9 +53,18 @@ const ManualEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 				<Field isHorizontal label="id" type="text" value={data.id.toString()} isReadonly />
 				<Field onChange={changeHanderDtoString('name', setData)}
 					isHorizontal label="Название" type="text" value={data.name} />
-				<ReactQuill className={styles.quillEditor}
-					modules={modules} theme="snow" value={data.html}
-					onChange={changeHanderDtoString('html', setData)} />
+				<label className={styles.manualEditorLabel}>
+					<span>Содержимое методички (HTML)</span>
+					<textarea
+						className={styles.manualHtmlEditor}
+						value={data.html ?? ''}
+						onChange={(event) => changeHanderDtoString('html', setData)(event.currentTarget.value)}
+						spellCheck={false}
+					/>
+				</label>
+				<section className={styles.manualPreview} aria-label="Предпросмотр методички">
+					<div dangerouslySetInnerHTML={{ __html: sanitizeManualHtml(data.html ?? '') }} />
+				</section>
 			</article>
 			: <article>Error: {error}</article>}
 	</EditorTemplate>

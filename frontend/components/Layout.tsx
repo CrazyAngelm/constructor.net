@@ -6,7 +6,6 @@ import styles from '@/styles/Layout.module.scss'
 import Navbar from './Navbar'
 import logo from '@/assets/logo.svg'
 import Image from 'next/image'
-import Script from 'next/script'
 import Auth from './auth/Auth'
 
 
@@ -34,7 +33,7 @@ const Layout = ({ children, title, navbar = true, footer = true }: Props) => {
 					<section className={styles.info}>
 						<header>
 							<div>
-								<Image src={logo} layout="fill" objectFit="contain" />
+								<Image src={logo} alt="" layout="fill" objectFit="contain" />
 							</div>
 							Lab Studio
 						</header>
