@@ -53,3 +53,6 @@
 		}
 	}
 }
+
+.editor .row { display:grid; grid-template-columns:1fr; gap:20px; }.editor .row > section { width:100%; min-width:0; }.editor .manualPreview { overflow-wrap:anywhere; }.editor .manualPreview table { display:block; max-width:100%; overflow:auto; }
+.editor .manualPreview { max-height:60dvh; overflow:auto; }.sourceEditor summary { cursor:pointer; color:var(--accent); font-size:13px; padding:12px 0; }.editor .row button { padding:9px 12px; margin:8px 0 16px; border:1px solid var(--line); border-radius:7px; color:var(--accent); background:white; cursor:pointer; font-size:12px; }

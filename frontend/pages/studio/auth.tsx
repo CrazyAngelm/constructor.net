@@ -7,14 +7,15 @@ import { useRouter } from 'next/router'
 import Layout from '@/components/Layout'
 import { useSession } from '@/lib/session/hooks'
 import styles from '@/styles/studioAuth.module.scss'
+import { previewExternalFlowsRestricted } from '@/lib/preview'
 
-const StudioAuthPage = () => {
+const StudioAuthPage = ({ preview }: { preview: boolean }) => {
 	const router = useRouter()
 	const session = useSession()
-	const [email, setEmail] = useState('')
-	const [password, setPassword] = useState('')
-	const [error, setError] = useState('')
-	const [submitting, setSubmitting] = useState(false)
+	const [ email, setEmail ] = useState('')
+	const [ password, setPassword ] = useState('')
+	const [ error, setError ] = useState('')
+	const [ submitting, setSubmitting ] = useState(false)
 
 	useEffect(() => {
 		if (session && session !== 'loading') void router.replace('/studio')
@@ -46,14 +47,14 @@ const StudioAuthPage = () => {
 			</Link>
 			<section className={styles.intro}>
 				<p>Веб-версия Lab Studio</p>
-				<h1>Продолжите работу с материалами в браузере.</h1>
+				<h1>Ваши материалы.<br />Теперь в браузере.</h1>
 				<span>Текущая версия приложения продолжает работать параллельно.</span>
 			</section>
 			<form className={styles.card} onSubmit={submit}>
 				<div>
 					<span className={styles.kicker}>Личный кабинет</span>
 					<h2>Войти</h2>
-					<p>Используйте существующую или выданную для просмотра учётную запись.</p>
+					<p>{preview ? 'Используйте выданную для просмотра учётную запись. Аккаунты основного приложения сюда не перенесены.' : 'Используйте email и пароль своей учётной записи.'}</p>
 				</div>
 				<label>Email<input type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
 				<label>Пароль<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
@@ -66,3 +67,4 @@ const StudioAuthPage = () => {
 }
 
 export default StudioAuthPage
+export const getServerSideProps = () => ({ props: { preview: previewExternalFlowsRestricted() } })

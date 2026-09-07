@@ -21,3 +21,5 @@
 		height: 50vh;
 	}
 }
+
+.editor,.editor.withList { grid-template-columns:1fr; height:auto; gap:24px; }.editor .list { height:auto; min-width:0; border:1px solid var(--line); box-shadow:none; padding:16px; }.editor .description { height:auto; min-height:120px; }

@@ -53,7 +53,7 @@ const ManualEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 				<Field isHorizontal label="id" type="text" value={data.id.toString()} isReadonly />
 				<Field onChange={changeHanderDtoString('name', setData)}
 					isHorizontal label="Название" type="text" value={data.name} />
-				<label className={styles.manualEditorLabel}>
+				<details className={styles.sourceEditor}><summary>Редактировать HTML</summary><label className={styles.manualEditorLabel}>
 					<span>Содержимое методички (HTML)</span>
 					<textarea
 						className={styles.manualHtmlEditor}
@@ -61,15 +61,13 @@ const ManualEditor = ({ id, callbackUpdate, callbackBack }: Props) => {
 						onChange={(event) => changeHanderDtoString('html', setData)(event.currentTarget.value)}
 						spellCheck={false}
 					/>
-				</label>
+				</label></details>
 				<section className={styles.manualPreview} aria-label="Предпросмотр методички">
 					<div dangerouslySetInnerHTML={{ __html: sanitizeManualHtml(data.html ?? '') }} />
 				</section>
 			</article>
-			: <article>Error: {error}</article>}
+			: <article>{error || 'Загружаем руководство…'}</article>}
 	</EditorTemplate>
 }
 
 export default dynamic(() => Promise.resolve(ManualEditor), { ssr: false })
-
-

@@ -36,7 +36,7 @@ const getContent = (type?: TypeContent): ReactNode => {
 
 const Content = ({ type }: Props) => {
 	return (
-		<article className={styles.content}>
+		<article className={styles.panel}>
 			{getContent(type)}
 		</article>
 	)

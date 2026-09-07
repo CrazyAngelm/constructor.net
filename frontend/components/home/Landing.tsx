@@ -80,7 +80,7 @@ const Landing = () => {
 		<section className={styles.hero} id="top">
 			<div className={styles.heroCopy}>
 				<p className={styles.eyebrow}>Lab Studio в браузере</p>
-				<h1>Конструктор учебных материалов, который остаётся в фокусе занятия.</h1>
+				<h1>Материалы к занятию — в одном месте.</h1>
 				<p className={styles.lead}>Собирайте листы педагога и ученика из каталога, сохраняйте их на сервере и возвращайтесь к ним в браузере.</p>
 				<div className={styles.heroActions}>
 					<Link className={styles.primaryButton} href="/studio/auth">Открыть веб-версию <ArrowRight size={19} weight="bold" aria-hidden="true" /></Link>
@@ -154,7 +154,7 @@ const Landing = () => {
 			{licenses && <div className={styles.priceGrid}>
 				{licenses.map((license) => <article key={license.id ?? license.name}>
 					<h3>{license.name}</h3>
-					{license.description && <p>{license.description}</p>}
+				{license.description && <p className={styles.priceDescription}>{license.description}</p>}
 					<strong>{typeof license.price === 'number' ? `${new Intl.NumberFormat('ru-RU').format(license.price)} ₽` : 'Стоимость уточняется'}</strong>
 					{license.duration && <span>на {license.duration} дн.</span>}
 					<Link href="/studio/auth">Открыть веб-версию <ArrowRight size={17} weight="bold" aria-hidden="true" /></Link>
@@ -185,7 +185,7 @@ const Landing = () => {
 		<footer className={styles.footer}>
 			<div className={styles.footerBrand}><Image className={styles.brandMark} src="/logo.png" width={34} height={34} alt="" /><strong>Lab Studio</strong></div>
 			<div><h2>Контакты</h2><a href="mailto:bestlaboratory@mail.ru">bestlaboratory@mail.ru</a><a href="tel:+79229800770">8-922-9800770</a><span>РФ, г. Киров</span></div>
-			<div><h2>Социальные сети</h2><a href="https://vk.com/studiolab">ВКонтакте</a></div>
+			<div><h2>Полезные ссылки</h2><Link href="/docs">Руководства</Link><Link href="/license">Лицензионное соглашение</Link><a href="https://vk.com/studiolab">ВКонтакте</a></div>
 			<div className={styles.legal}>Индивидуальный предприниматель Калашникова Виктория Владимировна<br />ОГРНИП 319435000027099<br />ИНН 434510331832</div>
 		</footer>
 	</main>

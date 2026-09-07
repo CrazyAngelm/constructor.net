@@ -1,103 +1,33 @@
-import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next'
-import { useState } from 'react'
-import { ParsedUrlQuery } from 'querystring'
-import Layout from '@/components/Layout'
-import TittlePanel from '@/components/home/TittlePanel'
-import About from '@/components/home/About'
-import FAQ from '@/components/home/FAQ'
-import Tarifs from '@/components/home/Tarifs'
-import stylesIndex from '@/styles/home/Index.module.scss'
-import styles from '@/styles/auth/Auth.module.scss'
-import Image from 'next/image'
-import close from '@/assets/close.svg'
-import { onChangeDto } from '@/lib/changeHandler'
-import { SignUpDto } from '@/lib/dto/users'
-import { makeFetcher } from '@/lib/fetchers'
+import { GetServerSideProps } from 'next'
+import { FormEvent, useState } from 'react'
+import StatusPage from '@/components/StatusPage'
 import { resetPassword } from '@/lib/requests/auth'
 import { ApiError } from '@/lib/requests'
-import Router from 'next/router'
+import { previewExternalFlowsRestricted } from '@/lib/preview'
+import styles from '@/styles/pages.module.scss'
 
-interface Props {
-	token: string
+export default function ResetPassword({ token, preview }: { token: string; preview: boolean }) {
+ const [ password, setPassword ] = useState('')
+ const [ confirmation, setConfirmation ] = useState('')
+ const [ error, setError ] = useState('')
+ const [ busy, setBusy ] = useState(false)
+ const [ done, setDone ] = useState(false)
+ async function submit(event: FormEvent) {
+  event.preventDefault()
+  if (password !== confirmation) { setError('Пароли не совпадают. Проверьте оба поля.'); return }
+  setBusy(true); setError('')
+  try { await resetPassword({ token, newPassword: password }); setDone(true) } catch (cause) { setError(cause instanceof ApiError ? cause.message : 'Не удалось изменить пароль. Попробуйте ещё раз.') } finally { setBusy(false) }
+ }
+ return <StatusPage title="Новый пароль">
+  {preview ? <p>В демонстрационной версии восстановление пароля отключено. Для входа используйте выданную для просмотра учётную запись.</p>
+   : done ? <p role="status">Пароль изменён. Войдите с новым паролем.</p>
+   : !token ? <p>В ссылке отсутствует код восстановления. Откройте полную ссылку из письма.</p>
+   : <><p>Укажите новый пароль для своей учётной записи.</p><form className={styles.form} onSubmit={submit}>
+    <label>Новый пароль<input type="password" autoComplete="new-password" required value={password} onChange={e => setPassword(e.target.value)} /></label>
+    <label>Повторите пароль<input type="password" autoComplete="new-password" required value={confirmation} onChange={e => setConfirmation(e.target.value)} /></label>
+    {error && <p role="alert" className={styles.error}>{error}</p>}
+    <button className={styles.primary} disabled={busy}>{busy ? 'Сохраняем…' : 'Сохранить пароль'}</button>
+   </form></>}
+ </StatusPage>
 }
-
-const ResetPassword: NextPage<Props> = ({ token }: Props) => {
-	const [ error, setError ] = useState<string>()
-	const [ signupDto, setSignupDto ] = useState<SignUpDto>()
-	const [ confirmPassword, setConfirmPassword ] = useState<string>()
-
-	const onClose = () => {
-		Router.push('/')
-	}
-
-	const reset = async () => {
-		if(!signupDto || signupDto?.password !== confirmPassword) {
-			setError('Данные в полях "пароль" и "повторите пароль" не совпадают')
-			return
-		}
-		try {
-			await makeFetcher(resetPassword)({ token, newPassword: signupDto.password })
-			Router.push('/')
-		} catch (err) {
-			if(err instanceof ApiError) setError(err.message)
-			console.log(err)
-		}
-	}
-
-	return (
-		<Layout>
-			<div className={stylesIndex.index}>
-				<TittlePanel />
-				<About />
-				<Tarifs />
-				<br />
-				<br />
-				<FAQ />
-				<article className={styles.auth}>
-					<article className={styles.modal}>
-						<section className={styles.body}>
-							<section className={styles.close}>
-								<div onClick={onClose}>
-									<Image src={close} alt="" layout="fill" objectFit="contain" />
-								</div>
-							</section>
-							<section className={styles.content}>
-								<header>Сброс пароля</header>
-									Введите ниже новый пароль.
-										<input type={'password'} placeholder="ПАРОЛЬ"
-											value={signupDto?.password}
-											onChange={onChangeDto('password', setSignupDto)} />
-										<input type={'password'} placeholder="ПОВТОРИТЕ ПАРОЛЬ"
-											value={confirmPassword}
-											onChange={v => setConfirmPassword(v.target.value)} />
-										<section className={styles.buttons}>
-											<button onClick={reset} className={styles.primary}>Подтвердить</button>
-											<button onClick={onClose} className={styles.secondary}>Отмена</button>
-										</section>
-										{error && <section>{error}</section>}
-							</section>
-						</section>
-					</article>
-				</article>
-			</div>
-		</Layout >
-	)
-}
-
-interface QueryWithToken extends ParsedUrlQuery {
-	token: string | undefined
-}
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-	const { token } = context.query as QueryWithToken
-
-	if (!token) return { notFound: true }
-
-	return {
-		props: {
-			token,
-		},
-	}
-}
-
-export default ResetPassword
+export const getServerSideProps: GetServerSideProps = async ({ query }) => ({ props: { token: typeof query.token === 'string' ? query.token : '', preview: previewExternalFlowsRestricted() } })

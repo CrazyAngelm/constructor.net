@@ -5,7 +5,7 @@ test('landing leads to the dedicated web sign-in', async ({ page }) => {
 
 	await expect(page.getByRole('heading', {
 		level: 1,
-		name: 'Конструктор учебных материалов, который остаётся в фокусе занятия.',
+		name: 'Материалы к занятию — в одном месте.',
 	})).toBeVisible()
 	await expect(page.getByText('Текущая версия приложения остаётся доступна параллельно с веб-версией.')).toBeVisible()
 

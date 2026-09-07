@@ -1,48 +1,14 @@
 import styles from '@/styles/adm/List.module.scss'
-
-interface Row {
-	header: string
-	value: (id: number) => string
-	key?: boolean
+interface Row { header: string; value: (id: number) => string; key?: boolean }
+interface Props { name?: string; rows?: Row[]; length: number; callback?: (id: number) => void; maxWidth?: number; selected?: number }
+export default function List({ name, rows, callback, length = 0, selected }: Props) {
+ return <article className={styles.list}>
+  {name && <h2>{name}</h2>}
+  {!length ? <p className={styles.empty}>Пока нет записей.</p> : <div className={styles.content}><table>
+   <thead><tr>{rows?.map((row, i) => <th key={i} style={row.header.toLowerCase() === 'id' ? { width: 64 } : undefined}>{row.header === 'id' ? 'ID' : row.header}</th>)}</tr></thead>
+   <tbody>{Array.from({length}, (_, i) => <tr key={i} className={selected === i ? styles.selected : ''} tabIndex={callback ? 0 : undefined} onClick={() => callback?.(i)} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); callback?.(i) } }}>
+    {rows?.map((row, j) => <td key={j} title={row.key ? String(i) : row.value(i)}>{row.key ? i : row.value(i)}</td>)}
+   </tr>)}</tbody>
+  </table></div>}
+ </article>
 }
-
-interface Props {
-	name?: string
-	rows?: Row[]
-	length: number
-	callback?: (id: number) => void
-	maxWidth?: number
-	selected?: number //Сделать возможность выбора нескольких
-}
-
-const List = ({ name, rows, callback, length = 0, maxWidth = 20, selected }: Props) => {
-
-	const styleMaxWidth = {
-		maxWidth: maxWidth / (rows ? rows.length : 1) + 'vw',
-	}
-
-	return (
-		<article className={styles.list}>
-			<header>{name}</header>
-			<section className={styles.content}>
-				<table className={styles.table}>
-					<thead>
-						<tr>
-							{rows?.map((p, i) => <th key={i}><div>{p.header}</div></th>)}
-						</tr>
-					</thead>
-					<tbody>
-						{Array.from({ length }).map((u, i) => <tr className={selected === i ? styles.selected : ''}
-							onClick={() => callback && callback(i)} key={i}>{
-								rows?.map((p, pi) => p.key
-									? <th key={pi}><div style={styleMaxWidth}>{i}</div></th>
-									: <td key={pi}><div style={styleMaxWidth} >{p.value(i)}</div></td>)
-							}</tr>)}
-					</tbody>
-				</table>
-			</section>
-		</article>
-	)
-}
-
-export default List

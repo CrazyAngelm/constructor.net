@@ -1,24 +1,8 @@
-import Layout from '@/components/Layout'
-import { NextPage } from 'next'
-import styles from '@/styles/subscribe-sucessful.module.scss'
-import Image from 'next/image'
-import sucessful from '@/assets/sucessful.svg'
-
-const SubscribeSucessful: NextPage = () => {
-
-	return (
-		<Layout navbar={false} footer={false}>
-			<article className={styles.index}>
-				<div className={styles.image}>
-					<Image src={sucessful} alt="" objectFit="contain"
-						layout="fill" />
-				</div>
-				<section>Подписка совершена успешно!<br />
-					Перейдите в личный кабинет, что бы скачать приложение</section>
-				<a href="../lk#subscription"><button>Перейти</button></a>
-			</article>
-		</Layout>
-	)
+import StatusPage from '@/components/StatusPage'
+import { previewExternalFlowsRestricted } from '@/lib/preview'
+export default function SubscriptionResult({ preview }: { preview: boolean }) {
+ return <StatusPage title="Статус подписки" href="/lk#subscription" action="Проверить доступ в кабинете">
+  <p>{preview ? 'Это демонстрационная версия: платежи здесь отключены, деньги не списываются.' : 'Текущий статус подписки и доступные материалы отображаются в личном кабинете. Сам переход на эту страницу не подтверждает оплату.'}</p>
+ </StatusPage>
 }
-
-export default SubscribeSucessful
+export const getServerSideProps = () => ({ props: { preview: previewExternalFlowsRestricted() } })

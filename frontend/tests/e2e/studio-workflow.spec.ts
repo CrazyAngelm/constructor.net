@@ -1,4 +1,5 @@
 import { expect, test, APIRequestContext } from '@playwright/test'
+import type { StudioCourse, StudioCategory, StudioTask } from '../../components/studio/StudioWorkspace'
 
 const email = process.env.PREVIEW_DEMO_EMAIL
 const password = process.env.PREVIEW_DEMO_PASSWORD
@@ -28,9 +29,9 @@ test('real catalog, independent sheets, persistence, print and access control', 
 	expect(catalogResponse.ok()).toBeTruthy()
 	const catalog = await catalogResponse.json()
 	expect(catalog.courses.length).toBeGreaterThan(0)
-	const tasks = [...new Map<number, { id: number; name: string; image: string }>(catalog.courses.flatMap((c: any) => c.categories.flatMap((f: any) => f.tasks)).map((task: any) => [task.id, task])).values()]
+	const tasks = [ ...new Map<number, StudioTask>(catalog.courses.flatMap((c: StudioCourse) => c.categories.flatMap((f: StudioCategory) => f.tasks)).map((task: StudioTask) => [ task.id, task ])).values() ]
 	expect(tasks.length).toBeGreaterThan(1)
-	const selected = tasks.filter((task) => task.image).slice(0, 2) as [typeof tasks[number], typeof tasks[number]]
+	const selected = tasks.filter((task) => task.image).slice(0, 2) as [ StudioTask & { image: string }, StudioTask & { image: string } ]
 	expect(selected).toHaveLength(2)
 	const lessonName = `Проверка занятия ${Date.now()}`
 	await page.getByLabel('Название конспекта').fill(lessonName)
@@ -50,7 +51,7 @@ test('real catalog, independent sheets, persistence, print and access control', 
 	const savedResponse = await saveResponse
 	expect(savedResponse.ok()).toBeTruthy()
 	const saved = await savedResponse.json()
-	expect(saved.teacherSheet.data.items.map((item: any) => item.id)).toEqual([selected[1].id, selected[0].id])
+	expect(saved.teacherSheet.data.items.map((item: StudioTask) => item.id)).toEqual([ selected[1].id, selected[0].id ])
 	expect(saved.studentSheet.data.items).toHaveLength(1)
 	expect(saved.studentSheet.data.items[0].instruction).toBe('Самостоятельная инструкция ученика')
 	expect(saved.teacherSheet.data.items[0].instruction).toBe('Проверенная инструкция педагога')
@@ -71,6 +72,7 @@ test('real catalog, independent sheets, persistence, print and access control', 
 		await reopened.emulateMedia({ media: 'print' })
 		await expect(reopened.getByRole('complementary', { name: 'Каталог заданий' })).toBeHidden()
 		await expect(reopened.getByRole('region', { name: 'Предпросмотр листа' })).toBeVisible()
+		await reopened.screenshot({ path: testInfo.outputPath('print-preview.png'), fullPage: true })
 		await reopened.pdf({ path: testInfo.outputPath('teacher-sheet.pdf'), format: 'A4', printBackground: true })
 		await reopened.emulateMedia({ media: 'screen' })
 		const imageResponse = await second.request.get(selected[0].image)
@@ -81,29 +83,29 @@ test('real catalog, independent sheets, persistence, print and access control', 
 		expect((await second.request.get('/api/admin/visibility')).status()).toBe(403)
 		expect((await admin.request.get(`/api/studio/worklists/${saved.id}`)).status()).toBe(404)
 		const course = catalog.courses[0]
-		const category = course.categories.find((item: any) => item.tasks.length > 0)
+		const category = course.categories.find((item: StudioCategory) => item.tasks.length > 0)
 		const adminPage = await admin.newPage()
 		await adminPage.goto('/adm')
 		await adminPage.locator('menu').hover()
-		await adminPage.getByText('Видимость каталога', { exact: true }).click()
+		await adminPage.getByRole('button', { name: 'Видимость каталога', exact: true }).click()
 		await expect(adminPage.getByRole('heading', { name: 'Папки заданий', exact: true })).toBeVisible()
 		const courseRow = adminPage.getByRole('row').filter({ has: adminPage.getByRole('cell', { name: course.name, exact: true }) }).first()
 		await courseRow.getByRole('button', { name: 'Скрыть', exact: true }).click()
 		try {
 			await expect(courseRow.getByRole('button', { name: 'Показать', exact: true })).toBeVisible()
-			expect((await (await second.request.get('/api/studio/catalog')).json()).courses.some((item: any) => item.id === course.id)).toBe(false)
+			expect((await (await second.request.get('/api/studio/catalog')).json()).courses.some((item: StudioCourse) => item.id === course.id)).toBe(false)
 			await courseRow.getByRole('button', { name: 'Показать', exact: true }).click()
 			await expect(courseRow.getByRole('button', { name: 'Скрыть', exact: true })).toBeVisible()
 		} finally {
 			await admin.request.patch(`/api/admin/visibility/course/${course.id}`, { data: { visible: true } })
 		}
-		for (const [type, id] of [['category', category.id], ['course', course.id]] as const) {
+		for (const [ type, id ] of [ [ 'category', category.id ], [ 'course', course.id ] ] as const) {
 			const endpoint = `/api/admin/visibility/${type}/${id}`
 			expect((await admin.request.patch(endpoint, { data: { visible: false } })).ok()).toBeTruthy()
 			try {
 				const hidden = await (await second.request.get('/api/studio/catalog')).json()
-				if (type === 'course') expect(hidden.courses.some((item: any) => item.id === id)).toBe(false)
-				else expect(hidden.courses.flatMap((item: any) => item.categories).some((item: any) => item.id === id)).toBe(false)
+				if (type === 'course') expect(hidden.courses.some((item: StudioCourse) => item.id === id)).toBe(false)
+				else expect(hidden.courses.flatMap((item: StudioCourse) => item.categories).some((item: StudioCategory) => item.id === id)).toBe(false)
 			} finally {
 				expect((await admin.request.patch(endpoint, { data: { visible: true } })).ok()).toBeTruthy()
 			}
