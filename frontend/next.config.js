@@ -3,6 +3,7 @@ const { PHASE_PRODUCTION_SERVER } = require('next/constants')
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: true,
+	output: 'standalone',
 	webpack: (config, { dev }) => {
 		if (dev) {
 			const poll = Number(process.env.NEXT_WATCH_POLL)

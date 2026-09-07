@@ -40,5 +40,5 @@ export const getStudioCatalogAccess = async (
 	})
 	if (!subscription) return null
 	const selectedCourses = parseCourseIds(subscription.courses)
-	return { isAdmin: false, courseIds: [ ...new Set(selectedCourses) ] }
+	return { isAdmin: false, courseIds: [ ...new Set([...selectedCourses, ...parseCourseIds(subscription.license.courses)]) ] }
 }

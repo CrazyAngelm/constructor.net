@@ -36,7 +36,11 @@ async function main(): Promise<void> {
 		const demo = await ensureUser(tx, demoEmail, demoPassword, 'Preview demo')
 		const scope = await tx.scope.upsert({ where: { value: 'admin' }, create: { value: 'admin' }, update: {} })
 		if (!await tx.scopeJoin.findFirst({ where: { userId: admin.id, scopeId: scope.id } })) await tx.scopeJoin.create({ data: { userId: admin.id, scopeId: scope.id } })
-		const license = await tx.license.upsert({ where: { id: 1 }, create: { id: 1, name: licenseName, description: 'Preview-only license', price: 0, duration: licenseDuration, freeCourses, courses: '[]' }, update: { name: licenseName, duration: licenseDuration, freeCourses, price: 0, courses: '[]' } })
+		const licenseData = { name: licenseName, description: 'Preview-only license', price: 0, duration: licenseDuration, freeCourses, courses: '[]' }
+		const existingLicense = await tx.license.findFirst({ where: { name: licenseName } })
+		const license = existingLicense
+			? await tx.license.update({ where: { id: existingLicense.id }, data: licenseData })
+			: await tx.license.create({ data: licenseData })
 		const selectedCourses = JSON.stringify((await tx.course.findMany({ where: { deleted: false }, orderBy: { id: 'asc' }, take: freeCourses, select: { id: true } })).map((course) => course.id))
 		const subscription = await tx.subscription.findFirst({ where: { userId: demo.id, licenseId: license.id, canceled: false } })
 		if (subscription) await tx.subscription.update({ where: { id: subscription.id }, data: { active: true, startDate: subscription.startDate, endDate: null, courses: selectedCourses, canceled: false, paymentToken: null, paymentTitle: null } })

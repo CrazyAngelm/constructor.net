@@ -1,4 +1,12 @@
 .studio { --ink:#1c1720; --muted:#6d6170; --line:#eadde7; --paper:#fffdf9; --accent:#745cc4; --accent-soft:#f0ebfb; min-height:100dvh; background:#faf7fa; color:var(--ink); font-family:"Montserrat",Arial,sans-serif; }
+.editable { border:0; padding:0; margin:0; min-width:0; }
+.manuals { max-width:1484px; margin:0 auto 24px; padding:20px; border:1px solid #eadde7; background:white; }
+.manuals details { padding:12px 0; border-bottom:1px solid #eadde7; }
+.manuals summary { cursor:pointer; font-weight:600; }
+.manuals details div { padding-top:16px; overflow-wrap:anywhere; }
+.manuals img { max-width:100%; height:auto; }
+@page { size:A4; margin:12mm; }
+@media print { .editable,.manuals { display:none!important; } .studio { min-height:0; } }
 .topbar,.layout,.sheet { max-width:1540px; margin:0 auto; }
 .topbar { min-height:92px; padding:18px 28px; display:grid; grid-template-columns:150px 1fr auto; align-items:center; gap:26px; background:#fff; }
 .brand img { display:block; width:112px; height:auto; }

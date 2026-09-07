@@ -122,12 +122,13 @@ async function main(): Promise<void> {
 	requirePreviewConfirmation('PREVIEW_CATALOG_IMPORT_CONFIRMED')
 	await assertPreviewDatabase(prisma)
 	const snapshotDirectory = requireEnvironment('CATALOG_SNAPSHOT_DIR')
-	const [coursesRaw, categoriesRaw, tasksRaw, linksRaw, manualsRaw] = await Promise.all([
+	const [coursesRaw, categoriesRaw, tasksRaw, linksRaw, manualsRaw, licensesRaw] = await Promise.all([
 		readSnapshot(snapshotDirectory, 'course.json'),
 		readSnapshot(snapshotDirectory, 'task-category.json'),
 		readSnapshot(snapshotDirectory, 'task.json'),
 		readSnapshot(snapshotDirectory, 'category-task-links.json'),
 		readSnapshot(snapshotDirectory, 'manuals.json', false),
+		readSnapshot(snapshotDirectory, 'licenses.json', false),
 	])
 	distinctIds(coursesRaw, 'course.json')
 	distinctIds(categoriesRaw, 'task-category.json')
@@ -185,6 +186,7 @@ async function main(): Promise<void> {
 
 	await assertEmptyCatalog(prisma)
 	await prisma.$transaction([
+		prisma.license.createMany({ data: licensesRaw.map((row) => ({ id: integer(row.id, 'license.id'), name: text(row.name, 'license.name'), description: row.description == null ? null : text(row.description, 'license.description'), price: integer(row.price, 'license.price'), duration: integer(row.duration, 'license.duration'), freeCourses: integer(row.freeCourses, 'license.freeCourses'), courses: row.courses == null ? null : text(row.courses, 'license.courses') })) }),
 		prisma.course.createMany({ data: courses.map((row) => ({ id: integer(row.id, 'course.id'), name: text(row.name, 'course.name'), description: text(row.description, 'course.description'), date: optionalDate(row.date, 'course.date'), deleted: optionalBoolean(row.deleted, false, 'course.deleted'), visible: optionalBoolean(row.visible, true, 'course.visible') })) }),
 		prisma.taskCategory.createMany({ data: categories.map((row) => ({ id: integer(row.id, 'task-category.id'), name: text(row.name, 'task-category.name'), description: text(row.description, 'task-category.description'), date: optionalDate(row.date, 'task-category.date'), deleted: optionalBoolean(row.deleted, false, 'task-category.deleted') })) }),
 		prisma.task.createMany({ data: tasks.map((row) => ({ id: integer(row.id, 'task.id'), name: text(row.name, 'task.name'), description: text(row.description, 'task.description'), instruction: text(row.instruction, 'task.instruction'), image: text(row.image, 'task.image'), complexity: row.complexity === undefined ? 1 : integer(row.complexity, 'task.complexity'), date: optionalDate(row.date, 'task.date'), deleted: optionalBoolean(row.deleted, false, 'task.deleted') })) }),

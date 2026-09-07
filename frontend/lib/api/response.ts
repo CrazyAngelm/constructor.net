@@ -4,6 +4,7 @@ import { FromBase64 } from '../Base64'
 import { getPrisma } from './database'
 import { ScopeEnum } from '../dto/users'
 import { getToken } from 'next-auth/jwt'
+import { previewAuthCookies } from '../auth/cookies'
 
 const prisma = getPrisma()
 
@@ -48,7 +49,7 @@ const getBasicCredentials = (authorization?: string): { id: string, password: st
 
 export const getAuthenticatedApiUser = async (req: NextApiRequest): Promise<AuthenticatedApiUser | null> => {
 	try {
-		const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+		const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: previewAuthCookies()?.sessionToken.name })
 		if (token?.sub) {
 			const user = await prisma.user.findUnique({
 				where: { id: token.sub },

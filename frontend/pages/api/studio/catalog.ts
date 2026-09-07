@@ -33,7 +33,7 @@ handler.get(responseAuth(async (_req, _res, userId) => {
 		orderBy: { id: 'asc' },
 	})
 	const categories = await prisma.taskCategory.findMany({
-		where: { deleted: false },
+		where: { deleted: false, visible: true },
 		select: {
 			id: true,
 			name: true,

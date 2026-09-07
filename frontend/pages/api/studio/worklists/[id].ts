@@ -23,7 +23,7 @@ handler.get(responseAuth(async (req, _res, userId) => {
 	if (!access) return { error: { code: 403, message: 'Требуется активная подписка' } }
 	const id = getId(req.query as Query)
 	if (!id) return { error: { code: 400, message: 'Некорректный идентификатор' } }
-	const worklist = await prisma.studioWorklist.findFirst({ where: access.isAdmin ? { id } : { id, ownerId: userId } })
+	const worklist = await prisma.studioWorklist.findFirst({ where: { id, ownerId: userId } })
 	if (!worklist) return { error: { code: 404, message: 'Ворклист не найден' } }
 	return { response: serialize(worklist) }
 }))
@@ -35,7 +35,7 @@ handler.put(responseAuth(async (req, _res, userId) => {
 	if (!id) return { error: { code: 400, message: 'Некорректный идентификатор' } }
 	const parsed = parseUpdateStudioWorklist(req.body)
 	if ('error' in parsed) return { error: { code: 400, message: parsed.error } }
-	const ownerFilter = access.isAdmin ? { id } : { id, ownerId: userId }
+	const ownerFilter = { id, ownerId: userId }
 	const current = await prisma.studioWorklist.findFirst({ where: ownerFilter, select: { id: true } })
 	if (!current) return { error: { code: 404, message: 'Ворклист не найден' } }
 	const data: Prisma.StudioWorklistUncheckedUpdateInput = {
@@ -54,7 +54,7 @@ handler.delete(responseAuth(async (req, _res, userId) => {
 	if (!access) return { error: { code: 403, message: 'Требуется активная подписка' } }
 	const id = getId(req.query as Query)
 	if (!id) return { error: { code: 400, message: 'Некорректный идентификатор' } }
-	const deleted = await prisma.studioWorklist.deleteMany({ where: access.isAdmin ? { id } : { id, ownerId: userId } })
+	const deleted = await prisma.studioWorklist.deleteMany({ where: { id, ownerId: userId } })
 	if (deleted.count === 0) return { error: { code: 404, message: 'Ворклист не найден' } }
 	return { response: { deleted: true } }
 }))

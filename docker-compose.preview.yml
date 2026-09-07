@@ -3,8 +3,8 @@ name: labstudio-preview
 services:
   app:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile.preview
+      context: .
+      dockerfile: frontend/Dockerfile.preview
     env_file:
       - ${PREVIEW_ENV_FILE:?Set PREVIEW_ENV_FILE to the untracked preview environment file}
     environment:

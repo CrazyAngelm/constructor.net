@@ -6,7 +6,7 @@ const prisma = getPrisma()
 const handler = getDefaultHandler()
 
 handler.get(responseAdmin(async () => {
-	const [ courses, folders ] = await Promise.all([
+	const [ courses, folders, categories ] = await Promise.all([
 		prisma.course.findMany({
 			where: { deleted: false },
 			select: { id: true, name: true, visible: true },
@@ -17,9 +17,14 @@ handler.get(responseAdmin(async () => {
 			select: { id: true, name: true, visible: true },
 			orderBy: { name: 'asc' },
 		}),
+		prisma.taskCategory.findMany({
+			where: { deleted: false },
+			select: { id: true, name: true, visible: true },
+			orderBy: { name: 'asc' },
+		}),
 	])
 
-	return { response: { courses, folders } }
+	return { response: { courses, folders, categories } }
 }))
 
 export default handler

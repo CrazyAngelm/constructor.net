@@ -5,12 +5,14 @@ import { Session } from '@/lib/session'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { getPrisma } from '@/lib/api/database'
 import { compare } from 'bcryptjs'
+import { previewAuthCookies } from '@/lib/auth/cookies'
 import { UserDto } from '@/lib/dto/users'
 import { ConfirmEmailError } from '@/lib/api/error'
 const prisma = getPrisma()
 const yandexClientId = process.env.YANDEX_CLIENT_ID
 const yandexClientSecret = process.env.YANDEX_CLIENT_SECRET
 export default NextAuth({
+	cookies: previewAuthCookies(),
 	providers: [
 		CredentialsProvider({
 			name: 'Credentials',
@@ -49,6 +51,7 @@ export default NextAuth({
 				where: {
 					id: token.sub,
 				},
+				select: { id: true, name: true, email: true, emailVerified: true, image: true },
 			}) as UserDto
 			if (!user) throw new Error('User not found')
 			user.scopes = (await prisma.scopeJoin.findMany({

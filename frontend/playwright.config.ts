@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const port = 18180
-const baseURL = `http://127.0.0.1:${port}`
+const baseURL = process.env.E2E_BASE_URL || `http://127.0.0.1:${port}`
 
 export default defineConfig({
 	testDir: './tests/e2e',
@@ -9,7 +9,7 @@ export default defineConfig({
 		baseURL,
 		trace: 'retain-on-failure',
 	},
-	webServer: {
+	webServer: process.env.E2E_BASE_URL ? undefined : {
 		command: `npm run start -- -p ${port}`,
 		url: baseURL,
 		reuseExistingServer: !process.env.CI,

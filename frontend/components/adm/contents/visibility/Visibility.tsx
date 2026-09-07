@@ -11,6 +11,7 @@ interface VisibilityItem {
 interface VisibilityCatalog {
 	courses: VisibilityItem[]
 	folders: VisibilityItem[]
+	categories: VisibilityItem[]
 }
 
 const readError = (error: unknown): string => {
@@ -80,7 +81,7 @@ const Visibility = () => {
 		void load()
 	}, [ load ])
 
-	const toggle = async (type: 'course' | 'folder', item: VisibilityItem) => {
+	const toggle = async (type: 'course' | 'folder' | 'category', item: VisibilityItem) => {
 		const itemId = String(item.id)
 		setToggling(`${type}:${itemId}`)
 		setError(undefined)
@@ -91,9 +92,10 @@ const Visibility = () => {
 				body: JSON.stringify({ visible: !item.visible }),
 			})
 			await handleNonOk(response)
+			const collection = type === 'category' ? 'categories' : type === 'course' ? 'courses' : 'folders'
 			setCatalog((current) => current && {
 				...current,
-				[`${type}s`]: current[`${type}s` as 'courses' | 'folders'].map((currentItem) =>
+				[collection]: current[collection].map((currentItem) =>
 					String(currentItem.id) === itemId ? { ...currentItem, visible: !item.visible } : currentItem),
 			})
 		} catch (requestError) {
@@ -119,6 +121,8 @@ const Visibility = () => {
 			togglingId={toggling?.replace('course:', '')} onToggle={(item) => void toggle('course', item)} />
 		<VisibilityGroup title="Папки" items={catalog.folders}
 			togglingId={toggling?.replace('folder:', '')} onToggle={(item) => void toggle('folder', item)} />
+		<VisibilityGroup title="Папки заданий" items={catalog.categories}
+			togglingId={toggling?.replace('category:', '')} onToggle={(item) => void toggle('category', item)} />
 	</article>
 }
 

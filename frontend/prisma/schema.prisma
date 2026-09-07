@@ -93,6 +93,7 @@ model TaskCategory {
   description      String               @db.LongText
   date             DateTime?
   deleted          Boolean              @default(false)
+  visible          Boolean              @default(true)
   tasks            Task[]
   Course           Course[]
   CourseToCategory CourseToCategory[]

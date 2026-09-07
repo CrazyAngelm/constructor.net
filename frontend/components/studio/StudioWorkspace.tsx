@@ -1,6 +1,8 @@
 import { ChangeEvent, DragEvent, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { signOut } from 'next-auth/react'
+import { useSession } from '@/lib/session/hooks'
 
 import styles from '@/styles/studio.module.scss'
 
@@ -64,6 +66,8 @@ function unwrap<T>(value: T | { response: T }): T {
 }
 
 const StudioWorkspace = () => {
+	const session = useSession()
+	const [manuals, setManuals] = useState<Array<{ id: number; name: string; html: string }>>([])
 	const [courses, setCourses] = useState<StudioCourse[]>([])
 	const [worklists, setWorklists] = useState<StudioWorklist[]>([])
 	const [draft, setDraft] = useState<StudioWorklist>(initialDraft)
@@ -82,9 +86,10 @@ const StudioWorkspace = () => {
 			setLoading(true)
 			setError('')
 			try {
-				const [catalogResult, worklistsResult] = await Promise.all([
+				const [catalogResult, worklistsResult, manualsResult] = await Promise.all([
 					fetch('/api/studio/catalog'),
 					fetch('/api/studio/worklists'),
+					fetch('/api/studio/manuals'),
 				])
 				if (!catalogResult.ok || !worklistsResult.ok) throw new Error('Не удалось загрузить рабочие данные.')
 				const catalogPayload = unwrap(await catalogResult.json()) as CatalogResponse
@@ -92,6 +97,7 @@ const StudioWorkspace = () => {
 				if (!active) return
 				setCourses(catalogPayload.courses || [])
 				setWorklists((worklistsPayload.worklists || []).map(normalizeWorklist))
+				if (manualsResult.ok) setManuals((await manualsResult.json()).manuals)
 			} catch (cause) {
 				if (active) setError(cause instanceof Error ? cause.message : 'Не удалось загрузить рабочие данные.')
 			} finally {
@@ -103,7 +109,7 @@ const StudioWorkspace = () => {
 	}, [])
 
 	useEffect(() => {
-		if (saveState !== 'dirty') return
+		if (saveState !== 'dirty' && saveState !== 'saving') return
 		const preventAccidentalClose = (event: BeforeUnloadEvent) => event.preventDefault()
 		window.addEventListener('beforeunload', preventAccidentalClose)
 		return () => window.removeEventListener('beforeunload', preventAccidentalClose)
@@ -122,6 +128,7 @@ const StudioWorkspace = () => {
 		})).filter((course) => course.categories.length > 0), [courses, activeCourse, query])
 
 	const markDirty = (next: StudioWorklist) => {
+		if (saveState === 'saving') return
 		setDraft(next)
 		setSaveState('dirty')
 	}
@@ -199,6 +206,7 @@ const StudioWorkspace = () => {
 	}
 
 	const reopen = (worklist: StudioWorklist) => {
+		if (saveState === 'saving') return
 		if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Открыть другой конспект?')) return
 		const normalized = normalizeWorklist(worklist)
 		setDraft(normalized)
@@ -218,12 +226,15 @@ const StudioWorkspace = () => {
 			<Link className={styles.brand} href="/" aria-label="LabStudio — на главную"><Image src="/logo.png" width={112} height={112} alt="LabStudio" priority /></Link>
 			<div><span className={styles.eyebrow}>Рабочий кабинет</span><h1>Конструктор занятия</h1></div>
 			<div className={styles.actions}>
+				{session && session !== 'loading' && session.scopes.includes('admin') && <Link href="/adm">Администрирование</Link>}
+				<button type="button" className={styles.secondary} onClick={() => { if (saveState === 'dirty' && !window.confirm('Выйти без сохранения изменений?')) return; void signOut({ callbackUrl: '/studio/auth' }) }} disabled={saveState === 'saving'}>Выйти</button>
 				<span className={`${styles.status} ${saveState === 'dirty' ? styles.dirty : ''}`} aria-live="polite">{saveState === 'saving' ? 'Сохраняем…' : saveState === 'dirty' ? 'Есть несохранённые изменения' : saveState === 'saved' ? 'Сохранено' : 'Черновик'}</span>
 				<button type="button" className={styles.secondary} onClick={() => window.print()}>Печать / PDF</button>
 				<button type="button" className={styles.primary} onClick={() => void save()} disabled={saveState === 'saving'}>Сохранить</button>
 			</div>
 		</header>
 
+		<fieldset disabled={saveState === 'saving'} className={styles.editable}>
 		{error && <div className={styles.alert} role="alert">{error}<button type="button" onClick={() => setError('')}>Закрыть</button></div>}
 		{loading ? <div className={styles.loading} aria-label="Загружаем каталог и конспекты"><span /><span /><span /></div> : <div className={styles.layout}>
 			<aside className={styles.catalog} aria-label="Каталог заданий">
@@ -255,6 +266,8 @@ const StudioWorkspace = () => {
 			</aside>
 		</div>}
 
+		</fieldset>
+		{manuals.length > 0 && <section className={styles.manuals} aria-label="Руководства"><h2>Руководства</h2>{manuals.map((manual) => <details key={manual.id}><summary>{manual.name}</summary><div dangerouslySetInnerHTML={{ __html: manual.html }} /></details>)}</section>}
 		<section className={styles.sheet} aria-label="Предпросмотр листа">
 			<div className={styles.sheetHead}><div><span className={styles.eyebrow}>Предпросмотр</span><h2>{activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'}</h2></div><div className={styles.switch} role="group" aria-label="Версия листа"><button type="button" className={activeSheet === 'teacherSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('teacherSheet')}>Педагог</button><button type="button" className={activeSheet === 'studentSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('studentSheet')}>Ученик</button></div></div>
 			<article className={styles.paper}><header><small>LabStudio</small><h2>{draft.name || 'Без названия'}</h2></header>{activeItems.length ? <ol>{activeItems.map((task) => <li key={task.id}><h3>{task.name}</h3>{task.image && <img src={task.image} alt="" />}{task.description && <p>{task.description}</p>}<p>{task.instruction || 'Инструкция не заполнена.'}</p>{task.complexity && <small>Сложность: {task.complexity}</small>}</li>)}</ol> : <p>Выберите задания в каталоге, чтобы увидеть готовый лист.</p>}</article>
