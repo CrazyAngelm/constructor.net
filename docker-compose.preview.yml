@@ -21,6 +21,7 @@ services:
       NEXTAUTH_SECRET: ${PREVIEW_NEXTAUTH_SECRET:?Set PREVIEW_NEXTAUTH_SECRET}
       UPLOAD_IMAGE_TASK: /app/frontend/public/uploads/task
       DOWNLOAD_IMAGE_TASK: /uploads/task
+      STUDIO_UPLOAD_DIR: /app/studio-uploads
       CATALOG_SNAPSHOT_DIR: /preview/catalog
       CATALOG_UPLOADS_DIR: /preview/catalog/uploads/task
     depends_on:
@@ -30,6 +31,7 @@ services:
       - 127.0.0.1:${PREVIEW_APP_PORT:?Set PREVIEW_APP_PORT}:3000
     volumes:
       - labstudio_preview_uploads:/app/frontend/public/uploads
+      - labstudio_preview_studio_uploads:/app/studio-uploads
       - ${PREVIEW_CATALOG_SNAPSHOT_DIR:?Set PREVIEW_CATALOG_SNAPSHOT_DIR}:/preview/catalog:ro
     networks:
       - preview
@@ -65,3 +67,5 @@ volumes:
     name: labstudio_preview_mysql_data
   labstudio_preview_uploads:
     name: labstudio_preview_uploads
+  labstudio_preview_studio_uploads:
+    name: labstudio_preview_studio_uploads

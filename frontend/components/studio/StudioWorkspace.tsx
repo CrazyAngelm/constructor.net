@@ -1,84 +1,93 @@
-import { ChangeEvent, DragEvent, useEffect, useMemo, useState } from 'react'
+/* eslint-disable @next/next/no-img-element -- user uploads and catalog thumbnails are authenticated dynamic resources */
+import { ChangeEvent, DragEvent, useEffect, useState } from 'react'
+import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import Head from 'next/head'
+import { ImageSquare, Plus, TextT } from '@phosphor-icons/react'
 import { signOut } from 'next-auth/react'
-import { useSession } from '@/lib/session/hooks'
 
+import { useSession } from '@/lib/session/hooks'
+import {
+	catalogTaskToSheetItem,
+	emptyStudioSheet,
+	upgradeStudioSheet,
+} from '@/lib/studio/types'
+import type {
+	StudioCourse,
+	StudioImageAlignment,
+	StudioPageSettings,
+	StudioSheetItem,
+	StudioTask,
+	StudioWorklist,
+} from '@/lib/studio/types'
+import CatalogBrowser from './CatalogBrowser'
+import SheetPreview from './SheetPreview'
+import SheetSettings from './SheetSettings'
 import styles from '@/styles/studio.module.scss'
 
-export type StudioTask = {
-	id: number
-	name: string
-	description: string
-	instruction: string
-	complexity: number | null
-	image: string | null
-}
+export type { StudioCategory, StudioCourse, StudioTask } from '@/lib/studio/types'
 
-export type StudioCategory = {
-	id: number
-	name: string
-	tasks: StudioTask[]
-}
-
-export type StudioCourse = {
-	id: number
-	name: string
-	categories: StudioCategory[]
-}
-
-type StudioSheet = {
-	version: 1
-	data: { items: StudioTask[] }
-}
-
-export type StudioWorklist = {
-	id: string
-	name: string
-	teacherSheet: StudioSheet
-	studentSheet: StudioSheet
-	position?: number
-	createdAt?: string
-	updatedAt?: string
-}
-
+type SheetName = 'teacherSheet' | 'studentSheet'
+type WorklistsResponse = { worklists: Array<Omit<StudioWorklist, 'teacherSheet' | 'studentSheet'> & { teacherSheet: unknown; studentSheet: unknown }> }
 type CatalogResponse = { courses: StudioCourse[] }
-type WorklistsResponse = { worklists: StudioWorklist[] }
 
-const emptySheet = (): StudioSheet => ({ version: 1, data: { items: [] } })
 const initialDraft = (): StudioWorklist => ({
 	id: '',
 	name: 'Новый конспект',
-	teacherSheet: emptySheet(),
-	studentSheet: emptySheet(),
+	teacherSheet: emptyStudioSheet(),
+	studentSheet: emptyStudioSheet(),
 })
 
-const normalizeWorklist = (worklist: StudioWorklist): StudioWorklist => ({
+const normalizeWorklist = (worklist: WorklistsResponse['worklists'][number]): StudioWorklist => ({
 	...worklist,
-	teacherSheet: worklist.teacherSheet?.version === 1 && Array.isArray(worklist.teacherSheet.data?.items)
-		? worklist.teacherSheet : emptySheet(),
-	studentSheet: worklist.studentSheet?.version === 1 && Array.isArray(worklist.studentSheet.data?.items)
-		? worklist.studentSheet : emptySheet(),
+	teacherSheet: upgradeStudioSheet(worklist.teacherSheet as never),
+	studentSheet: upgradeStudioSheet(worklist.studentSheet as never),
 })
 
 function unwrap<T>(value: T | { response: T }): T {
 	return 'response' in (value as object) ? (value as { response: T }).response : value as T
 }
 
-const StudioWorkspace = () => {
+const newInstanceId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`
+
+const blankItem = (kind: StudioSheetItem['kind']): StudioSheetItem => ({
+	instanceId: newInstanceId(),
+	sourceTaskId: null,
+	kind,
+	name: kind === 'text' ? 'Текстовый блок' : kind === 'spacer' ? '' : 'Своё упражнение',
+	description: '',
+	instruction: kind === 'text' ? 'Пользовательский текст' : '',
+	complexity: null,
+	image: null,
+	showDescription: true,
+	showInstruction: true,
+	imageWidthPercent: 100,
+	imageAlignment: 'center',
+	spacerHeightMm: kind === 'spacer' ? 12 : 0,
+})
+
+const readApiError = async (response: Response, fallback: string) => {
+	try {
+		const body = await response.json()
+		return body.message || fallback
+	} catch {
+		return fallback
+	}
+}
+
+export default function StudioWorkspace() {
 	const session = useSession()
 	const [ courses, setCourses ] = useState<StudioCourse[]>([])
 	const [ worklists, setWorklists ] = useState<StudioWorklist[]>([])
 	const [ draft, setDraft ] = useState<StudioWorklist>(initialDraft)
-	const [ selectedTaskId, setSelectedTaskId ] = useState<number | null>(null)
-	const [ query, setQuery ] = useState('')
+	const [ selectedItemId, setSelectedItemId ] = useState<string | null>(null)
 	const [ activeCourse, setActiveCourse ] = useState<number | null>(null)
 	const [ loading, setLoading ] = useState(true)
 	const [ error, setError ] = useState('')
 	const [ saveState, setSaveState ] = useState<'clean' | 'dirty' | 'saving' | 'saved'>('clean')
-	const [ activeSheet, setActiveSheet ] = useState<'teacherSheet' | 'studentSheet'>('teacherSheet')
-	const [ dragId, setDragId ] = useState<number | null>(null)
+	const [ activeSheet, setActiveSheet ] = useState<SheetName>('teacherSheet')
+	const [ dragId, setDragId ] = useState<string | null>(null)
+	const [ uploading, setUploading ] = useState(false)
 
 	useEffect(() => {
 		let active = true
@@ -95,6 +104,7 @@ const StudioWorkspace = () => {
 				const worklistsPayload = unwrap(await worklistsResult.json()) as WorklistsResponse
 				if (!active) return
 				setCourses(catalogPayload.courses || [])
+				setActiveCourse(current => current ?? catalogPayload.courses?.[0]?.id ?? null)
 				setWorklists((worklistsPayload.worklists || []).map(normalizeWorklist))
 			} catch (cause) {
 				if (active) setError(cause instanceof Error ? cause.message : 'Не удалось загрузить рабочие данные.')
@@ -114,46 +124,40 @@ const StudioWorkspace = () => {
 	}, [ saveState ])
 
 	const activeItems = draft[activeSheet].data.items
-	const selectedTask = activeItems.find((task) => task.id === selectedTaskId) || null
-	const filteredCourses = useMemo(() => courses
-		.filter((course) => activeCourse === null || course.id === activeCourse)
-		.map((course) => ({
-			...course,
-			categories: course.categories.map((category) => ({
-				...category,
-				tasks: category.tasks.filter((task) => `${task.name} ${task.description} ${task.instruction}`.toLowerCase().includes(query.toLowerCase())),
-			})).filter((category) => category.tasks.length > 0),
-		})).filter((course) => course.categories.length > 0), [ courses, activeCourse, query ])
-
+	const selectedItem = activeItems.find(item => item.instanceId === selectedItemId) || null
 	const markDirty = (next: StudioWorklist) => {
 		if (saveState === 'saving') return
 		setDraft(next)
 		setSaveState('dirty')
 	}
-	const replaceActiveItems = (items: StudioTask[]) => markDirty({
+	const replaceActiveItems = (items: StudioSheetItem[]) => markDirty({
 		...draft,
-		[activeSheet]: { ...draft[activeSheet], data: { items } },
+		[activeSheet]: { ...draft[activeSheet], data: { ...draft[activeSheet].data, items } },
 	})
-
-	const addTask = (task: StudioTask) => {
-		if (activeItems.some((item) => item.id === task.id)) return
-		replaceActiveItems([ ...activeItems, { ...task } ])
-		setSelectedTaskId(task.id)
+	const addItem = (item: StudioSheetItem) => {
+		replaceActiveItems([ ...activeItems, item ])
+		setSelectedItemId(item.instanceId)
 	}
-
-	const updateTask = (key: keyof StudioTask, value: string | number | null) => {
-		if (!selectedTask) return
-		replaceActiveItems(activeItems.map((task) => task.id === selectedTask.id ? { ...task, [key]: value } : task))
+	const addTask = (task: StudioTask) => addItem(catalogTaskToSheetItem(task, newInstanceId()))
+	const updateItem = <K extends keyof StudioSheetItem>(key: K, value: StudioSheetItem[K]) => {
+		if (!selectedItem) return
+		replaceActiveItems(activeItems.map(item => item.instanceId === selectedItem.instanceId ? { ...item, [key]: value } : item))
 	}
-
-	const removeTask = (id: number) => {
-		const items = activeItems.filter((task) => task.id !== id)
+	const updateSettings = (settings: StudioPageSettings) => markDirty({
+		...draft,
+		[activeSheet]: { ...draft[activeSheet], data: { ...draft[activeSheet].data, settings } },
+	})
+	const copySettings = () => {
+		const other: SheetName = activeSheet === 'teacherSheet' ? 'studentSheet' : 'teacherSheet'
+		markDirty({ ...draft, [other]: { ...draft[other], data: { ...draft[other].data, settings: structuredClone(draft[activeSheet].data.settings) } } })
+	}
+	const removeItem = (instanceId: string) => {
+		const items = activeItems.filter(item => item.instanceId !== instanceId)
 		replaceActiveItems(items)
-		if (selectedTaskId === id) setSelectedTaskId(items[0]?.id || null)
+		if (selectedItemId === instanceId) setSelectedItemId(items[0]?.instanceId || null)
 	}
-
-	const moveTask = (id: number, direction: -1 | 1) => {
-		const from = activeItems.findIndex((task) => task.id === id)
+	const moveItem = (instanceId: string, direction: -1 | 1) => {
+		const from = activeItems.findIndex(item => item.instanceId === instanceId)
 		const to = from + direction
 		if (from < 0 || to < 0 || to >= activeItems.length) return
 		const items = [ ...activeItems ]
@@ -164,12 +168,11 @@ const StudioWorkspace = () => {
 		items[to] = current
 		replaceActiveItems(items)
 	}
-
-	const handleDrop = (event: DragEvent<HTMLLIElement>, targetId: number) => {
+	const handleDrop = (event: DragEvent<HTMLLIElement>, targetId: string) => {
 		event.preventDefault()
-		if (dragId === null || dragId === targetId) return
-		const from = activeItems.findIndex((task) => task.id === dragId)
-		const to = activeItems.findIndex((task) => task.id === targetId)
+		if (!dragId || dragId === targetId) return
+		const from = activeItems.findIndex(item => item.instanceId === dragId)
+		const to = activeItems.findIndex(item => item.instanceId === targetId)
 		if (from < 0 || to < 0) return
 		const items = [ ...activeItems ]
 		const [ moved ] = items.splice(from, 1)
@@ -177,6 +180,38 @@ const StudioWorkspace = () => {
 		items.splice(to, 0, moved)
 		replaceActiveItems(items)
 		setDragId(null)
+	}
+
+	const uploadImage = async (file: File): Promise<string | null> => {
+		setUploading(true)
+		setError('')
+		try {
+			const form = new FormData()
+			form.append('file', file)
+			const response = await fetch('/api/studio/uploads', { method: 'POST', body: form })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось загрузить изображение.'))
+			return (await response.json()).url as string
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Не удалось загрузить изображение.')
+			return null
+		} finally {
+			setUploading(false)
+		}
+	}
+	const addOwnImage = async (event: ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0]
+		event.target.value = ''
+		if (!file) return
+		const url = await uploadImage(file)
+		if (!url) return
+		addItem({ ...blankItem('image'), name: file.name.replace(/\.[^.]+$/, '') || 'Своё упражнение', image: url })
+	}
+	const replaceImage = async (event: ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0]
+		event.target.value = ''
+		if (!file) return
+		const url = await uploadImage(file)
+		if (url) updateItem('image', url)
 	}
 
 	const save = async () => {
@@ -190,33 +225,31 @@ const StudioWorkspace = () => {
 					name: draft.name,
 					teacherSheet: draft.teacherSheet,
 					studentSheet: draft.studentSheet,
+					...(activeCourse === null ? {} : { courseId: activeCourse }),
 				}),
 			})
-			if (!response.ok) throw new Error('Сохранение не выполнено. Проверьте соединение и повторите попытку.')
-			const saved = normalizeWorklist(unwrap(await response.json()) as StudioWorklist)
+			if (!response.ok) throw new Error(await readApiError(response, 'Сохранение не выполнено.'))
+			const saved = normalizeWorklist(unwrap(await response.json()) as WorklistsResponse['worklists'][number])
 			setDraft(saved)
-			setWorklists((current) => [ saved, ...current.filter((worklist) => worklist.id !== saved.id) ])
+			setWorklists(current => [ saved, ...current.filter(worklist => worklist.id !== saved.id) ])
 			setSaveState('saved')
 		} catch (cause) {
 			setSaveState('dirty')
 			setError(cause instanceof Error ? cause.message : 'Сохранение не выполнено.')
 		}
 	}
-
 	const reopen = (worklist: StudioWorklist) => {
 		if (saveState === 'saving') return
 		if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Открыть другой конспект?')) return
-		const normalized = normalizeWorklist(worklist)
-		setDraft(normalized)
-		setSelectedTaskId(normalized[activeSheet].data.items[0]?.id || null)
+		setDraft(worklist)
+		setActiveCourse(worklist.courseId ?? activeCourse)
+		setSelectedItemId(worklist[activeSheet].data.items[0]?.instanceId || null)
 		setSaveState('clean')
 	}
-
-	const chooseSheet = (sheet: 'teacherSheet' | 'studentSheet') => {
+	const chooseSheet = (sheet: SheetName) => {
 		setActiveSheet(sheet)
-		setSelectedTaskId(draft[sheet].data.items[0]?.id || null)
+		setSelectedItemId(draft[sheet].data.items[0]?.instanceId || null)
 	}
-
 	const changeName = (event: ChangeEvent<HTMLInputElement>) => markDirty({ ...draft, name: event.target.value })
 
 	return <main className={styles.studio}>
@@ -235,41 +268,45 @@ const StudioWorkspace = () => {
 		</header>
 
 		<fieldset disabled={saveState === 'saving'} className={styles.editable}>
-		{error && <div className={styles.alert} role="alert">{error}<button type="button" onClick={() => setError('')}>Закрыть</button></div>}
-		{loading ? <div className={styles.loading} aria-label="Загружаем каталог и конспекты"><span /><span /><span /></div> : <div className={styles.layout}>
-			<aside className={styles.catalog} aria-label="Каталог заданий">
-				<div className={styles.panelHead}><div><span className={styles.eyebrow}>База заданий</span><h2>Каталог</h2></div></div>
-				<label className={styles.search}><span className="sr-only">Поиск заданий</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Найти задание" /></label>
-				<label className={styles.courseSelect}>Курс<select value={activeCourse ?? ''} onChange={event => setActiveCourse(event.target.value ? Number(event.target.value) : null)}><option value="">Все курсы</option>{courses.map(course => <option value={course.id} key={course.id}>{course.name}</option>)}</select></label>
-				<div className={styles.catalogList}>{filteredCourses.length ? filteredCourses.map((course) => <section key={course.id}><h3>{course.name}</h3>{course.categories.map((category) => <div className={styles.category} key={category.id}><h4>{category.name}</h4>{category.tasks.map((task) => <button className={styles.catalogTask} type="button" key={task.id} onClick={() => addTask(task)} disabled={activeItems.some((item) => item.id === task.id)}><span>{task.name}</span><small>{task.complexity ? `Сложность ${task.complexity}` : 'Без уровня'}</small></button>)}</div>)}</section>) : <p className={styles.empty}>В каталоге пока нет заданий по этому запросу.</p>}</div>
-			</aside>
+			{error && <div className={styles.alert} role="alert">{error}<button type="button" onClick={() => setError('')}>Закрыть</button></div>}
+			{loading ? <div className={styles.loading} aria-label="Загружаем каталог и конспекты"><span /><span /><span /></div> : <div className={styles.layout}>
+				<CatalogBrowser courses={courses} activeCourse={activeCourse} onCourseChange={setActiveCourse} onAdd={addTask} />
 
-			<section className={styles.builder} aria-label="Состав занятия">
-				<div className={styles.builderHead}><div><label htmlFor="worklist-name" className={styles.eyebrow}>Название конспекта</label><input id="worklist-name" value={draft.name} onChange={changeName} /></div><button type="button" className={styles.secondary} onClick={() => { if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Создать новый конспект?')) return; setDraft(initialDraft()); setSelectedTaskId(null); setSaveState('clean') }}>Новый</button></div>
-				<div className={styles.sheetChooser} role="group" aria-label="Редактируемый лист"><button type="button" className={activeSheet === 'teacherSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('teacherSheet')}>Лист педагога <span>{draft.teacherSheet.data.items.length}</span></button><button type="button" className={activeSheet === 'studentSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('studentSheet')}>Лист ученика <span>{draft.studentSheet.data.items.length}</span></button></div>
-				{activeItems.length ? <ol className={styles.taskList}>{activeItems.map((task, index) => <li key={task.id} draggable onDragStart={() => setDragId(task.id)} onDragOver={(event) => event.preventDefault()} onDrop={(event) => handleDrop(event, task.id)} className={selectedTaskId === task.id ? styles.selected : ''}><button type="button" className={styles.taskSelect} onClick={() => setSelectedTaskId(task.id)}><span className={styles.order}>{index + 1}</span><span><strong>{task.name}</strong><small>{task.instruction || task.description || 'Инструкция не заполнена'}</small></span></button><div className={styles.itemActions}><button type="button" onClick={() => moveTask(task.id, -1)} disabled={index === 0} aria-label={`Поднять «${task.name}»`}>Выше</button><button type="button" onClick={() => moveTask(task.id, 1)} disabled={index === activeItems.length - 1} aria-label={`Опустить «${task.name}»`}>Ниже</button><button type="button" onClick={() => removeTask(task.id)} aria-label={`Удалить «${task.name}»`}>Удалить</button></div></li>)}</ol> : <div className={styles.empty}><h2>Добавьте задания на {activeSheet === 'teacherSheet' ? 'лист педагога' : 'лист ученика'}</h2><p>Выберите задание слева — оно появится в текущем листе и будет доступно для редактирования.</p></div>}
-				{worklists.length > 0 && <section className={styles.reopen}><h2>Сохранённые конспекты</h2>{worklists.map((worklist) => <button type="button" key={worklist.id} onClick={() => reopen(worklist)}>{worklist.name}<span>Открыть</span></button>)}</section>}
-			</section>
+				<section className={styles.builder} aria-label="Состав занятия">
+					<div className={styles.builderHead}><div><label htmlFor="worklist-name" className={styles.eyebrow}>Название конспекта</label><input id="worklist-name" value={draft.name} onChange={changeName} /></div><button type="button" className={styles.secondary} onClick={() => { if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Создать новый конспект?')) return; setDraft(initialDraft()); setSelectedItemId(null); setSaveState('clean') }}>Новый</button></div>
+					<div className={styles.sheetChooser} role="group" aria-label="Редактируемый лист"><button type="button" className={activeSheet === 'teacherSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('teacherSheet')}>Лист педагога <span>{draft.teacherSheet.data.items.length}</span></button><button type="button" className={activeSheet === 'studentSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('studentSheet')}>Лист ученика <span>{draft.studentSheet.data.items.length}</span></button></div>
+					<div className={styles.insertBar} aria-label="Свои материалы">
+						<label className={styles.secondary} aria-disabled={uploading}><ImageSquare size={17} />{uploading ? 'Загружаем…' : 'Своё изображение'}<input type="file" accept="image/png,image/jpeg" onChange={event => void addOwnImage(event)} disabled={uploading} /></label>
+						<button type="button" className={styles.secondary} onClick={() => addItem(blankItem('text'))}><TextT size={17} />Добавить текст</button>
+						<button type="button" className={styles.secondary} onClick={() => addItem(blankItem('spacer'))}><Plus size={17} />Свободное место</button>
+					</div>
+					<SheetSettings settings={draft[activeSheet].data.settings} onChange={updateSettings} onCopy={copySettings} />
+					{activeItems.length ? <ol className={styles.taskList}>{activeItems.map((item, index) => <li key={item.instanceId} draggable onDragStart={() => setDragId(item.instanceId)} onDragOver={event => event.preventDefault()} onDrop={event => handleDrop(event, item.instanceId)} className={selectedItemId === item.instanceId ? styles.selected : ''}>
+						<button type="button" className={styles.taskSelect} onClick={() => setSelectedItemId(item.instanceId)}><span className={styles.order}>{index + 1}</span>{item.image && <img src={item.image} alt="" />}<span><strong>{item.kind === 'spacer' ? `Свободное место — ${item.spacerHeightMm} мм` : item.name}</strong><small>{item.kind === 'spacer' ? 'Пустая область на печатном листе' : item.instruction || item.description || 'Текст не заполнен'}</small></span></button>
+						<div className={styles.itemActions}><button type="button" onClick={() => moveItem(item.instanceId, -1)} disabled={index === 0} aria-label={`Поднять «${item.name || 'свободное место'}»`}>Выше</button><button type="button" onClick={() => moveItem(item.instanceId, 1)} disabled={index === activeItems.length - 1} aria-label={`Опустить «${item.name || 'свободное место'}»`}>Ниже</button><button type="button" onClick={() => removeItem(item.instanceId)} aria-label={`Удалить «${item.name || 'свободное место'}»`}>Удалить</button></div>
+					</li>)}</ol> : <div className={styles.empty}><h2>Добавьте материалы на {activeSheet === 'teacherSheet' ? 'лист педагога' : 'лист ученика'}</h2><p>Откройте папку каталога, просмотрите упражнение и добавьте его в текущий лист.</p></div>}
+					{worklists.length > 0 && <section className={styles.reopen}><h2>Сохранённые конспекты</h2>{worklists.map(worklist => <button type="button" key={worklist.id} onClick={() => reopen(worklist)}>{worklist.name}<span>Открыть</span></button>)}</section>}
+				</section>
 
-			<aside className={styles.inspector} aria-label="Параметры задания">
-				<div className={styles.panelHead}><div><span className={styles.eyebrow}>Редактор</span><h2>{selectedTask ? selectedTask.name : 'Выберите задание'}</h2></div></div>
-				{selectedTask ? <div className={styles.form}>
-					<label>Название<input value={selectedTask.name} onChange={(event) => updateTask('name', event.target.value)} /></label>
-					<label>Описание<textarea value={selectedTask.description} onChange={(event) => updateTask('description', event.target.value)} /></label>
-					<label>Инструкция<textarea value={selectedTask.instruction} onChange={(event) => updateTask('instruction', event.target.value)} /></label>
-					<label>Сложность<input type="number" min={1} value={selectedTask.complexity ?? ''} onChange={(event) => updateTask('complexity', event.target.value ? Number(event.target.value) : null)} /></label>
-					{selectedTask.image && <img className={styles.previewImage} src={selectedTask.image} alt="Предпросмотр задания" />}
-				</div> : <p className={styles.empty}>Поля задания появятся здесь после добавления в конспект.</p>}
-			</aside>
-		</div>}
-
+				<aside className={styles.inspector} aria-label="Параметры элемента">
+					<div className={styles.panelHead}><div><span className={styles.eyebrow}>Редактор</span><h2>{selectedItem ? selectedItem.kind === 'spacer' ? 'Свободное место' : selectedItem.name : 'Выберите элемент'}</h2></div></div>
+					{selectedItem ? <div className={styles.form}>
+						{selectedItem.kind === 'spacer' ? <label>Высота, мм<input type="number" min="1" value={selectedItem.spacerHeightMm} onChange={event => updateItem('spacerHeightMm', Number(event.target.value))} /></label> : <>
+							<label>Название<input value={selectedItem.name} onChange={event => updateItem('name', event.target.value)} /></label>
+							<label>Описание<textarea value={selectedItem.description} onChange={event => updateItem('description', event.target.value)} /></label>
+							<label>Инструкция / текст<textarea value={selectedItem.instruction} onChange={event => updateItem('instruction', event.target.value)} /></label>
+							{selectedItem.kind === 'task' && <label>Сложность<input type="number" min="1" value={selectedItem.complexity ?? ''} onChange={event => updateItem('complexity', event.target.value ? Number(event.target.value) : null)} /></label>}
+							<label className={styles.checkField}><input type="checkbox" checked={selectedItem.showDescription} onChange={event => updateItem('showDescription', event.target.checked)} /> Показывать описание</label>
+							<label className={styles.checkField}><input type="checkbox" checked={selectedItem.showInstruction} onChange={event => updateItem('showInstruction', event.target.checked)} /> Показывать инструкцию</label>
+							{selectedItem.image && <><label>Ширина изображения, %<input type="number" min="1" max="100" value={selectedItem.imageWidthPercent} onChange={event => updateItem('imageWidthPercent', Number(event.target.value))} /></label><label>Выравнивание<select aria-label="Выравнивание" value={selectedItem.imageAlignment} onChange={event => updateItem('imageAlignment', event.target.value as StudioImageAlignment)}><option value="left">Слева</option><option value="center">По центру</option><option value="right">Справа</option></select></label></>}
+							<label className={styles.uploadReplacement}>{selectedItem.image ? 'Заменить изображение' : 'Добавить изображение'}<input type="file" accept="image/png,image/jpeg" onChange={event => void replaceImage(event)} disabled={uploading} /></label>
+							{selectedItem.image && <img className={styles.previewImage} src={selectedItem.image} alt="Предпросмотр задания" />}
+						</>}
+					</div> : <p className={styles.empty}>Нажмите на добавленный элемент, чтобы скорректировать его копию. Каталог при этом не изменится.</p>}
+				</aside>
+			</div>}
 		</fieldset>
 		<section className={styles.manuals} aria-label="Руководства"><span>Нужна инструкция к материалам?</span><Link href="/docs" target="_blank" rel="noreferrer">Открыть руководства ↗</Link></section>
-		<section className={styles.sheet} aria-label="Предпросмотр листа">
-			<div className={styles.sheetHead}><div><span className={styles.eyebrow}>Предпросмотр</span><h2>{activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'}</h2></div><div className={styles.switch} role="group" aria-label="Версия листа"><button type="button" className={activeSheet === 'teacherSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('teacherSheet')}>Педагог</button><button type="button" className={activeSheet === 'studentSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('studentSheet')}>Ученик</button></div></div>
-			<article className={styles.paper}><header><small>LabStudio</small><h2>{draft.name || 'Без названия'}</h2></header>{activeItems.length ? <ol>{activeItems.map((task) => <li key={task.id}><h3>{task.name}</h3>{task.image && <img src={task.image} alt="" />}{task.description && <p>{task.description}</p>}<p>{task.instruction || 'Инструкция не заполнена.'}</p>{task.complexity && <small>Сложность: {task.complexity}</small>}</li>)}</ol> : <p>Выберите задания в каталоге, чтобы увидеть готовый лист.</p>}</article>
-		</section>
+		<SheetPreview sheet={draft[activeSheet]} title={draft.name} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} />
 	</main>
 }
-
-export default StudioWorkspace

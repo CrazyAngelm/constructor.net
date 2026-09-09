@@ -2,7 +2,7 @@ import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { getPrisma } from '@/lib/api/database'
 import { responseAuth } from '@/lib/api/response'
 import { getStudioCatalogAccess } from '@/lib/studio/access'
-import { collectDescendantCategoryIds } from '@/lib/studio/catalog'
+import { buildCategoryForest, collectDescendantCategoryIds, selectRootCategoryIds } from '@/lib/studio/catalog'
 
 const prisma = getPrisma()
 const handler = getDefaultHandler()
@@ -44,25 +44,43 @@ handler.get(responseAuth(async (_req, _res, userId) => {
 			},
 			CategoryToTask: {
 				where: { task: { deleted: false } },
-				select: { task: true },
+				select: { task: { select: {
+					id: true,
+					name: true,
+					description: true,
+					instruction: true,
+					complexity: true,
+					image: true,
+				} } },
 				orderBy: { taskId: 'asc' },
 			},
 		},
 		orderBy: { id: 'asc' },
 	})
-	const byId = new Map(categories.map((category) => [category.id, category]))
+	const byId = new Map(categories.map((category) => [ category.id, category ]))
 	const categoryTree = categories.map((category) => ({
 		id: category.id,
 		childrenIds: category.CategoryParent.map((relation) => relation.childrenId),
 	}))
+	const categoryData = categories.map(category => ({
+		id: category.id,
+		name: category.name,
+		description: category.description,
+		childrenIds: category.CategoryParent.map(relation => relation.childrenId),
+		tasks: category.CategoryToTask.map(({ task }) => task),
+	}))
 	return {
 		response: {
-			courses: courses.map((course) => ({
+			courses: courses.map((course) => {
+				const linkedIds = course.CourseToCategory.map(item => item.categoryId)
+				const rootIds = selectRootCategoryIds(linkedIds, categoryTree)
+				return {
 				id: course.id,
 				name: course.name,
 				description: course.description,
 				folders: course.FolderToCourse.map(({ folder }) => ({ id: folder.id, name: folder.name })),
-				categories: collectDescendantCategoryIds(course.CourseToCategory.map((item) => item.categoryId), categoryTree)
+				categoryTree: buildCategoryForest(rootIds, categoryData),
+				categories: collectDescendantCategoryIds(rootIds, categoryTree)
 					.map((categoryId) => byId.get(categoryId))
 					.filter((category): category is NonNullable<typeof category> => Boolean(category))
 					.map((category) => ({
@@ -71,7 +89,8 @@ handler.get(responseAuth(async (_req, _res, userId) => {
 						description: category.description,
 						tasks: category.CategoryToTask.map(({ task }) => task),
 					})),
-			})),
+				}
+			}),
 		},
 	}
 }))
