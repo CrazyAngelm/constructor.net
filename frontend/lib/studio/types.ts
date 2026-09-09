@@ -23,7 +23,6 @@ export interface StudioCourse {
 	id: number
 	name: string
 	description?: string
-	categories: StudioCategory[]
 	categoryTree: StudioCategory[]
 }
 

@@ -1,6 +1,11 @@
 import { test, expect, Page, TestInfo } from '@playwright/test'
 import type { StudioCategory } from '../../components/studio/StudioWorkspace'
 
+const flattenCategories = (nodes: StudioCategory[]): StudioCategory[] => nodes.flatMap(node => [
+	node,
+	...flattenCategories(node.children),
+])
+
 async function screenshot(page: Page, testInfo: TestInfo, name: string) {
 	await page.evaluate(() => document.fonts.ready)
 	await page.evaluate(async () => { await Promise.all([ ...document.images ].map(image => { image.loading = 'eager'; return image.decode().catch(() => undefined) })) })
@@ -105,7 +110,8 @@ test('admin lists and existing editors are readable without changing records', a
 	await expect(page.getByLabel('Название', { exact: true })).toHaveValue(course.name)
 	await screenshot(page, testInfo, 'admin-course')
 	await page.getByRole('button', { name: 'Развернуть ' + course.name, exact: true }).click()
-	const category = course.categories.find((item: StudioCategory) => item.tasks.length)
+	const category = flattenCategories(course.categoryTree).find((item: StudioCategory) => item.tasks.length)
+	if (!category || !category.tasks[0]) throw new Error('Preview catalog must contain a category with a task')
 	await page.getByRole('button', { name: category.name, exact: true }).click()
 	await expect(page.getByRole('heading', { name: 'Задания', exact: true })).toBeVisible()
 	await screenshot(page, testInfo, 'admin-category')

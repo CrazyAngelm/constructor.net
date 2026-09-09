@@ -19,6 +19,11 @@ const flattenTasks = (nodes: StudioCategory[]): StudioTask[] => nodes.flatMap(no
 	...flattenTasks(node.children),
 ])
 
+const flattenCategories = (nodes: StudioCategory[]): StudioCategory[] => nodes.flatMap(node => [
+	node,
+	...flattenCategories(node.children),
+])
+
 const findNestedTaskPath = (nodes: StudioCategory[], path: StudioCategory[] = []): StudioCategory[] | null => {
 	for (const node of nodes) {
 		const next = [ ...path, node ]
@@ -41,9 +46,12 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 
 	const catalogResponse = await page.request.get('/api/studio/catalog')
 	expect(catalogResponse.ok()).toBeTruthy()
-	const catalog = await catalogResponse.json() as { courses: StudioCourse[] }
+	const catalogBody = await catalogResponse.body()
+	expect(catalogBody.byteLength, 'catalog response must stay below the Next.js API response warning threshold').toBeLessThan(4 * 1024 * 1024)
+	const catalog = JSON.parse(catalogBody.toString()) as { courses: StudioCourse[] }
 	expect(catalog.courses.length).toBeGreaterThan(0)
 	expect(catalog.courses.every(course => Array.isArray(course.categoryTree)), JSON.stringify(catalog.courses.map(course => Object.keys(course)))).toBeTruthy()
+	expect(catalog.courses.every(course => !('categories' in course))).toBeTruthy()
 	const nestedCourse = catalog.courses.find(course => findNestedTaskPath(course.categoryTree))
 	expect(nestedCourse, 'the copied desktop catalog must contain nested folders').toBeTruthy()
 	const nestedPath = findNestedTaskPath(nestedCourse!.categoryTree)!
@@ -189,7 +197,7 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 		expect((await admin.request.get(`/api/studio/worklists/${saved.id}`)).status()).toBe(404)
 
 		const course = catalog.courses[0]!
-		const category = course.categories.find(item => item.tasks.length > 0)!
+		const category = flattenCategories(course.categoryTree).find(item => item.tasks.length > 0)!
 		const adminPage = await admin.newPage()
 		await adminPage.goto('/adm')
 		await adminPage.locator('menu').hover()
@@ -211,7 +219,7 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 			try {
 				const hidden = await (await second.request.get('/api/studio/catalog')).json()
 				if (type === 'course') expect(hidden.courses.some((item: StudioCourse) => item.id === id)).toBe(false)
-				else expect(hidden.courses.flatMap((item: StudioCourse) => item.categories).some((item: StudioCategory) => item.id === id)).toBe(false)
+				else expect(hidden.courses.flatMap((item: StudioCourse) => flattenCategories(item.categoryTree)).some((item: StudioCategory) => item.id === id)).toBe(false)
 			} finally {
 				expect((await admin.request.patch(endpoint, { data: { visible: true } })).ok()).toBeTruthy()
 			}
