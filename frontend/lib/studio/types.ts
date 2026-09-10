@@ -1,6 +1,8 @@
 export type StudioPageFormat = 'A5' | 'A4' | 'A3'
 export type StudioItemKind = 'task' | 'image' | 'text' | 'spacer'
 export type StudioImageAlignment = 'left' | 'center' | 'right'
+export type StudioFontFamily = 'inherit' | 'Arial'
+export const studioFontCss = (font?: StudioFontFamily) => font === 'Arial' ? 'Arial, sans-serif' : 'var(--font-ui)'
 
 export interface StudioTask {
 	id: number
@@ -34,6 +36,10 @@ export interface StudioPageSettings {
 	showItemNumbers: boolean
 	fontSizePt: number
 	itemGapMm: number
+	fontFamily?: StudioFontFamily
+	headingSizePt?: number
+	footerFontFamily?: StudioFontFamily
+	footerSizePt?: number
 }
 
 export interface StudioSheetItem {
@@ -50,6 +56,10 @@ export interface StudioSheetItem {
 	imageWidthPercent: number
 	imageAlignment: StudioImageAlignment
 	spacerHeightMm: number
+	fontFamily?: StudioFontFamily
+	fontSizePt?: number
+	textAlignment?: StudioImageAlignment
+	companion?: StudioSheetItem
 }
 
 export interface StudioSheetV1 {
@@ -62,13 +72,21 @@ export interface StudioSheetV2 {
 	data: { items: StudioSheetItem[]; settings: StudioPageSettings }
 }
 
-export type StudioSheet = StudioSheetV1 | StudioSheetV2
+export interface StudioSheetV3 {
+	version: 3
+	data: { items: StudioSheetItem[]; settings: StudioPageSettings }
+}
+
+export type StudioSheet = StudioSheetV1 | StudioSheetV2 | StudioSheetV3
+
+export interface StudioFolder { id: string; name: string }
 
 export interface StudioWorklist {
 	id: string
 	name: string
-	teacherSheet: StudioSheetV2
-	studentSheet: StudioSheetV2
+	teacherSheet: StudioSheetV3
+	studentSheet: StudioSheetV3
+	personalFolderId?: string | null
 	courseId?: number | null
 	folderId?: string | null
 	position?: number
@@ -86,8 +104,8 @@ export const defaultPageSettings = (): StudioPageSettings => ({
 	itemGapMm: 5,
 })
 
-export const emptyStudioSheet = (): StudioSheetV2 => ({
-	version: 2,
+export const emptyStudioSheet = (): StudioSheetV3 => ({
+	version: 3,
 	data: { items: [], settings: defaultPageSettings() },
 })
 
@@ -107,10 +125,10 @@ export const catalogTaskToSheetItem = (task: StudioTask, instanceId: string): St
 	spacerHeightMm: 0,
 })
 
-export const upgradeStudioSheet = (sheet?: StudioSheet): StudioSheetV2 => {
-	if (sheet?.version === 2 && Array.isArray(sheet.data?.items)) {
+export const upgradeStudioSheet = (sheet?: StudioSheet): StudioSheetV3 => {
+	if ((sheet?.version === 2 || sheet?.version === 3) && Array.isArray(sheet.data?.items)) {
 		return {
-			version: 2,
+			version: 3,
 			data: {
 				items: sheet.data.items,
 				settings: sheet.data.settings || defaultPageSettings(),
@@ -119,7 +137,7 @@ export const upgradeStudioSheet = (sheet?: StudioSheet): StudioSheetV2 => {
 	}
 	if (sheet?.version === 1 && Array.isArray(sheet.data?.items)) {
 		return {
-			version: 2,
+			version: 3,
 			data: {
 				items: sheet.data.items.map((task, index) => catalogTaskToSheetItem(task, `legacy-${task.id}-${index}`)),
 				settings: defaultPageSettings(),

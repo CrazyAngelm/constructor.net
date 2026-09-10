@@ -70,6 +70,7 @@ handler.get(responseAuth(async (_req, _res, userId) => {
 	}))
 	return {
 		response: {
+			canEditFooter: access.canEditFooter,
 			courses: courses.map((course) => {
 				const linkedIds = course.CourseToCategory.map(item => item.categoryId)
 				const rootIds = selectRootCategoryIds(linkedIds, categoryTree)

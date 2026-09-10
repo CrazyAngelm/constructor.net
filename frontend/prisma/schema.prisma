@@ -47,6 +47,7 @@ model User {
   Subcription     Subscription[]
   Payment         Payment[]
   studioWorklists StudioWorklist[]
+  studioFolders   StudioFolder[]
 }
 
 model VerificationToken {
@@ -277,6 +278,7 @@ model StudioWorklist {
   ownerId      String
   courseId     Int?
   folderId     String?
+  personalFolderId String?
   name         String
   teacherSheet String   @db.LongText
   studentSheet String   @db.LongText
@@ -287,8 +289,20 @@ model StudioWorklist {
   owner  User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
   folder Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  personalFolder StudioFolder? @relation(fields: [personalFolderId], references: [id], onDelete: SetNull)
 
   @@index([ownerId, position])
   @@index([courseId])
   @@index([folderId])
+  @@index([personalFolderId])
+}
+
+model StudioFolder {
+  id String @id @default(uuid())
+  ownerId String
+  name String @db.VarChar(191)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  worklists StudioWorklist[]
+
+  @@index([ownerId])
 }

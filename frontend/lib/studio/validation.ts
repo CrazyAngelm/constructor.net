@@ -1,5 +1,6 @@
 import type {
 	StudioImageAlignment,
+	StudioFontFamily,
 	StudioItemKind,
 	StudioPageFormat,
 	StudioPageSettings,
@@ -14,6 +15,7 @@ export interface CreateStudioWorklistPayload {
 	studentSheet: StudioSheet
 	courseId?: number
 	folderId?: string
+	personalFolderId?: string | null
 }
 
 export interface UpdateStudioWorklistPayload {
@@ -22,6 +24,7 @@ export interface UpdateStudioWorklistPayload {
 	studentSheet?: StudioSheet
 	courseId?: number | null
 	folderId?: string | null
+	personalFolderId?: string | null
 }
 
 export type ValidationResult<T> = { value: T } | { error: string }
@@ -29,6 +32,8 @@ export type ValidationResult<T> = { value: T } | { error: string }
 const isObject = (value: unknown): value is Record<string, unknown> =>
 	typeof value === 'object' && value !== null && !Array.isArray(value)
 const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+const validFont = (value: unknown) => value === undefined || value === 'inherit' || value === 'Arial'
+const validSize = (value: unknown) => value === undefined || (isFiniteNumber(value) && value > 0)
 
 const parseLegacyTask = (value: unknown): ValidationResult<StudioTask> => {
 	if (!isObject(value) || !Number.isSafeInteger(value.id) || (value.id as number) < 1
@@ -56,6 +61,7 @@ const parseSettings = (value: unknown): ValidationResult<StudioPageSettings> => 
 		return { error: 'Настройки листа заполнены некорректно' }
 	}
 	const margins = value.margins
+	if (!validFont(value.fontFamily) || !validFont(value.footerFontFamily) || !validSize(value.headingSizePt) || !validSize(value.footerSizePt)) return { error: 'Некорректное оформление листа' }
 	const marginValues = [ margins.top, margins.right, margins.bottom, margins.left ]
 	if (!marginValues.every(margin => isFiniteNumber(margin) && margin >= 0)) {
 		return { error: 'Поля листа заполнены некорректно' }
@@ -77,13 +83,17 @@ const parseSettings = (value: unknown): ValidationResult<StudioPageSettings> => 
 		showItemNumbers: value.showItemNumbers,
 		fontSizePt: value.fontSizePt,
 		itemGapMm: value.itemGapMm,
+		...(value.fontFamily === undefined ? {} : { fontFamily: value.fontFamily as StudioFontFamily }),
+		...(value.headingSizePt === undefined ? {} : { headingSizePt: value.headingSizePt as number }),
+		...(value.footerFontFamily === undefined ? {} : { footerFontFamily: value.footerFontFamily as StudioFontFamily }),
+		...(value.footerSizePt === undefined ? {} : { footerSizePt: value.footerSizePt as number }),
 	} }
 }
 
 const itemKinds: StudioItemKind[] = [ 'task', 'image', 'text', 'spacer' ]
 const imageAlignments: StudioImageAlignment[] = [ 'left', 'center', 'right' ]
 
-const parseItem = (value: unknown): ValidationResult<StudioSheetItem> => {
+const parseItem = (value: unknown, allowCompanion = false): ValidationResult<StudioSheetItem> => {
 	if (!isObject(value) || typeof value.instanceId !== 'string' || value.instanceId.length === 0
 		|| !itemKinds.includes(value.kind as StudioItemKind)
 		|| !(value.sourceTaskId === null || (Number.isSafeInteger(value.sourceTaskId) && (value.sourceTaskId as number) > 0))
@@ -99,6 +109,15 @@ const parseItem = (value: unknown): ValidationResult<StudioSheetItem> => {
 	}
 	if (value.kind === 'image' && !value.image) return { error: 'Для пользовательского изображения требуется файл' }
 	if (value.kind === 'spacer' && value.spacerHeightMm === 0) return { error: 'Высота свободного места должна быть больше нуля' }
+	if (!validFont(value.fontFamily) || !validSize(value.fontSizePt) || (value.textAlignment !== undefined && !imageAlignments.includes(value.textAlignment as StudioImageAlignment))) return { error: 'Некорректное оформление задания' }
+	let companion: StudioSheetItem | undefined
+	if (value.companion !== undefined) {
+		if (!allowCompanion || value.kind === 'spacer') return { error: 'В строке могут быть только два элемента без вложенных строк' }
+		const parsed = parseItem(value.companion)
+		if ('error' in parsed) return parsed
+		if (parsed.value.kind === 'spacer') return { error: 'Свободное место нельзя поместить в соседнюю колонку' }
+		companion = parsed.value
+	}
 	return { value: {
 		instanceId: value.instanceId,
 		sourceTaskId: value.sourceTaskId as number | null,
@@ -113,6 +132,10 @@ const parseItem = (value: unknown): ValidationResult<StudioSheetItem> => {
 		imageWidthPercent: value.imageWidthPercent,
 		imageAlignment: value.imageAlignment as StudioImageAlignment,
 		spacerHeightMm: value.spacerHeightMm,
+		...(value.fontFamily === undefined ? {} : { fontFamily: value.fontFamily as StudioFontFamily }),
+		...(value.fontSizePt === undefined ? {} : { fontSizePt: value.fontSizePt as number }),
+		...(value.textAlignment === undefined ? {} : { textAlignment: value.textAlignment as StudioImageAlignment }),
+		...(companion ? { companion } : {}),
 	} }
 }
 
@@ -132,19 +155,20 @@ const parseSheet = (value: unknown): ValidationResult<StudioSheet> => {
 		}
 		return { value: { version: 1, data: { items } } }
 	}
-	if (value.version === 2) {
+	if (value.version === 2 || value.version === 3) {
 		const settings = parseSettings(value.data.settings)
 		if ('error' in settings) return settings
 		const items: StudioSheetItem[] = []
 		for (const item of value.data.items) {
-			const parsed = parseItem(item)
+			const parsed = parseItem(item, value.version === 3)
 			if ('error' in parsed) return parsed
 			items.push(parsed.value)
 		}
-		if (new Set(items.map(item => item.instanceId)).size !== items.length) {
+		const ids = items.flatMap(item => [ item.instanceId, ...(item.companion ? [ item.companion.instanceId ] : []) ])
+		if (new Set(ids).size !== ids.length) {
 			return { error: 'Экземпляры элементов листа не должны повторяться' }
 		}
-		return { value: { version: 2, data: { items, settings: settings.value } } }
+		return { value: { version: value.version, data: { items, settings: settings.value } } }
 	}
 	return { error: 'Версия листа не поддерживается' }
 }
@@ -175,17 +199,20 @@ export const parseCreateStudioWorklist = (body: unknown): ValidationResult<Creat
 	const studentSheet = parseSheet(body.studentSheet)
 	const courseId = parseCourseId(body.courseId, false)
 	const folderId = parseFolderId(body.folderId, false)
+	const personalFolderId = parseFolderId(body.personalFolderId, true)
 	if ('error' in name) return name
 	if ('error' in teacherSheet) return teacherSheet
 	if ('error' in studentSheet) return studentSheet
 	if ('error' in courseId) return courseId
 	if ('error' in folderId) return folderId
+	if ('error' in personalFolderId) return personalFolderId
 	return { value: {
 		name: name.value,
 		teacherSheet: teacherSheet.value,
 		studentSheet: studentSheet.value,
 		...(typeof courseId.value === 'number' ? { courseId: courseId.value } : {}),
 		...(typeof folderId.value === 'string' ? { folderId: folderId.value } : {}),
+		...(personalFolderId.value === undefined ? {} : { personalFolderId: personalFolderId.value }),
 	} }
 }
 
@@ -196,19 +223,22 @@ export const parseUpdateStudioWorklist = (body: unknown): ValidationResult<Updat
 	const studentSheet = body.studentSheet === undefined ? { value: undefined } : parseSheet(body.studentSheet)
 	const courseId = parseCourseId(body.courseId, true)
 	const folderId = parseFolderId(body.folderId, true)
+	const personalFolderId = parseFolderId(body.personalFolderId, true)
 	if ('error' in name) return name
 	if ('error' in teacherSheet) return teacherSheet
 	if ('error' in studentSheet) return studentSheet
 	if ('error' in courseId) return courseId
 	if ('error' in folderId) return folderId
+	if ('error' in personalFolderId) return personalFolderId
 	if (name.value === undefined && teacherSheet.value === undefined && studentSheet.value === undefined
-		&& courseId.value === undefined && folderId.value === undefined) return { error: 'Нет данных для изменения' }
+		&& courseId.value === undefined && folderId.value === undefined && personalFolderId.value === undefined) return { error: 'Нет данных для изменения' }
 	return { value: {
 		...(name.value === undefined ? {} : { name: name.value }),
 		...(teacherSheet.value === undefined ? {} : { teacherSheet: teacherSheet.value }),
 		...(studentSheet.value === undefined ? {} : { studentSheet: studentSheet.value }),
 		...(courseId.value === undefined ? {} : { courseId: courseId.value }),
 		...(folderId.value === undefined ? {} : { folderId: folderId.value }),
+		...(personalFolderId.value === undefined ? {} : { personalFolderId: personalFolderId.value }),
 	} }
 }
 

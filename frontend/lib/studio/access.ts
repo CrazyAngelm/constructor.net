@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 import { ScopeEnum } from '@/lib/dto/users'
+import { licenseCanEditFooter } from './footer'
 
 export interface StudioCatalogAccess {
 	isAdmin: boolean
 	courseIds: number[]
+	canEditFooter: boolean
 }
 
 const parseCourseIds = (value: string | null): number[] => {
@@ -26,7 +28,7 @@ export const getStudioCatalogAccess = async (
 	})
 	if (!user) return null
 	const isAdmin = user.scopes.some((item) => item.scope.value === ScopeEnum.admin)
-	if (isAdmin) return { isAdmin: true, courseIds: [] }
+	if (isAdmin) return { isAdmin: true, courseIds: [], canEditFooter: true }
 
 	const subscription = await prisma.subscription.findFirst({
 		where: {
@@ -40,5 +42,5 @@ export const getStudioCatalogAccess = async (
 	})
 	if (!subscription) return null
 	const selectedCourses = parseCourseIds(subscription.courses)
-	return { isAdmin: false, courseIds: [ ...new Set([...selectedCourses, ...parseCourseIds(subscription.license.courses)]) ] }
+	return { isAdmin: false, courseIds: [ ...new Set([...selectedCourses, ...parseCourseIds(subscription.license.courses)]) ], canEditFooter: licenseCanEditFooter(subscription.license) }
 }

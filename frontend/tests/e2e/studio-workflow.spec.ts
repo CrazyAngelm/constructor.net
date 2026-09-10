@@ -76,6 +76,13 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 	const leaf = nestedPath.at(-1)!
 	await tree.getByRole('button', { name: leaf.name, exact: true }).last().click()
 	await expect(catalogPanel.getByRole('heading', { name: leaf.name, exact: true }).last()).toBeVisible()
+	const otherCourse = catalog.courses.find(course => course.id !== nestedCourse!.id)
+	if (otherCourse) {
+		await courseSelect.selectOption(String(otherCourse.id))
+		await courseSelect.selectOption(String(nestedCourse!.id))
+		await expect(tree.getByRole('button', { name: leaf.name, exact: true }).last()).toBeVisible()
+		await expect(catalogPanel.getByRole('heading', { name: leaf.name, exact: true }).last()).toBeVisible()
+	}
 
 	const tasks = [ ...new Map<number, StudioTask>(catalog.courses
 		.flatMap(course => flattenTasks(course.categoryTree))
@@ -105,6 +112,7 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 	const uploadedResult = await uploadResponse
 	expect(uploadedResult.ok()).toBeTruthy()
 	const uploaded = await uploadedResult.json() as { url: string }
+	await testInfo.attach('uploaded-test-files', { body: JSON.stringify([ uploaded.url ]), contentType: 'application/json' })
 	expect(uploaded.url).toMatch(/^\/api\/studio\/files\/[0-9a-f-]{36}\.png$/)
 	await page.getByRole('button', { name: 'Добавить текст', exact: true }).click()
 	await page.getByRole('button', { name: 'Свободное место', exact: true }).click()
@@ -133,7 +141,7 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 	const savedResponse = await saveResponse
 	expect(savedResponse.ok()).toBeTruthy()
 	const saved = await savedResponse.json()
-	expect(saved.teacherSheet.version).toBe(2)
+	expect(saved.teacherSheet.version).toBe(3)
 	expect(saved.teacherSheet.data.items).toHaveLength(5)
 	expect(saved.teacherSheet.data.items.slice(0, 2).map((item: StudioSheetItem) => item.sourceTaskId)).toEqual([ selected[1].id, selected[0].id ])
 	expect(saved.teacherSheet.data.items[1].instruction).toBe('Проверенная инструкция педагога')
@@ -177,11 +185,13 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 		expect(imageChecks.length).toBeGreaterThan(1)
 		expect(imageChecks.every(Boolean)).toBeTruthy()
 		await reopened.screenshot({ path: testInfo.outputPath('workspace.png'), fullPage: true })
+		const screenPageCount = await preview.locator('article[aria-label^="Страница"]').count()
 		await reopened.emulateMedia({ media: 'print' })
 		await expect(reopened.getByRole('complementary', { name: 'Каталог заданий' })).toBeHidden()
 		await expect(preview).toBeVisible()
 		await reopened.screenshot({ path: testInfo.outputPath('print-preview.png'), fullPage: true })
 		await reopened.pdf({ path: testInfo.outputPath('teacher-sheet.pdf'), printBackground: true, preferCSSPageSize: true })
+		expect(await preview.locator('article[aria-label^="Страница"]').count()).toBe(screenPageCount)
 		await reopened.emulateMedia({ media: 'screen' })
 
 		const imageResponse = await second.request.get(selected[0].image)

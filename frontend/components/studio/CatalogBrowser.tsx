@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- authenticated catalog images are rendered without the public image optimizer */
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { CaretRight, Eye, Plus, X } from '@phosphor-icons/react'
 
@@ -64,7 +64,7 @@ const CategoryNode = ({ node, level, selectedId, openIds, previewableIds, onSele
 	return <li>
 		<div className={`${styles.treeRow} ${selectedId === node.id ? styles.treeSelected : ''}`} style={{ paddingLeft: `${8 + level * 16}px` }}>
 			{node.children.length ? <button type="button" className={styles.treeToggle} onClick={() => onToggle(node.id)} aria-label={`${open ? 'Свернуть' : 'Развернуть'} ${node.name}`} aria-expanded={open}><CaretRight size={14} weight="bold" /></button> : <span className={styles.treeLeaf} />}
-			<button type="button" className={styles.treeName} onClick={() => onSelect(node)}>{node.name}</button>
+			<button type="button" className={styles.treeName} onClick={() => onSelect(node)} aria-expanded={node.children.length ? open : undefined} title={node.children.length ? 'Нажмите, чтобы раскрыть или свернуть папку' : 'Открыть упражнения'}>{node.name}</button>
 			{previewableIds.has(node.id) && <button type="button" className={styles.iconButton} onClick={() => onPreview(node)} aria-label={`Посмотреть упражнения раздела «${node.name}»`} title="Посмотреть упражнения"><Eye size={17} /></button>}
 		</div>
 		{open && node.children.length > 0 && <ul>{node.children.map(child => <CategoryNode key={`${node.id}-${child.id}`} node={child} level={level + 1} selectedId={selectedId} openIds={openIds} previewableIds={previewableIds} onSelect={onSelect} onToggle={onToggle} onPreview={onPreview} />)}</ul>}
@@ -89,7 +89,7 @@ const TaskPreview = ({ task, onClose, onAdd }: { task: StudioTask; onClose: () =
 		<section className={styles.previewDialog} role="dialog" aria-modal="true" aria-labelledby="task-preview-title">
 			<header><div><span className={styles.eyebrow}>Предварительный просмотр</span><h2 id="task-preview-title">{task.name}</h2></div><button type="button" className={styles.iconButton} onClick={onClose} aria-label="Закрыть просмотр"><X size={20} /></button></header>
 			<div className={styles.previewBody}>
-				{task.image ? <img src={task.image} alt={task.name} /> : <div className={styles.noImage}>У этого упражнения нет изображения</div>}
+				{task.image ? <img src={task.image} alt={task.name} /> : !task.instruction.trim() && !task.description.trim() ? <div className={styles.noImage}>Содержание пока не заполнено</div> : null}
 				{task.description && <section><h3>Описание</h3><p>{task.description}</p></section>}
 				{task.instruction && <section><h3>Инструкция</h3><p>{task.instruction}</p></section>}
 			</div>
@@ -110,10 +110,11 @@ const CategoryPreview = ({ category, onClose, onPreview, onAdd }: {
 		<div className={`${styles.previewBody} ${styles.categoryPreviewGrid}`}>
 			{tasks.map(({ task, path }) => <article key={`${path.join('-')}-${task.id}`} className={styles.categoryPreviewCard}>
 				<button type="button" className={styles.categoryPreviewOpen} onClick={() => onPreview(task)} aria-label={`Открыть «${task.name}»`}>
-					{task.image ? <img src={task.image} alt="" loading="lazy" /> : <span className={styles.noImage}>Без изображения</span>}
+					{task.image ? <img src={task.image} alt="" loading="lazy" /> : <span className={styles.textPreview}>{task.instruction.trim() || task.description.trim() || 'Содержание пока не заполнено'}</span>}
 					<strong>{task.name}</strong>
 					<span>{path.join(' / ')}</span>
 					{task.description && <small>{task.description}</small>}
+					{!task.image && (task.instruction.trim() || task.description.trim()) && <span className={styles.readMore}>Читать полностью</span>}
 				</button>
 				<button type="button" className={styles.primary} onClick={() => onAdd(task)}>Добавить</button>
 			</article>)}
@@ -123,47 +124,48 @@ const CategoryPreview = ({ category, onClose, onPreview, onAdd }: {
 	</div>, document.body)
 }
 
-export default function CatalogBrowser({ courses, activeCourse, onCourseChange, onAdd }: {
+export default function CatalogBrowser({ courses, activeCourse, onCourseChange, onAdd, onRefresh, refreshing, refreshStatus }: {
 	courses: StudioCourse[]
 	activeCourse: number | null
 	onCourseChange: (id: number) => void
 	onAdd: (task: StudioTask) => void
+	onRefresh: () => void
+	refreshing: boolean
+	refreshStatus: string
 }) {
 	const [ query, setQuery ] = useState('')
-	const [ selectedCategoryId, setSelectedCategoryId ] = useState<number | null>(null)
-	const [ openIds, setOpenIds ] = useState<Set<number>>(new Set())
+	const [ navigation, setNavigation ] = useState<Record<number, { selectedId: number | null; openIds: Set<number> }>>({})
 	const [ previewTask, setPreviewTask ] = useState<StudioTask | null>(null)
 	const [ previewCategory, setPreviewCategory ] = useState<StudioCategory | null>(null)
 	const course = courses.find(item => item.id === activeCourse) || courses[0]
 	const roots = useMemo(() => course?.categoryTree || [], [ course ])
 	const previewableIds = useMemo(() => collectPreviewableCategoryIds(roots), [ roots ])
 
-	useEffect(() => {
-		if (!course) return
-		const first = roots[0]
-		setSelectedCategoryId(first?.id ?? null)
-		setOpenIds(first ? new Set([ first.id ]) : new Set())
-	}, [ course?.id ]) // eslint-disable-line react-hooks/exhaustive-deps
-
-	const selectedCategory = findCategory(roots, selectedCategoryId)
+	const currentNavigation = course ? navigation[course.id] : undefined
+	const selectedCategory = findCategory(roots, currentNavigation?.selectedId ?? null) || roots[0] || null
+	const selectedCategoryId = selectedCategory?.id ?? null
+	const openIds = currentNavigation?.openIds ?? new Set(roots[0] ? [ roots[0].id ] : [])
 	const matches = useMemo(() => {
 		if (!query.trim()) return []
 		const found = collectMatches(roots, query.trim().toLocaleLowerCase('ru'))
 		return [ ...new Map(found.map(item => [ item.task.id, item ])).values() ]
 	}, [ roots, query ])
-	const toggle = (id: number) => setOpenIds(current => {
-		const next = new Set(current)
+	const toggle = (id: number) => {
+		if (!course) return
+		const next = new Set(openIds)
 		if (next.has(id)) next.delete(id)
 		else next.add(id)
-		return next
-	})
+		setNavigation(current => ({ ...current, [course.id]: { selectedId: id, openIds: next } }))
+	}
 	const choose = (category: StudioCategory) => {
-		setSelectedCategoryId(category.id)
-		setOpenIds(current => new Set(current).add(category.id))
+		if (!course) return
+		if (category.children.length) toggle(category.id)
+		else setNavigation(current => ({ ...current, [course.id]: { selectedId: category.id, openIds } }))
 	}
 
 	return <aside className={styles.catalog} aria-label="Каталог заданий">
-		<div className={styles.panelHead}><div><span className={styles.eyebrow}>База заданий</span><h2>Каталог</h2></div></div>
+		<div className={styles.panelHead}><div><span className={styles.eyebrow}>База заданий</span><h2>Каталог</h2></div><button type="button" className={styles.secondary} onClick={onRefresh} disabled={refreshing}>{refreshing ? 'Обновляем…' : 'Обновить каталог'}</button></div>
+		{refreshStatus && <p className={styles.catalogStatus} role="status">{refreshStatus}</p>}
 		<label className={styles.search}><span className="sr-only">Поиск заданий</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Найти задание" /></label>
 		<label className={styles.courseSelect}>Курс<select aria-label="Курс" value={course?.id ?? ''} onChange={event => onCourseChange(Number(event.target.value))}>{courses.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
 		<div className={styles.catalogList}>

@@ -14,6 +14,8 @@ import {
 } from '@/lib/studio/types'
 import type {
 	StudioCourse,
+	StudioFolder,
+	StudioFontFamily,
 	StudioImageAlignment,
 	StudioPageSettings,
 	StudioSheetItem,
@@ -23,13 +25,15 @@ import type {
 import CatalogBrowser from './CatalogBrowser'
 import SheetPreview from './SheetPreview'
 import SheetSettings from './SheetSettings'
+import WorklistLibrary from './WorklistLibrary'
+import { pairSheetItems, swapSheetPair, unpairSheetItems, updateSheetItem } from '@/lib/studio/items'
 import styles from '@/styles/studio.module.scss'
 
 export type { StudioCategory, StudioCourse, StudioTask } from '@/lib/studio/types'
 
 type SheetName = 'teacherSheet' | 'studentSheet'
 type WorklistsResponse = { worklists: Array<Omit<StudioWorklist, 'teacherSheet' | 'studentSheet'> & { teacherSheet: unknown; studentSheet: unknown }> }
-type CatalogResponse = { courses: StudioCourse[] }
+type CatalogResponse = { courses: StudioCourse[]; canEditFooter: boolean }
 
 const initialDraft = (): StudioWorklist => ({
 	id: '',
@@ -79,6 +83,12 @@ export default function StudioWorkspace() {
 	const session = useSession()
 	const [ courses, setCourses ] = useState<StudioCourse[]>([])
 	const [ worklists, setWorklists ] = useState<StudioWorklist[]>([])
+	const [ folders, setFolders ] = useState<StudioFolder[]>([])
+	const [ foldersBusy, setFoldersBusy ] = useState(false)
+	const [ refreshing, setRefreshing ] = useState(false)
+	const [ refreshStatus, setRefreshStatus ] = useState('')
+	const [ printable, setPrintable ] = useState(false)
+	const [ canEditFooter, setCanEditFooter ] = useState(false)
 	const [ draft, setDraft ] = useState<StudioWorklist>(initialDraft)
 	const [ selectedItemId, setSelectedItemId ] = useState<string | null>(null)
 	const [ activeCourse, setActiveCourse ] = useState<number | null>(null)
@@ -95,17 +105,21 @@ export default function StudioWorkspace() {
 			setLoading(true)
 			setError('')
 			try {
-				const [ catalogResult, worklistsResult ] = await Promise.all([
+				const [ catalogResult, worklistsResult, foldersResult ] = await Promise.all([
 					fetch('/api/studio/catalog'),
 					fetch('/api/studio/worklists'),
+					fetch('/api/studio/folders'),
 				])
-				if (!catalogResult.ok || !worklistsResult.ok) throw new Error('Не удалось загрузить рабочие данные.')
+				if (!catalogResult.ok || !worklistsResult.ok || !foldersResult.ok) throw new Error('Не удалось загрузить рабочие данные.')
 				const catalogPayload = unwrap(await catalogResult.json()) as CatalogResponse
 				const worklistsPayload = unwrap(await worklistsResult.json()) as WorklistsResponse
+				const foldersPayload = unwrap(await foldersResult.json()) as { folders: StudioFolder[] }
 				if (!active) return
 				setCourses(catalogPayload.courses || [])
+				setCanEditFooter(catalogPayload.canEditFooter)
 				setActiveCourse(current => current ?? catalogPayload.courses?.[0]?.id ?? null)
 				setWorklists((worklistsPayload.worklists || []).map(normalizeWorklist))
+				setFolders(foldersPayload.folders)
 			} catch (cause) {
 				if (active) setError(cause instanceof Error ? cause.message : 'Не удалось загрузить рабочие данные.')
 			} finally {
@@ -124,7 +138,8 @@ export default function StudioWorkspace() {
 	}, [ saveState ])
 
 	const activeItems = draft[activeSheet].data.items
-	const selectedItem = activeItems.find(item => item.instanceId === selectedItemId) || null
+	const selectedItem = activeItems.flatMap(item => item.companion ? [ item, item.companion ] : [ item ]).find(item => item.instanceId === selectedItemId) || null
+	const selectedRow = activeItems.find(item => item.instanceId === selectedItemId || item.companion?.instanceId === selectedItemId)
 	const markDirty = (next: StudioWorklist) => {
 		if (saveState === 'saving') return
 		setDraft(next)
@@ -141,7 +156,7 @@ export default function StudioWorkspace() {
 	const addTask = (task: StudioTask) => addItem(catalogTaskToSheetItem(task, newInstanceId()))
 	const updateItem = <K extends keyof StudioSheetItem>(key: K, value: StudioSheetItem[K]) => {
 		if (!selectedItem) return
-		replaceActiveItems(activeItems.map(item => item.instanceId === selectedItem.instanceId ? { ...item, [key]: value } : item))
+		replaceActiveItems(updateSheetItem(activeItems, selectedItem.instanceId, { [key]: value }))
 	}
 	const updateSettings = (settings: StudioPageSettings) => markDirty({
 		...draft,
@@ -149,12 +164,12 @@ export default function StudioWorkspace() {
 	})
 	const copySettings = () => {
 		const other: SheetName = activeSheet === 'teacherSheet' ? 'studentSheet' : 'teacherSheet'
-		markDirty({ ...draft, [other]: { ...draft[other], data: { ...draft[other].data, settings: structuredClone(draft[activeSheet].data.settings) } } })
+		markDirty({ ...draft, [other]: { ...draft[other], data: { ...draft[other].data, settings: { ...structuredClone(draft[activeSheet].data.settings), ...(!canEditFooter ? { footer: draft[other].data.settings.footer } : {}) } } } })
 	}
 	const removeItem = (instanceId: string) => {
 		const items = activeItems.filter(item => item.instanceId !== instanceId)
 		replaceActiveItems(items)
-		if (selectedItemId === instanceId) setSelectedItemId(items[0]?.instanceId || null)
+		if (selectedRow?.instanceId === instanceId) setSelectedItemId(items[0]?.instanceId || null)
 	}
 	const moveItem = (instanceId: string, direction: -1 | 1) => {
 		const from = activeItems.findIndex(item => item.instanceId === instanceId)
@@ -225,6 +240,7 @@ export default function StudioWorkspace() {
 					name: draft.name,
 					teacherSheet: draft.teacherSheet,
 					studentSheet: draft.studentSheet,
+					personalFolderId: draft.personalFolderId ?? null,
 					...(activeCourse === null ? {} : { courseId: activeCourse }),
 				}),
 			})
@@ -251,6 +267,42 @@ export default function StudioWorkspace() {
 		setSelectedItemId(draft[sheet].data.items[0]?.instanceId || null)
 	}
 	const changeName = (event: ChangeEvent<HTMLInputElement>) => markDirty({ ...draft, name: event.target.value })
+	const refreshCatalog = async () => {
+		setRefreshing(true)
+		setRefreshStatus('')
+		try {
+			const response = await fetch('/api/studio/catalog', { cache: 'no-store' })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось обновить каталог. Текущий каталог и черновик сохранены.'))
+			const payload = unwrap(await response.json()) as CatalogResponse
+			const next = payload.courses
+			setCanEditFooter(payload.canEditFooter)
+			setCourses(next)
+			setActiveCourse(current => next.some(course => course.id === current) ? current : next[0]?.id ?? null)
+			setRefreshStatus('Каталог обновлён. Черновик не изменён.')
+		} catch (cause) {
+			setRefreshStatus(cause instanceof Error ? cause.message : 'Не удалось обновить каталог. Черновик не изменён.')
+		} finally { setRefreshing(false) }
+	}
+	const mutateFolder = async (method: 'POST' | 'PUT' | 'DELETE', id?: string, name?: string) => {
+		setFoldersBusy(true)
+		setError('')
+		try {
+			const response = await fetch(`/api/studio/folders${id ? `/${id}` : ''}`, { method, headers: { 'Content-Type': 'application/json' }, ...(name === undefined ? {} : { body: JSON.stringify({ name }) }) })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось изменить папку.'))
+			if (method === 'DELETE') {
+				setFolders(current => current.filter(folder => folder.id !== id))
+				setWorklists(current => current.map(worklist => worklist.personalFolderId === id ? { ...worklist, personalFolderId: null } : worklist))
+				setDraft(current => current.personalFolderId === id ? { ...current, personalFolderId: null } : current)
+			} else {
+				const folder = unwrap(await response.json()) as StudioFolder
+				setFolders(current => [ ...current.filter(value => value.id !== folder.id), folder ].sort((a, b) => a.name.localeCompare(b.name, 'ru')))
+			}
+			return true
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Не удалось изменить папку.')
+			return false
+		} finally { setFoldersBusy(false) }
+	}
 
 	return <main className={styles.studio}>
 		<Head><title>Конструктор занятия — Lab Studio</title></Head>
@@ -262,15 +314,15 @@ export default function StudioWorkspace() {
 				{session && session !== 'loading' && session.scopes.includes('admin') && <Link href="/adm">Администрирование</Link>}
 				<button type="button" className={styles.secondary} onClick={() => { if (saveState === 'dirty' && !window.confirm('Выйти без сохранения изменений?')) return; void signOut({ callbackUrl: '/studio/auth' }) }} disabled={saveState === 'saving'}>Выйти</button>
 				<span className={`${styles.status} ${saveState === 'dirty' ? styles.dirty : ''}`} aria-live="polite">{saveState === 'saving' ? 'Сохраняем…' : saveState === 'dirty' ? 'Есть несохранённые изменения' : saveState === 'saved' ? 'Сохранено' : 'Черновик'}</span>
-				<button type="button" className={styles.secondary} onClick={() => window.print()}>Печать / PDF</button>
-				<button type="button" className={styles.primary} onClick={() => void save()} disabled={saveState === 'saving'}>Сохранить</button>
+				<button type="button" className={styles.secondary} onClick={() => window.print()} disabled={!printable || uploading} title={!printable ? 'Дождитесь загрузки изображений и устраните предупреждения в предпросмотре' : undefined}>Печать / PDF</button>
+				<button type="button" className={styles.primary} onClick={() => void save()} disabled={saveState === 'saving' || uploading || foldersBusy || loading}>Сохранить</button>
 			</div>
 		</header>
 
-		<fieldset disabled={saveState === 'saving'} className={styles.editable}>
+		<fieldset disabled={saveState === 'saving' || uploading || foldersBusy} className={styles.editable}>
 			{error && <div className={styles.alert} role="alert">{error}<button type="button" onClick={() => setError('')}>Закрыть</button></div>}
 			{loading ? <div className={styles.loading} aria-label="Загружаем каталог и конспекты"><span /><span /><span /></div> : <div className={styles.layout}>
-				<CatalogBrowser courses={courses} activeCourse={activeCourse} onCourseChange={setActiveCourse} onAdd={addTask} />
+				<CatalogBrowser courses={courses} activeCourse={activeCourse} onCourseChange={setActiveCourse} onAdd={addTask} onRefresh={() => void refreshCatalog()} refreshing={refreshing} refreshStatus={refreshStatus} />
 
 				<section className={styles.builder} aria-label="Состав занятия">
 					<div className={styles.builderHead}><div><label htmlFor="worklist-name" className={styles.eyebrow}>Название конспекта</label><input id="worklist-name" value={draft.name} onChange={changeName} /></div><button type="button" className={styles.secondary} onClick={() => { if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Создать новый конспект?')) return; setDraft(initialDraft()); setSelectedItemId(null); setSaveState('clean') }}>Новый</button></div>
@@ -280,16 +332,18 @@ export default function StudioWorkspace() {
 						<button type="button" className={styles.secondary} onClick={() => addItem(blankItem('text'))}><TextT size={17} />Добавить текст</button>
 						<button type="button" className={styles.secondary} onClick={() => addItem(blankItem('spacer'))}><Plus size={17} />Свободное место</button>
 					</div>
-					<SheetSettings settings={draft[activeSheet].data.settings} onChange={updateSettings} onCopy={copySettings} />
+					<SheetSettings settings={draft[activeSheet].data.settings} onChange={updateSettings} onCopy={copySettings} canEditFooter={canEditFooter} />
 					{activeItems.length ? <ol className={styles.taskList}>{activeItems.map((item, index) => <li key={item.instanceId} draggable onDragStart={() => setDragId(item.instanceId)} onDragOver={event => event.preventDefault()} onDrop={event => handleDrop(event, item.instanceId)} className={selectedItemId === item.instanceId ? styles.selected : ''}>
 						<button type="button" className={styles.taskSelect} onClick={() => setSelectedItemId(item.instanceId)}><span className={styles.order}>{index + 1}</span>{item.image && <img src={item.image} alt="" />}<span><strong>{item.kind === 'spacer' ? `Свободное место — ${item.spacerHeightMm} мм` : item.name}</strong><small>{item.kind === 'spacer' ? 'Пустая область на печатном листе' : item.instruction || item.description || 'Текст не заполнен'}</small></span></button>
+						{item.companion && <button type="button" className={`${styles.taskSelect} ${selectedItemId === item.companion.instanceId ? styles.selectedColumn : ''}`} onClick={() => setSelectedItemId(item.companion!.instanceId)}><span className={styles.order}>↔</span>{item.companion.image && <img src={item.companion.image} alt="" />}<span><strong>{item.companion.name}</strong><small>Правая колонка · Изменить</small></span></button>}
+						<div className={styles.rowActions}>{item.kind !== 'spacer' && <button type="button" onClick={() => { setSelectedItemId(item.instanceId); document.querySelector('[aria-label="Параметры элемента"]')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }}>Редактировать</button>}{item.companion ? <><button type="button" onClick={() => replaceActiveItems(swapSheetPair(activeItems, item.instanceId))}>Поменять колонки местами</button><button type="button" onClick={() => replaceActiveItems(unpairSheetItems(activeItems, item.instanceId))}>Разделить колонки</button></> : item.kind !== 'spacer' && activeItems[index + 1] && activeItems[index + 1]?.kind !== 'spacer' && !activeItems[index + 1]?.companion && <button type="button" onClick={() => replaceActiveItems(pairSheetItems(activeItems, item.instanceId))}>Разместить со следующим рядом</button>}</div>
 						<div className={styles.itemActions}><button type="button" onClick={() => moveItem(item.instanceId, -1)} disabled={index === 0} aria-label={`Поднять «${item.name || 'свободное место'}»`}>Выше</button><button type="button" onClick={() => moveItem(item.instanceId, 1)} disabled={index === activeItems.length - 1} aria-label={`Опустить «${item.name || 'свободное место'}»`}>Ниже</button><button type="button" onClick={() => removeItem(item.instanceId)} aria-label={`Удалить «${item.name || 'свободное место'}»`}>Удалить</button></div>
 					</li>)}</ol> : <div className={styles.empty}><h2>Добавьте материалы на {activeSheet === 'teacherSheet' ? 'лист педагога' : 'лист ученика'}</h2><p>Откройте папку каталога, просмотрите упражнение и добавьте его в текущий лист.</p></div>}
-					{worklists.length > 0 && <section className={styles.reopen}><h2>Сохранённые конспекты</h2>{worklists.map(worklist => <button type="button" key={worklist.id} onClick={() => reopen(worklist)}>{worklist.name}<span>Открыть</span></button>)}</section>}
+					<WorklistLibrary folders={folders} worklists={worklists} currentFolderId={draft.personalFolderId ?? null} onFolderChange={id => markDirty({ ...draft, personalFolderId: id })} onOpen={reopen} onCreate={name => mutateFolder('POST', undefined, name)} onRename={(id, name) => mutateFolder('PUT', id, name)} onDelete={id => mutateFolder('DELETE', id)} busy={foldersBusy} />
 				</section>
 
 				<aside className={styles.inspector} aria-label="Параметры элемента">
-					<div className={styles.panelHead}><div><span className={styles.eyebrow}>Редактор</span><h2>{selectedItem ? selectedItem.kind === 'spacer' ? 'Свободное место' : selectedItem.name : 'Выберите элемент'}</h2></div></div>
+					<div className={styles.panelHead}><div><span className={styles.eyebrow}>Настройки выбранного задания</span><h2>{selectedItem ? selectedItem.kind === 'spacer' ? 'Свободное место' : selectedItem.name : 'Выберите элемент'}</h2></div></div>
 					{selectedItem ? <div className={styles.form}>
 						{selectedItem.kind === 'spacer' ? <label>Высота, мм<input type="number" min="1" value={selectedItem.spacerHeightMm} onChange={event => updateItem('spacerHeightMm', Number(event.target.value))} /></label> : <>
 							<label>Название<input value={selectedItem.name} onChange={event => updateItem('name', event.target.value)} /></label>
@@ -298,6 +352,9 @@ export default function StudioWorkspace() {
 							{selectedItem.kind === 'task' && <label>Сложность<input type="number" min="1" value={selectedItem.complexity ?? ''} onChange={event => updateItem('complexity', event.target.value ? Number(event.target.value) : null)} /></label>}
 							<label className={styles.checkField}><input type="checkbox" checked={selectedItem.showDescription} onChange={event => updateItem('showDescription', event.target.checked)} /> Показывать описание</label>
 							<label className={styles.checkField}><input type="checkbox" checked={selectedItem.showInstruction} onChange={event => updateItem('showInstruction', event.target.checked)} /> Показывать инструкцию</label>
+							<label>Шрифт задания<select value={selectedItem.fontFamily ?? ''} onChange={event => updateItem('fontFamily', (event.target.value || undefined) as StudioFontFamily | undefined)}><option value="">Как на листе</option><option value="inherit">LabStudio</option><option value="Arial">Arial</option></select></label>
+							<label>Размер текста задания, пт<input type="number" min="1" step="0.5" placeholder="Как на листе" value={selectedItem.fontSizePt ?? ''} onChange={event => updateItem('fontSizePt', event.target.value ? Number(event.target.value) : undefined)} /></label>
+							<label>Выравнивание текста<select value={selectedItem.textAlignment ?? 'left'} onChange={event => updateItem('textAlignment', event.target.value as StudioImageAlignment)}><option value="left">Слева</option><option value="center">По центру</option><option value="right">Справа</option></select></label>
 							{selectedItem.image && <><label>Ширина изображения, %<input type="number" min="1" max="100" value={selectedItem.imageWidthPercent} onChange={event => updateItem('imageWidthPercent', Number(event.target.value))} /></label><label>Выравнивание<select aria-label="Выравнивание" value={selectedItem.imageAlignment} onChange={event => updateItem('imageAlignment', event.target.value as StudioImageAlignment)}><option value="left">Слева</option><option value="center">По центру</option><option value="right">Справа</option></select></label></>}
 							<label className={styles.uploadReplacement}>{selectedItem.image ? 'Заменить изображение' : 'Добавить изображение'}<input type="file" accept="image/png,image/jpeg" onChange={event => void replaceImage(event)} disabled={uploading} /></label>
 							{selectedItem.image && <img className={styles.previewImage} src={selectedItem.image} alt="Предпросмотр задания" />}
@@ -307,6 +364,6 @@ export default function StudioWorkspace() {
 			</div>}
 		</fieldset>
 		<section className={styles.manuals} aria-label="Руководства"><span>Нужна инструкция к материалам?</span><Link href="/docs" target="_blank" rel="noreferrer">Открыть руководства ↗</Link></section>
-		<SheetPreview sheet={draft[activeSheet]} title={draft.name} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} />
+		<SheetPreview sheet={draft[activeSheet]} title={draft.name} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} onPrintable={setPrintable} onResize={saveState === 'saving' || uploading ? undefined : (id, width) => { replaceActiveItems(updateSheetItem(activeItems, id, { imageWidthPercent: width })); setSelectedItemId(id) }} />
 	</main>
 }
