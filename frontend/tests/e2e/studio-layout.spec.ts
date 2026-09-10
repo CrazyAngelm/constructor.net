@@ -161,9 +161,14 @@ test('resize reflow, two columns, typography, personal folders and text previews
 		const textTask = categories([root]).flatMap(category => category.tasks).find(task => !task.image && task.instruction.trim())!
 		const card = dialog.getByRole('button', { name: `Открыть «${textTask.name}»`, exact: true }).first()
 		await expect(card).toContainText(textTask.instruction.trim())
+		const categoryScroller = dialog.locator('[class*="categoryPreviewGrid"]')
+		await card.scrollIntoViewIfNeeded()
+		const categoryScrollTop = await categoryScroller.evaluate(node => node.scrollTop)
 		await card.click()
 		await expect(page.getByRole('dialog').getByText(textTask.instruction, { exact: true })).toBeVisible()
 		await page.getByRole('button', { name: 'Закрыть просмотр', exact: true }).click()
+		await expect(dialog).toBeVisible()
+		expect(await categoryScroller.evaluate(node => node.scrollTop)).toBe(categoryScrollTop)
 		await page.screenshot({ path: testInfo.outputPath('layout-workspace.png'), fullPage: true })
 	} finally {
 		await page.request.delete(`/api/studio/worklists/${saved.id}`)

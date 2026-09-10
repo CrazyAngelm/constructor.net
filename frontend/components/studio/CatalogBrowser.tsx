@@ -97,14 +97,15 @@ const TaskPreview = ({ task, onClose, onAdd }: { task: StudioTask; onClose: () =
 		</section>
 	</div>, document.body)
 
-const CategoryPreview = ({ category, onClose, onPreview, onAdd }: {
+const CategoryPreview = ({ category, inactive, onClose, onPreview, onAdd }: {
 	category: StudioCategory
+	inactive: boolean
 	onClose: () => void
 	onPreview: (task: StudioTask) => void
 	onAdd: (task: StudioTask) => void
 }) => {
 	const tasks = [ ...new Map(collectCategoryTasks(category).map(item => [ item.task.id, item ])).values() ]
-	return createPortal(<div className={styles.modalBackdrop} role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) onClose() }}>
+	return createPortal(<div className={styles.modalBackdrop} role="presentation" aria-hidden={inactive || undefined} style={inactive ? { display: 'none' } : undefined} onMouseDown={event => { if (event.target === event.currentTarget) onClose() }}>
 	<section className={`${styles.previewDialog} ${styles.categoryPreviewDialog}`} role="dialog" aria-modal="true" aria-labelledby="category-preview-title">
 		<header><div><span className={styles.eyebrow}>Предварительный просмотр раздела</span><h2 id="category-preview-title">{category.name}</h2></div><button type="button" className={styles.iconButton} onClick={onClose} aria-label="Закрыть просмотр раздела"><X size={20} /></button></header>
 		<div className={`${styles.previewBody} ${styles.categoryPreviewGrid}`}>
@@ -177,7 +178,7 @@ export default function CatalogBrowser({ courses, activeCourse, onCourseChange, 
 				</section>
 			</>}
 		</div>
-		{previewCategory && <CategoryPreview category={previewCategory} onClose={() => setPreviewCategory(null)} onPreview={task => { setPreviewCategory(null); setPreviewTask(task) }} onAdd={onAdd} />}
+		{previewCategory && <CategoryPreview category={previewCategory} inactive={Boolean(previewTask)} onClose={() => setPreviewCategory(null)} onPreview={setPreviewTask} onAdd={onAdd} />}
 		{previewTask && <TaskPreview task={previewTask} onClose={() => setPreviewTask(null)} onAdd={onAdd} />}
 	</aside>
 }
