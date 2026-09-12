@@ -139,3 +139,102 @@
 	.studio,.sheet,.previewPages { min-height:0!important; margin:0!important; padding:0!important; border:0!important; background:#fff!important; overflow:visible!important; }
 	.previewPages { display:block!important; }.previewPage { margin:0!important; border:0!important; box-shadow:none!important; break-inside:avoid-page; page-break-inside:avoid; print-color-adjust:exact; -webkit-print-color-adjust:exact; }.previewPage + .previewPage { break-before:page; page-break-before:always; }
 }
+
+/* Clear document actions and a dedicated saved-worklist library. */
+.actions { display:grid; grid-template-columns:1fr; justify-items:end; gap:7px; }
+.accountActions,.documentActions { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:8px; }
+.accountActions > a { padding:5px 0; color:var(--accent); font-size:12px; }
+.actions .status { order:initial; flex-basis:auto; text-align:right; }
+.documentActions button,.mobileDock button,.exportDialog button,.saveDialog button { display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+.textButton,.dangerLink { padding:4px 0!important; border:0!important; background:transparent!important; color:#5c4170!important; text-decoration:underline; text-underline-offset:3px; }
+.dangerLink { color:#934f58!important; }
+.draftLocation { margin-top:6px!important; color:var(--muted); font-size:11px; }
+.sheetHelp { padding:10px 14px; border-bottom:1px solid var(--line); background:#faf7fc; color:#625667; font-size:12px; line-height:1.5; }
+
+.libraryDialog { width:min(1120px,100%); max-height:calc(100dvh - 48px); display:grid; grid-template-rows:auto auto minmax(0,1fr); overflow:hidden; border:1px solid #d9cdd8; border-radius:15px; background:#fff; box-shadow:0 22px 70px rgba(39,24,47,.24); }
+.libraryHeader { padding:20px 24px 18px; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; border-bottom:1px solid var(--line); }
+.libraryHeader p { max-width:64ch; margin-top:7px!important; color:var(--muted); font-size:12px; line-height:1.5; }
+.libraryError,.dialogError { padding:10px 14px; display:flex; justify-content:space-between; gap:12px; color:#6f3228; background:#fff2ee; border-bottom:1px solid #efc8bd; font-size:12px; }
+.libraryError button,.dialogError button { border:0; padding:0; background:transparent; color:inherit; text-decoration:underline; }
+.libraryLayout { min-height:0; display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); }
+.folderPane { min-height:0; padding:16px; overflow:auto; border-right:1px solid var(--line); background:#faf7fa; }
+.folderPane nav { display:grid; gap:4px; }
+.folderPane nav > button { width:100%; min-height:40px; padding:8px 10px; display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid transparent; border-radius:7px; color:var(--ink); background:transparent; text-align:left; }
+.folderPane nav > button > span { min-width:0; display:flex; align-items:center; gap:7px; overflow-wrap:anywhere; }
+.folderPane nav > button > small { min-width:24px; padding:2px 6px; border-radius:999px; background:#eee8ef; color:var(--muted); text-align:center; font-variant-numeric:tabular-nums; }
+.folderPane nav > button:hover { background:#f1ebf5; }
+.folderPane nav > .folderSelected { border-color:#d9cae2; background:var(--accent-soft); color:#513a9a; }
+.folderEditor { margin-top:20px; padding-top:16px; display:grid; gap:8px; border-top:1px solid var(--line); }
+.folderEditor label,.saveDialog label,.worklistActions label { display:grid; gap:6px; color:var(--muted); font-size:11px; font-weight:600; }
+.folderEditor input,.saveDialog input,.saveDialog select,.worklistActions select { width:100%; min-width:0; padding:9px 10px; border:1px solid #d7cad5; border-radius:7px; color:var(--ink); background:#fff; }
+.folderManage { margin-top:14px; display:grid; justify-items:start; gap:8px; }
+.worklistPane { min-height:0; display:grid; grid-template-rows:auto minmax(0,1fr); background:#fff; }
+.worklistPaneHead { padding:17px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+.worklistPaneHead > span { min-width:30px; padding:4px 8px; border-radius:999px; background:var(--accent-soft); color:var(--accent); text-align:center; font-size:12px; font-variant-numeric:tabular-nums; }
+.worklistList { padding:14px 18px 24px; display:grid; align-content:start; gap:10px; overflow:auto; }
+.worklistCard { padding:14px; display:grid; gap:12px; border:1px solid var(--line); border-radius:10px; background:#fff; transition:border-color .2s ease,background .2s ease; }
+.worklistCard:hover { border-color:#d4c5dc; }
+.currentWorklist { border-color:#c7b8e4; background:#fcfaff; }
+.worklistMeta > div { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.worklistMeta h4 { color:var(--ink); font-size:14px; }
+.worklistMeta p { margin-top:5px!important; color:var(--muted); font-size:11px; }
+.currentBadge { padding:3px 6px; border-radius:4px; color:#523b8f; background:#ece6fb; font-size:10px; }
+.worklistActions { display:grid; grid-template-columns:auto minmax(150px,1fr) auto auto; align-items:end; gap:8px; }
+.worklistActions > button { min-height:36px; margin:0; padding:7px 10px; }
+.inlineConfirm { padding:10px 12px; border-left:3px solid #ad6269; background:#fff5f4; color:#6b3c41; font-size:12px; }
+.inlineConfirm p { line-height:1.5; }
+.inlineConfirm > div { margin-top:8px; display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.dangerButton { padding:8px 10px; border:1px solid #8f4c54; border-radius:6px; background:#8f4c54; color:#fff; }
+.libraryEmpty { min-height:220px; display:grid; place-content:center; justify-items:center; gap:8px; color:var(--muted); text-align:center; }
+.libraryEmpty h4 { color:var(--ink); font-size:14px; }
+.libraryEmpty p { max-width:42ch; font-size:12px; line-height:1.5; }
+
+.saveDialog,.exportDialog { width:min(560px,100%); overflow:hidden; border:1px solid #d9cdd8; border-radius:14px; background:#fff; box-shadow:0 22px 70px rgba(39,24,47,.24); }
+.saveDialog > header,.exportDialog > header { padding:18px 20px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; border-bottom:1px solid var(--line); }
+.saveDialogBody,.exportDialog > div { padding:20px; display:grid; gap:16px; }
+.saveDialogBody > p,.exportDialog p { color:var(--muted); font-size:13px; line-height:1.6; }
+.saveDialog > footer,.exportDialog > footer { padding:15px 20px; display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--line); background:#faf8fa; }
+.quickFolder { display:grid; grid-template-columns:1fr auto; align-items:end; gap:8px; padding-top:14px; border-top:1px solid var(--line); }
+.exportDialog > .dialogError { margin:0; border-top:1px solid #efc8bd; border-bottom:0; }
+.mobileDock { display:none; }
+
+.previewScale { display:flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+.previewScale button { padding:7px 9px; border:0; border-radius:5px; color:var(--muted); background:transparent; font-size:11px; }
+.pageFrame { position:relative; flex:none; }
+.pageFrame > .previewPage { position:absolute; inset:0; transform-origin:top left; }
+
+@media(max-width:720px) {
+	.studio { padding-bottom:72px; }
+	.topbar { position:relative; }
+	.documentActions { display:none; }
+	.actions { justify-items:start; }
+	.accountActions { justify-content:flex-start; }
+	.actions .status { text-align:left; }
+	.mobileDock { position:fixed; left:10px; right:10px; bottom:max(10px,env(safe-area-inset-bottom)); z-index:15; display:grid; grid-template-columns:repeat(4,1fr); overflow:hidden; border:1px solid #d8ccd8; border-radius:12px; background:rgba(255,253,255,.97); box-shadow:0 10px 34px rgba(39,24,47,.2); backdrop-filter:blur(10px); }
+	.mobileDock button { min-width:0; min-height:54px; padding:6px 2px; flex-direction:column; gap:1px; border:0; border-right:1px solid var(--line); color:#55455f; background:transparent; font-size:10px; }
+	.mobileDock button:last-child { border-right:0; }
+	.mobileDock button:nth-child(2) { color:#fff; background:var(--accent); }
+	.libraryDialog { max-height:calc(100dvh - 24px); border-radius:12px; }
+	.libraryHeader { padding:16px; }
+	.libraryHeader p { font-size:11px; }
+	.libraryLayout { grid-template-columns:1fr; grid-template-rows:max-content max-content; align-content:start; overflow:auto; }
+	.folderPane { min-height:max-content; overflow:visible; border-right:0; border-bottom:1px solid var(--line); }
+	.folderPane nav { grid-template-columns:repeat(2,minmax(0,1fr)); }
+	.folderPane nav > button { min-width:0; }
+	.worklistPane { min-height:360px; overflow:visible; }
+	.worklistList { overflow:visible; }
+	.worklistActions { grid-template-columns:1fr 1fr; }
+	.worklistActions label { grid-column:1/-1; }
+	.saveDialog,.exportDialog { max-height:calc(100dvh - 24px); overflow:auto; }
+	.saveDialog > footer,.exportDialog > footer { position:sticky; bottom:0; }
+	.quickFolder { grid-template-columns:1fr; }
+	.previewScale { align-self:stretch; justify-content:space-between; }
+	.previewScale button { flex:1; }
+}
+
+@media print {
+	.mobileDock { display:none!important; }
+	.pageFrame { width:auto!important; height:auto!important; position:static!important; }
+	.pageFrame > .previewPage { position:static!important; transform:none!important; }
+	.pageFrame + .pageFrame .previewPage { break-before:page; page-break-before:always; }
+}

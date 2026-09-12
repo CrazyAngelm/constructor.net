@@ -77,7 +77,7 @@ const TaskRow = ({ task, path, onPreview, onAdd }: {
 	onPreview: (task: StudioTask) => void
 	onAdd: (task: StudioTask) => void
 }) => <article className={styles.catalogTask}>
-	<div><strong>{task.name}</strong>{path && <span>{path.join(' / ')}</span>}<small>{task.complexity ? `Сложность ${task.complexity}` : 'Без уровня'}</small></div>
+	<div><strong>{task.name}</strong>{path && <span>{path.join(' / ')}</span>}</div>
 	<div className={styles.catalogActions}>
 		<button type="button" onClick={() => onPreview(task)} aria-label={`Посмотреть «${task.name}»`} title="Посмотреть"><Eye size={17} /></button>
 		<button type="button" onClick={() => onAdd(task)} aria-label={`Добавить «${task.name}»`} title="Добавить в текущий лист"><Plus size={17} weight="bold" /></button>
@@ -93,7 +93,7 @@ const TaskPreview = ({ task, onClose, onAdd }: { task: StudioTask; onClose: () =
 				{task.description && <section><h3>Описание</h3><p>{task.description}</p></section>}
 				{task.instruction && <section><h3>Инструкция</h3><p>{task.instruction}</p></section>}
 			</div>
-			<footer><span>{task.complexity ? `Сложность ${task.complexity}` : 'Сложность не указана'}</span><button type="button" className={styles.primary} onClick={() => { onAdd(task); onClose() }}>Добавить в текущий лист</button></footer>
+			<footer><span>Добавится в выбранный лист</span><button type="button" className={styles.primary} onClick={() => { onAdd(task); onClose() }}>Добавить в текущий лист</button></footer>
 		</section>
 	</div>, document.body)
 

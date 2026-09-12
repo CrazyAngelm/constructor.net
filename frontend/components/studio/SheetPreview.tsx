@@ -57,7 +57,6 @@ function Column({ item, settings, number, onResize }: { item: StudioSheetItem; s
 		{item.image && <SheetImage item={item} onResize={onResize} />}
 		{item.showDescription && item.description && <p>{item.description}</p>}
 		{item.showInstruction && item.instruction && <p>{item.instruction}</p>}
-		{item.complexity && <small>Сложность: {item.complexity}</small>}
 	</div>
 }
 
@@ -87,11 +86,11 @@ const variablesFor = (settings: StudioPageSettings): CSSProperties => {
 	} as CSSProperties
 }
 
-function Page({ items, allItems, settings, title, pageNumber, pageCount, measure = false, onResize }: {
+function Page({ items, allItems, settings, title, pageNumber, pageCount, measure = false, onResize, scale }: {
 	items: StudioSheetItem[]; allItems: StudioSheetItem[]; settings: StudioPageSettings; title: string
-	pageNumber: number; pageCount: number; measure?: boolean; onResize?: Resize
+	pageNumber: number; pageCount: number; measure?: boolean; onResize?: Resize; scale?: number
 }) {
-	return <article className={`${styles.previewPage} ${measure ? styles.measurePage : ''}`} style={variablesFor(settings)} aria-label={measure ? undefined : `Страница ${pageNumber} из ${pageCount}`}>
+	return <article className={`${styles.previewPage} ${measure ? styles.measurePage : ''}`} style={{ ...variablesFor(settings), ...(scale === undefined ? {} : { transform: `scale(${scale})` }) }} aria-label={measure ? undefined : `Страница ${pageNumber} из ${pageCount}`}>
 		<header className={styles.pageHeader}><small>LabStudio</small><h2>{title || 'Без названия'}</h2></header>
 		<div className={styles.pageBody} data-page-capacity={measure ? 'true' : undefined}>
 			{items.map(item => <ItemContent key={item.instanceId} item={item} settings={settings} number={allItems.findIndex(value => value.instanceId === item.instanceId) + 1} onResize={onResize} />)}
@@ -104,11 +103,31 @@ export default function SheetPreview({ sheet, title, label, onResize, onPrintabl
 	sheet: StudioSheetV3; title: string; label: string; onResize?: Resize; onPrintable?: (ready: boolean) => void
 }) {
 	const measureRef = useRef<HTMLDivElement>(null)
+	const previewRef = useRef<HTMLDivElement>(null)
 	const [ pages, setPages ] = useState<StudioSheetItem[][]>([ sheet.data.items ])
 	const [ oversized, setOversized ] = useState<string[]>([])
 	const [ failedImages, setFailedImages ] = useState(false)
 	const [ ready, setReady ] = useState(false)
+	const [ viewMode, setViewMode ] = useState<'fit' | 'actual'>('fit')
+	const [ availableWidth, setAvailableWidth ] = useState(0)
 	const settings = sheet.data.settings
+	const paper = pageSizes[settings.format]
+	const pageWidthPx = paper.width * 96 / 25.4
+	const pageHeightPx = paper.height * 96 / 25.4
+	const scale = viewMode === 'fit' && availableWidth ? Math.min(1, availableWidth / pageWidthPx) : 1
+
+	useLayoutEffect(() => {
+		const root = previewRef.current
+		if (!root) return
+		const readWidth = () => {
+			const computed = getComputedStyle(root)
+			setAvailableWidth(Math.max(1, root.clientWidth - parseFloat(computed.paddingLeft) - parseFloat(computed.paddingRight)))
+		}
+		const observer = new ResizeObserver(readWidth)
+		observer.observe(root)
+		readWidth()
+		return () => observer.disconnect()
+	}, [])
 
 	useLayoutEffect(() => {
 		let cancelled = false
@@ -146,10 +165,10 @@ export default function SheetPreview({ sheet, title, label, onResize, onPrintabl
 	return <>
 		<style>{`@page { size: ${settings.format}; margin: 0; }`}</style>
 		<section className={styles.sheet} aria-label="Предпросмотр листа" data-pagination-ready={ready ? 'true' : 'false'}>
-			<div className={styles.sheetHead}><div><span className={styles.eyebrow}>Предпросмотр страниц</span><h2>{label}</h2><p>{pages.length} {pages.length === 1 ? 'страница' : pages.length < 5 ? 'страницы' : 'страниц'}</p><p>Размер картинки можно менять за маркер ↔ в её нижнем углу. После отпускания листы пересчитаются.</p></div></div>
+			<div className={styles.sheetHead}><div><span className={styles.eyebrow}>Предпросмотр страниц</span><h2>{label}</h2><p>{pages.length} {pages.length === 1 ? 'страница' : pages.length < 5 ? 'страницы' : 'страниц'}</p><p>Размер картинки можно менять за маркер ↔ в её нижнем углу. После отпускания листы пересчитаются.</p></div><div className={styles.previewScale} role="group" aria-label="Масштаб предпросмотра"><button type="button" aria-pressed={viewMode === 'fit'} className={viewMode === 'fit' ? styles.activeTab : ''} onClick={() => setViewMode('fit')}>По ширине</button><button type="button" aria-pressed={viewMode === 'actual'} className={viewMode === 'actual' ? styles.activeTab : ''} onClick={() => setViewMode('actual')}>100%</button></div></div>
 			{oversized.length > 0 && <p className={styles.pageWarning} role="alert">Одно из упражнений выше печатной области. Уменьшите изображение или текст перед печатью.</p>}
 			{failedImages && <p className={styles.pageWarning} role="alert">Не все изображения загрузились. Проверьте соединение или замените недоступное изображение перед печатью.</p>}
-			<div className={styles.previewPages}>{pages.map((items, index) => <Page key={index} items={items} allItems={sheet.data.items} settings={settings} title={title} pageNumber={index + 1} pageCount={pages.length} onResize={onResize} />)}</div>
+			<div className={styles.previewPages} ref={previewRef} data-preview-mode={viewMode}>{pages.map((items, index) => <div className={styles.pageFrame} key={index} style={{ width: `${pageWidthPx * scale}px`, height: `${pageHeightPx * scale}px` }}><Page items={items} allItems={sheet.data.items} settings={settings} title={title} pageNumber={index + 1} pageCount={pages.length} onResize={onResize} scale={scale} /></div>)}</div>
 		</section>
 		<div className={styles.measureRoot} ref={measureRef} aria-hidden="true">
 			<Page items={[]} allItems={sheet.data.items} settings={settings} title={title} pageNumber={1} pageCount={1} measure />

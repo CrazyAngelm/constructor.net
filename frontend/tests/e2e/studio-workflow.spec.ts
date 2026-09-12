@@ -35,6 +35,7 @@ const findNestedTaskPath = (nodes: StudioCategory[], path: StudioCategory[] = []
 }
 
 test('hierarchical catalog, editable sheets, uploads, pagination, persistence and access control', async ({ page, browser }, testInfo) => {
+	test.slow()
 	test.skip(!process.env.E2E_BASE_URL || !email || !password || testInfo.project.name !== 'desktop-chromium', 'Requires the seeded isolated preview')
 	// This acceptance pass includes several browser sessions, PDF rendering and cleanup.
 	await authenticate(page.request, 'DEMO')
@@ -66,6 +67,7 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 	await categoryDialog.getByRole('button', { name: /^Открыть «/ }).first().click()
 	await expect(page.getByText('Предварительный просмотр', { exact: true })).toBeVisible()
 	await page.getByRole('button', { name: 'Закрыть просмотр', exact: true }).click()
+	await categoryDialog.getByRole('button', { name: 'Закрыть', exact: true }).click()
 	await expect(page.getByRole('button', { name: 'Лист педагога 0', exact: true })).toBeVisible()
 
 	const tree = catalogPanel.getByRole('navigation', { name: 'Папки курса' })
@@ -138,6 +140,9 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 
 	const saveResponse = page.waitForResponse(response => response.url().endsWith('/api/studio/worklists') && response.request().method() === 'POST')
 	await page.getByRole('button', { name: 'Сохранить', exact: true }).click()
+	const saveDialog = page.getByRole('dialog', { name: 'Сохранить в моих конспектах' })
+	await expect(saveDialog.getByLabel('Название конспекта')).toHaveValue(lessonName)
+	await saveDialog.getByRole('button', { name: 'Сохранить конспект', exact: true }).click()
 	const savedResponse = await saveResponse
 	expect(savedResponse.ok()).toBeTruthy()
 	const saved = await savedResponse.json()
@@ -150,7 +155,7 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 	expect(saved.studentSheet.data.items).toHaveLength(1)
 	expect(saved.studentSheet.data.items[0].instruction).toBe('Самостоятельная инструкция ученика')
 	expect(saved.studentSheet.data.settings.footer).toBe('Лист ученика')
-	await expect(page.getByText('Сохранено', { exact: true })).toBeVisible()
+	await expect(page.getByText('Сохранено без папки', { exact: true })).toBeVisible()
 
 	const second = await browser.newContext({ baseURL: process.env.E2E_BASE_URL })
 	const admin = await browser.newContext({ baseURL: process.env.E2E_BASE_URL })
@@ -161,7 +166,8 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 		expect(session.user).not.toHaveProperty('password')
 		const reopened = await second.newPage()
 		await reopened.goto('/studio')
-		await reopened.getByRole('button', { name: `${lessonName} Открыть` }).click()
+		await reopened.getByRole('button', { name: 'Мои конспекты', exact: true }).click()
+		await reopened.getByRole('dialog', { name: 'Мои конспекты' }).locator('article').filter({ hasText: lessonName }).getByRole('button', { name: 'Открыть', exact: true }).click()
 		await expect(reopened.getByLabel('Название конспекта')).toHaveValue(lessonName)
 		await reopened.getByRole('region', { name: 'Состав занятия' }).getByRole('listitem').filter({ hasText: selected[0].name }).first().getByRole('button').first().click()
 		await expect(reopened.getByRole('complementary', { name: 'Параметры элемента' }).getByRole('textbox', { name: 'Инструкция / текст', exact: true })).toHaveValue('Проверенная инструкция педагога')
@@ -239,7 +245,7 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 		await expect(reopened.getByRole('region', { name: 'Руководства' })).toBeVisible()
 		await reopened.getByRole('button', { name: `Удалить «${selected[1].name}»`, exact: true }).click()
 		await reopened.getByRole('button', { name: 'Сохранить', exact: true }).click()
-		await expect(reopened.getByText('Сохранено', { exact: true })).toBeVisible()
+		await expect(reopened.getByText('Сохранено без папки', { exact: true })).toBeVisible()
 		const edited = await (await second.request.get(`/api/studio/worklists/${saved.id}`)).json()
 		expect(edited.teacherSheet.data.items).toHaveLength(4)
 		expect(edited.studentSheet.data.items).toHaveLength(1)
