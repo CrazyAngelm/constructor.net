@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 import { UserDto } from '@/lib/dto/users'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response } from '@/lib/api/response'
+import { responseAdmin } from '@/lib/api/response'
 const prisma = new PrismaClient()
 const handler = getDefaultHandler()
-handler.get(response(async () => {
+handler.get(responseAdmin(async () => {
 	const resp = (await prisma.user.findMany({
 		include: {
 			scopes: {

@@ -48,7 +48,7 @@ const Upload = ({ onChange, value, preview, keyChange }: Props) => {
 	return (
 		<section className={styles.upload}>
 			{(preview && imgPreview)
-				&& <img src={imgPreview} />}
+				&& <img src={imgPreview} alt="Изображение задания" />}
 			<div className="file has-name">
 				<label className="file-label">
 					<input onChange={changeHandler} className="file-input"
@@ -61,7 +61,7 @@ const Upload = ({ onChange, value, preview, keyChange }: Props) => {
 							<i className="fas fa-upload"></i>
 						</span>
 						<span className="file-label">
-							Choose a file…
+							Выбрать изображение
 						</span>
 					</span>
 					<span className={`${styles.name} file-name`}>

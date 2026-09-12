@@ -1,73 +1,38 @@
+import { useCallback, useEffect, useState } from 'react'
 import Layout from '@/components/Layout'
-import { NextPage } from 'next'
-import styles from '@/styles/docs/index.module.scss'
-import { useFetchData } from '@/lib/hooks/useFetchData'
-import { getManuals } from '@/lib/requests/manuals'
-import { useState } from 'react'
-import { Manual } from '@/lib/dto/manuals'
-import arrow from '@/assets/arrow.svg'
-import Image from 'next/image'
-import dynamic from 'next/dynamic'
+import StatusPage from '@/components/StatusPage'
+import { useSession } from '@/lib/session/hooks'
+import styles from '@/styles/pages.module.scss'
+type Manual = { id: number; name: string; html: string }
 
-interface PropsItem {
-	manual: Manual
-	selectCallback: (manual: Manual) => void
+export default function Docs() {
+ const session = useSession()
+ const [ manuals, setManuals ] = useState<Manual[]>()
+ const [ selected, setSelected ] = useState<number>()
+ const [ error, setError ] = useState('')
+ const signedIn = !!session && session !== 'loading'
+ const load = useCallback(async () => {
+  setError('')
+  try {
+   const response = await fetch('/api/studio/manuals')
+   if (!response.ok) throw new Error(response.status === 403 ? 'Для чтения руководств требуется активный доступ к материалам.' : 'Не удалось загрузить руководства. Попробуйте ещё раз.')
+   const data = await response.json()
+   const items: Manual[] = data.manuals
+   setManuals(items); setSelected(current => current ?? items[0]?.id)
+  } catch (cause) { setError(cause instanceof Error ? cause.message : 'Не удалось загрузить руководства.') }
+ }, [])
+ useEffect(() => { if (signedIn) void load() }, [ signedIn, load ])
+ if (session === null) return <StatusPage title="Руководства к занятиям"><p>Войдите в свою учётную запись, чтобы открыть методические материалы и инструкции Lab Studio.</p></StatusPage>
+ const manual = manuals?.find(item => item.id === selected)
+ return <Layout title="Руководства"><main className={styles.page}>
+  <header className={styles.heading}><span className={styles.eyebrow}>Библиотека Lab Studio</span><h1>Руководства</h1><p>Методические материалы и инструкции для работы с заданиями.</p></header>
+  {error ? <div className={styles.error} role="alert"><p>{error}</p><button className={styles.secondary} onClick={() => void load()}>Повторить</button></div>
+   : !manuals ? <p role="status">Загружаем руководства…</p>
+   : !manuals.length ? <div className={styles.card}><p>Руководства пока не опубликованы.</p></div>
+   : <div className={styles.docLayout}>
+    <label className={styles.docSelect}>Выберите руководство<select value={selected} onChange={event => setSelected(Number(event.target.value))}>{manuals.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+    <nav className={styles.docNav} aria-label="Список руководств">{manuals.map(item => <button key={item.id} aria-pressed={selected === item.id} onClick={() => setSelected(item.id)}>{item.name}</button>)}</nav>
+    <article className={styles.card} aria-label="Текст руководства"><h2>{manual?.name}</h2><div className={styles.manual} dangerouslySetInnerHTML={{ __html: manual?.html || '<p>Текст пока не добавлен.</p>' }} /></article>
+   </div>}
+ </main></Layout>
 }
-
-const Item = ({ manual, selectCallback }: PropsItem) => {
-	const [ open, setOpen ] = useState(false)
-
-	const { data } = useFetchData(manual.id, getManuals)
-
-	const isOpen = (): boolean => data !== null && data !== undefined && data.length !== 0
-
-	return (
-		<section className={styles.item}>
-			<header>
-				<div onClick={() => setOpen(p => !p)}>
-					{isOpen()
-						&& <div className={`${styles.arrow} ${open && styles.open}`}>
-							<Image src={arrow} />
-						</div>}
-				</div>
-				<span onClick={() => selectCallback(manual)}>
-					{manual.name}
-				</span>
-			</header>
-			<section>
-				{open
-					&& data?.map(p => <Item key={p.id}
-						manual={p} selectCallback={selectCallback} />)}
-			</section>
-		</section>
-	)
-}
-
-const Docs: NextPage = () => {
-	const [ manual, setManual ] = useState<Manual>()
-	const { data } = useFetchData(-1, getManuals)
-
-	const QuillEditorReadonly = dynamic(() => import('../../components/controls/QuillEditorReadonly'), { ssr: false })
-
-	const openManual = (manual: Manual) => {
-		setManual(manual)
-	}
-
-	return (
-		<Layout footer={false}>
-			<article className={styles.docs}>
-				<section className={styles.list}>
-					<header>Документация</header>
-					{data?.map(p => <Item key={p.id} manual={p}
-						selectCallback={openManual} />)}
-				</section>
-				<section className={styles.content}>
-					<header>{manual?.name}</header>
-					<QuillEditorReadonly value={manual?.html} />
-				</section>
-			</article>
-		</Layout>
-	)
-}
-
-export default Docs

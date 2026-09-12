@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { FolderPlus, Trash } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 
 import { createTaskCategory, getCourseById, getCourses, getTaskCategoriesByIdCategory, getTaskCategoriesByIdCourse, getTaskCategoryById, removeCourse, removeTaskCategory, updateCourse, updateTaskCategory } from '@/lib/requests/tasks'
@@ -78,24 +79,24 @@ const ItemCat = ({ id, parentId: parentId, name: _name, isCourse, updater, ...se
 		<div className={styles.item} >
 			{modalDelete && <WarningDelete callbackRemove={remove} cancel={() => setModalDelete(false)} />}
 			<header>
-				<div onClick={() => setOpen(p => !p)}>
+				<div role="button" tabIndex={0} aria-label={`Развернуть ${name}`} aria-expanded={open} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setOpen(value => !value) } }} onClick={() => setOpen(p => !p)}>
 					{isOpen()
 						&& <div className={`${styles.arrow} ${open && styles.open}`}>
-							<Image src={arrow} />
+							<Image src={arrow} alt="" />
 						</div>}
 				</div>
-				<span onClick={onClick}>{name}</span>
+				<span role="button" tabIndex={0} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onClick() } }} onClick={onClick}>{name}</span>
 				<section className={styles.menu}>
 					<header>
-						<Image layout="fill" objectFit="contain" src={menu} />
+						<Image layout="fill" objectFit="contain" src={menu} alt="" />
 					</header>
 					<section>
-						<div onClick={create} className={styles.icon}>
-							<Image layout="fill" objectFit="contain" src={addFolder} />
-						</div>
-						<div onClick={() => setModalDelete(true)} className={styles.icon}>
-							<Image layout="fill" objectFit="contain" src={trash} />
-						</div>
+						<button type="button" aria-label={`Добавить папку в ${name}`} title="Добавить папку" onClick={create} className={styles.icon}>
+							<FolderPlus size={18} aria-hidden="true" />
+						</button>
+						<button type="button" aria-label={`Удалить ${name}`} title="Удалить" onClick={() => setModalDelete(true)} className={styles.icon}>
+							<Trash size={18} aria-hidden="true" />
+						</button>
 					</section>
 				</section>
 			</header>
@@ -127,8 +128,8 @@ const List = (props: ListProps) => {
 				setCourse={props.setCourse} setCat={props.setCat}
 				setTask={props.setTask}
 				updater={props.updater} />)}
-			<section className={styles.createCourse}
-				onClick={() => createCourse(props.setCourse, update)}>Создать курс</section>
+			<button type="button" className={styles.createCourse}
+				onClick={() => createCourse(props.setCourse, update)}>Создать курс</button>
 		</div>
 	)
 }
@@ -204,6 +205,7 @@ const Hierarchy = () => {
 					updater={updater} />
 			</section>
 			<section className={styles.editor}>
+				{courseId === undefined && categoryId === undefined && taskId === undefined && <p className={styles.empty}>Выберите курс или папку в списке. Стрелка рядом с названием раскрывает вложенные материалы.</p>}
 				{courseId !== undefined && <CourseEditor id={courseId} callbackUpdate={() => updater.update(courseId)} />}
 				{(categoryId !== undefined && taskId === undefined) && <TaskCategoriesEditor id={categoryId}
 					callbackUpdate={() => updater.update(categoryId)}

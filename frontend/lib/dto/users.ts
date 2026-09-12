@@ -29,7 +29,6 @@ export interface SignUpDto{
 }
 
 export interface ResetPasswordDto {
-	id: string,
-	password: string,
+	token: string,
 	newPassword: string
 }

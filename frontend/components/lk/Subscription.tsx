@@ -7,7 +7,6 @@ import { getCourses } from '@/lib/requests/tasks'
 import { useSession } from '@/lib/session/hooks'
 import { YooCheckoutWidget } from '@/lib/YooCheckoutWidget'
 import styles from '@/styles/lk/Subscription.module.scss'
-import Head from 'next/head'
 import Script from 'next/script'
 import { Fragment, useEffect, useState } from 'react'
 import Checkbox from '../controls/Checkbox'
@@ -205,7 +204,6 @@ const Subscriptions = () => {
 	}
 	return (
 		<>
-			<Head />
 			<Script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js" strategy="afterInteractive" />
 			<Modal closeCallback={() => setNot(false)}
 				visible={not}>

@@ -1,70 +1,24 @@
 import { ReactNode } from 'react'
 import Head from 'next/head'
-
+import Link from 'next/link'
+import Navbar from './Navbar'
 import styles from '@/styles/Layout.module.scss'
 
-import Navbar from './Navbar'
-import logo from '@/assets/logo.svg'
-import Image from 'next/image'
-import Script from 'next/script'
-import Auth from './auth/Auth'
-
-
 export interface Props {
-	children?: ReactNode
-	title?: string
-	navbar?: boolean
-	footer?: boolean
+ children?: ReactNode
+ title?: string
+ navbar?: boolean
+ footer?: boolean
 }
-//Переделать на номральный навбар
-const Layout = ({ children, title, navbar = true, footer = true }: Props) => {
-	return (
-		<div className={styles.root}>
-			<Head>
-				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				<title>Lab Studio{title && ` | ${title}`}</title>
-				<link rel="icon" type="image/png" href="/logo.png" />
-			</Head>
-			{navbar && <Navbar />}
-			<article className={`${styles.content} ${navbar ?? styles.isNavbar}`}>
-				{children}
-			</article>
-			{footer
-				&& <footer className={styles.footer}>
-					<section className={styles.info}>
-						<header>
-							<div>
-								<Image src={logo} layout="fill" objectFit="contain" />
-							</div>
-							Lab Studio
-						</header>
-						<section>
-							<header>Контакты</header>
-							<div>РФ, г. Киров</div>
-							<div>bestlaboratory@mail.ru</div>
-							<div>8-922-9800770</div>
-						</section>
-						<section>
-							<header>Соц сети</header>
-							<a href="https://t.me/labstudio">Telegramm</a>
-							<a href="https://vk.com/studiolab">ВКонтакте</a>
-						</section>
-						<div className={styles.ur}>
-							<div>Индивидуальный предприниматель Калашникова Виктория Владимировна</div>
-							<div>ОГРНИП 319435000027099</div>
-							<div>ИНН 434510331832</div>
-						</div>
-					</section>
-					<section className={styles.other}>
-						<div>Для оформления подписики авторизируйтесь</div>
-						<Auth button={
-							<button>Вход / Регистрация</button>
-						} />
-					</section>
-				</footer>
-			}
-		</div>
-	)
+export default function Layout({ children, title, navbar = true, footer = true }: Props) {
+ return <div className={styles.root}>
+  <Head><meta name="viewport" content="width=device-width, initial-scale=1" /><title>{title ? title + ' — Lab Studio' : 'Lab Studio'}</title><link rel="icon" href="/logo.png" /></Head>
+  {navbar && <Navbar />}
+  <div className={styles.content}>{children}</div>
+  {footer && <footer className={styles.footer}>
+   <span>Lab Studio · материалы для занятий</span>
+   <a href="mailto:bestlaboratory@mail.ru">bestlaboratory@mail.ru</a>
+   <Link href="/license">Лицензионное соглашение</Link>
+  </footer>}
+ </div>
 }
-
-export default Layout

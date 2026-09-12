@@ -21,3 +21,5 @@
 		}
 	}
 }
+
+.editor > article { gap:24px; width:100%; }.editor > article > section { width:100%; justify-content:flex-start; align-items:start; gap:16px; flex-wrap:wrap; }.editor > article > section > div { flex:1; min-width:0; }.editor > article > section .avatar { width:48px; height:48px; border-radius:50%; object-fit:cover; }

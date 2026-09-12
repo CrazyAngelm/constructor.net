@@ -37,7 +37,7 @@ export const resendConfirmEmail = async (
 }
 
 export const sendResetPasssword = async (
-	dto: SignUpDto,
+	dto: Pick<SignUpDto, 'email'>,
 	{ apiUrl }: RequestContext = defaultRequestContext,
 ): Promise<Status> => {
 	const res = await fetch(apiUrl + '/auth/sendResetPassword', {

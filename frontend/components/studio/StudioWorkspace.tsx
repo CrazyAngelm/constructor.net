@@ -1,0 +1,449 @@
+/* eslint-disable @next/next/no-img-element -- user uploads and catalog thumbnails are authenticated dynamic resources */
+import { ChangeEvent, DragEvent, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import { DownloadSimple, Files, FloppyDisk, ImageSquare, Plus, Printer, TextT, X } from '@phosphor-icons/react'
+import { signOut } from 'next-auth/react'
+
+import { useSession } from '@/lib/session/hooks'
+import {
+	catalogTaskToSheetItem,
+	emptyStudioSheet,
+	upgradeStudioSheet,
+} from '@/lib/studio/types'
+import type {
+	StudioCourse,
+	StudioFolder,
+	StudioFontFamily,
+	StudioImageAlignment,
+	StudioPageSettings,
+	StudioSheetItem,
+	StudioTask,
+	StudioWorklist,
+} from '@/lib/studio/types'
+import CatalogBrowser from './CatalogBrowser'
+import SheetPreview from './SheetPreview'
+import SheetSettings from './SheetSettings'
+import SaveWorklistDialog from './SaveWorklistDialog'
+import WorklistLibrary from './WorklistLibrary'
+import { pairSheetItems, swapSheetPair, unpairSheetItems, updateSheetItem } from '@/lib/studio/items'
+import styles from '@/styles/studio.module.scss'
+
+export type { StudioCategory, StudioCourse, StudioTask } from '@/lib/studio/types'
+
+type SheetName = 'teacherSheet' | 'studentSheet'
+type WorklistsResponse = { worklists: Array<Omit<StudioWorklist, 'teacherSheet' | 'studentSheet'> & { teacherSheet: unknown; studentSheet: unknown }> }
+type CatalogResponse = { courses: StudioCourse[]; canEditFooter: boolean }
+
+const initialDraft = (): StudioWorklist => ({
+	id: '',
+	name: 'Новый конспект',
+	teacherSheet: emptyStudioSheet(),
+	studentSheet: emptyStudioSheet(),
+})
+
+const normalizeWorklist = (worklist: WorklistsResponse['worklists'][number]): StudioWorklist => ({
+	...worklist,
+	teacherSheet: upgradeStudioSheet(worklist.teacherSheet as never),
+	studentSheet: upgradeStudioSheet(worklist.studentSheet as never),
+})
+
+function unwrap<T>(value: T | { response: T }): T {
+	return 'response' in (value as object) ? (value as { response: T }).response : value as T
+}
+
+const newInstanceId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`
+
+const blankItem = (kind: StudioSheetItem['kind']): StudioSheetItem => ({
+	instanceId: newInstanceId(),
+	sourceTaskId: null,
+	kind,
+	name: kind === 'text' ? 'Текстовый блок' : kind === 'spacer' ? '' : 'Своё упражнение',
+	description: '',
+	instruction: kind === 'text' ? 'Пользовательский текст' : '',
+	complexity: null,
+	image: null,
+	showDescription: true,
+	showInstruction: true,
+	imageWidthPercent: 100,
+	imageAlignment: 'center',
+	spacerHeightMm: kind === 'spacer' ? 12 : 0,
+})
+
+const readApiError = async (response: Response, fallback: string) => {
+	try {
+		const body = await response.json()
+		return body.message || fallback
+	} catch {
+		return fallback
+	}
+}
+
+function ExportDialog({ open, label, printable, onClose }: { open: boolean; label: string; printable: boolean; onClose: () => void }) {
+	if (!open) return null
+	return createPortal(<div className={styles.modalBackdrop} role="presentation">
+		<section className={styles.exportDialog} role="dialog" aria-modal="true" aria-labelledby="export-dialog-title">
+			<header><div><span className={styles.eyebrow}>Активный лист: {label.toLocaleLowerCase('ru')}</span><h2 id="export-dialog-title">Скачать PDF</h2></div><button type="button" className={styles.iconButton} onClick={onClose} aria-label="Закрыть экспорт"><X size={20} /></button></header>
+			<div><p>Браузер откроет окно печати. В поле принтера выберите <strong>«Сохранить как PDF»</strong>, затем укажите папку на устройстве.</p><p>PDF — отдельный файл. Редактируемый конспект хранится в разделе «Мои конспекты» после нажатия «Сохранить».</p></div>
+			<footer><button type="button" className={styles.secondary} onClick={onClose}>Отмена</button><button type="button" className={styles.primary} disabled={!printable} onClick={() => { onClose(); window.setTimeout(() => window.print(), 0) }}><DownloadSimple size={17} />Открыть сохранение PDF</button></footer>
+			{!printable && <p className={styles.dialogError} role="alert">Дождитесь загрузки изображений и устраните предупреждения в предпросмотре.</p>}
+		</section>
+	</div>, document.body)
+}
+
+export default function StudioWorkspace() {
+	const session = useSession()
+	const [ courses, setCourses ] = useState<StudioCourse[]>([])
+	const [ worklists, setWorklists ] = useState<StudioWorklist[]>([])
+	const [ folders, setFolders ] = useState<StudioFolder[]>([])
+	const [ foldersBusy, setFoldersBusy ] = useState(false)
+	const [ refreshing, setRefreshing ] = useState(false)
+	const [ refreshStatus, setRefreshStatus ] = useState('')
+	const [ printable, setPrintable ] = useState(false)
+	const [ canEditFooter, setCanEditFooter ] = useState(false)
+	const [ draft, setDraft ] = useState<StudioWorklist>(initialDraft)
+	const [ selectedItemId, setSelectedItemId ] = useState<string | null>(null)
+	const [ activeCourse, setActiveCourse ] = useState<number | null>(null)
+	const [ loading, setLoading ] = useState(true)
+	const [ error, setError ] = useState('')
+	const [ saveState, setSaveState ] = useState<'clean' | 'dirty' | 'saving' | 'saved'>('clean')
+	const [ activeSheet, setActiveSheet ] = useState<SheetName>('teacherSheet')
+	const [ dragId, setDragId ] = useState<string | null>(null)
+	const [ uploading, setUploading ] = useState(false)
+	const [ libraryOpen, setLibraryOpen ] = useState(false)
+	const [ saveDialogOpen, setSaveDialogOpen ] = useState(false)
+	const [ exportDialogOpen, setExportDialogOpen ] = useState(false)
+	const [ libraryBusy, setLibraryBusy ] = useState(false)
+
+	useEffect(() => {
+		let active = true
+		const load = async () => {
+			setLoading(true)
+			setError('')
+			try {
+				const [ catalogResult, worklistsResult, foldersResult ] = await Promise.all([
+					fetch('/api/studio/catalog'),
+					fetch('/api/studio/worklists'),
+					fetch('/api/studio/folders'),
+				])
+				if (!catalogResult.ok || !worklistsResult.ok || !foldersResult.ok) throw new Error('Не удалось загрузить рабочие данные.')
+				const catalogPayload = unwrap(await catalogResult.json()) as CatalogResponse
+				const worklistsPayload = unwrap(await worklistsResult.json()) as WorklistsResponse
+				const foldersPayload = unwrap(await foldersResult.json()) as { folders: StudioFolder[] }
+				if (!active) return
+				setCourses(catalogPayload.courses || [])
+				setCanEditFooter(catalogPayload.canEditFooter)
+				setActiveCourse(current => current ?? catalogPayload.courses?.[0]?.id ?? null)
+				setWorklists((worklistsPayload.worklists || []).map(normalizeWorklist))
+				setFolders(foldersPayload.folders)
+			} catch (cause) {
+				if (active) setError(cause instanceof Error ? cause.message : 'Не удалось загрузить рабочие данные.')
+			} finally {
+				if (active) setLoading(false)
+			}
+		}
+		void load()
+		return () => { active = false }
+	}, [])
+
+	useEffect(() => {
+		if (saveState !== 'dirty' && saveState !== 'saving') return
+		const preventAccidentalClose = (event: BeforeUnloadEvent) => event.preventDefault()
+		window.addEventListener('beforeunload', preventAccidentalClose)
+		return () => window.removeEventListener('beforeunload', preventAccidentalClose)
+	}, [ saveState ])
+
+	const activeItems = draft[activeSheet].data.items
+	const selectedItem = activeItems.flatMap(item => item.companion ? [ item, item.companion ] : [ item ]).find(item => item.instanceId === selectedItemId) || null
+	const selectedRow = activeItems.find(item => item.instanceId === selectedItemId || item.companion?.instanceId === selectedItemId)
+	const markDirty = (next: StudioWorklist) => {
+		if (saveState === 'saving') return
+		setDraft(next)
+		setSaveState('dirty')
+	}
+	const replaceActiveItems = (items: StudioSheetItem[]) => markDirty({
+		...draft,
+		[activeSheet]: { ...draft[activeSheet], data: { ...draft[activeSheet].data, items } },
+	})
+	const addItem = (item: StudioSheetItem) => {
+		replaceActiveItems([ ...activeItems, item ])
+		setSelectedItemId(item.instanceId)
+	}
+	const addTask = (task: StudioTask) => addItem(catalogTaskToSheetItem(task, newInstanceId()))
+	const updateItem = <K extends keyof StudioSheetItem>(key: K, value: StudioSheetItem[K]) => {
+		if (!selectedItem) return
+		replaceActiveItems(updateSheetItem(activeItems, selectedItem.instanceId, { [key]: value }))
+	}
+	const updateSettings = (settings: StudioPageSettings) => markDirty({
+		...draft,
+		[activeSheet]: { ...draft[activeSheet], data: { ...draft[activeSheet].data, settings } },
+	})
+	const copySettings = () => {
+		const other: SheetName = activeSheet === 'teacherSheet' ? 'studentSheet' : 'teacherSheet'
+		markDirty({ ...draft, [other]: { ...draft[other], data: { ...draft[other].data, settings: { ...structuredClone(draft[activeSheet].data.settings), ...(!canEditFooter ? { footer: draft[other].data.settings.footer } : {}) } } } })
+	}
+	const removeItem = (instanceId: string) => {
+		const items = activeItems.filter(item => item.instanceId !== instanceId)
+		replaceActiveItems(items)
+		if (selectedRow?.instanceId === instanceId) setSelectedItemId(items[0]?.instanceId || null)
+	}
+	const moveItem = (instanceId: string, direction: -1 | 1) => {
+		const from = activeItems.findIndex(item => item.instanceId === instanceId)
+		const to = from + direction
+		if (from < 0 || to < 0 || to >= activeItems.length) return
+		const items = [ ...activeItems ]
+		const current = items[from]
+		const target = items[to]
+		if (!current || !target) return
+		items[from] = target
+		items[to] = current
+		replaceActiveItems(items)
+	}
+	const handleDrop = (event: DragEvent<HTMLLIElement>, targetId: string) => {
+		event.preventDefault()
+		if (!dragId || dragId === targetId) return
+		const from = activeItems.findIndex(item => item.instanceId === dragId)
+		const to = activeItems.findIndex(item => item.instanceId === targetId)
+		if (from < 0 || to < 0) return
+		const items = [ ...activeItems ]
+		const [ moved ] = items.splice(from, 1)
+		if (!moved) return
+		items.splice(to, 0, moved)
+		replaceActiveItems(items)
+		setDragId(null)
+	}
+
+	const uploadImage = async (file: File): Promise<string | null> => {
+		setUploading(true)
+		setError('')
+		try {
+			const form = new FormData()
+			form.append('file', file)
+			const response = await fetch('/api/studio/uploads', { method: 'POST', body: form })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось загрузить изображение.'))
+			return (await response.json()).url as string
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Не удалось загрузить изображение.')
+			return null
+		} finally {
+			setUploading(false)
+		}
+	}
+	const addOwnImage = async (event: ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0]
+		event.target.value = ''
+		if (!file) return
+		const url = await uploadImage(file)
+		if (!url) return
+		addItem({ ...blankItem('image'), name: file.name.replace(/\.[^.]+$/, '') || 'Своё упражнение', image: url })
+	}
+	const replaceImage = async (event: ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0]
+		event.target.value = ''
+		if (!file) return
+		const url = await uploadImage(file)
+		if (url) updateItem('image', url)
+	}
+
+	const save = async (overrides?: { name: string; personalFolderId: string | null }) => {
+		const nextDraft = overrides ? { ...draft, ...overrides } : draft
+		setSaveState('saving')
+		setError('')
+		try {
+			const response = await fetch(nextDraft.id ? `/api/studio/worklists/${nextDraft.id}` : '/api/studio/worklists', {
+				method: nextDraft.id ? 'PUT' : 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: nextDraft.name,
+					teacherSheet: nextDraft.teacherSheet,
+					studentSheet: nextDraft.studentSheet,
+					personalFolderId: nextDraft.personalFolderId ?? null,
+					...(activeCourse === null ? {} : { courseId: activeCourse }),
+				}),
+			})
+			if (!response.ok) throw new Error(await readApiError(response, 'Сохранение не выполнено.'))
+			const saved = normalizeWorklist(unwrap(await response.json()) as WorklistsResponse['worklists'][number])
+			setDraft(saved)
+			setWorklists(current => [ saved, ...current.filter(worklist => worklist.id !== saved.id) ])
+			setSaveState('saved')
+			setSaveDialogOpen(false)
+			return true
+		} catch (cause) {
+			setSaveState('dirty')
+			setError(cause instanceof Error ? cause.message : 'Сохранение не выполнено.')
+			return false
+		}
+	}
+	const requestSave = () => draft.id ? void save() : setSaveDialogOpen(true)
+	const reopen = (worklist: StudioWorklist) => {
+		if (saveState === 'saving') return
+		if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Открыть другой конспект?')) return
+		setDraft(worklist)
+		setActiveCourse(worklist.courseId ?? activeCourse)
+		setSelectedItemId(worklist[activeSheet].data.items[0]?.instanceId || null)
+		setSaveState('clean')
+		setLibraryOpen(false)
+	}
+	const chooseSheet = (sheet: SheetName) => {
+		setActiveSheet(sheet)
+		setSelectedItemId(draft[sheet].data.items[0]?.instanceId || null)
+	}
+	const changeName = (event: ChangeEvent<HTMLInputElement>) => markDirty({ ...draft, name: event.target.value })
+	const refreshCatalog = async () => {
+		setRefreshing(true)
+		setRefreshStatus('')
+		try {
+			const response = await fetch('/api/studio/catalog', { cache: 'no-store' })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось обновить каталог. Текущий каталог и черновик сохранены.'))
+			const payload = unwrap(await response.json()) as CatalogResponse
+			const next = payload.courses
+			setCanEditFooter(payload.canEditFooter)
+			setCourses(next)
+			setActiveCourse(current => next.some(course => course.id === current) ? current : next[0]?.id ?? null)
+			setRefreshStatus('Каталог обновлён. Черновик не изменён.')
+		} catch (cause) {
+			setRefreshStatus(cause instanceof Error ? cause.message : 'Не удалось обновить каталог. Черновик не изменён.')
+		} finally { setRefreshing(false) }
+	}
+	const mutateFolder = async (method: 'POST' | 'PUT' | 'DELETE', id?: string, name?: string): Promise<StudioFolder | true | false> => {
+		setFoldersBusy(true)
+		setError('')
+		try {
+			const response = await fetch(`/api/studio/folders${id ? `/${id}` : ''}`, { method, headers: { 'Content-Type': 'application/json' }, ...(name === undefined ? {} : { body: JSON.stringify({ name }) }) })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось изменить папку.'))
+			if (method === 'DELETE') {
+				setFolders(current => current.filter(folder => folder.id !== id))
+				setWorklists(current => current.map(worklist => worklist.personalFolderId === id ? { ...worklist, personalFolderId: null } : worklist))
+				setDraft(current => current.personalFolderId === id ? { ...current, personalFolderId: null } : current)
+				return true
+			} else {
+				const folder = unwrap(await response.json()) as StudioFolder
+				setFolders(current => [ ...current.filter(value => value.id !== folder.id), folder ].sort((a, b) => a.name.localeCompare(b.name, 'ru')))
+				return folder
+			}
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Не удалось изменить папку.')
+			return false
+		} finally { setFoldersBusy(false) }
+	}
+	const createFolder = async (name: string) => {
+		const result = await mutateFolder('POST', undefined, name)
+		return typeof result === 'object' ? result : null
+	}
+	const renameFolder = async (id: string, name: string) => Boolean(await mutateFolder('PUT', id, name))
+	const deleteFolder = async (id: string) => Boolean(await mutateFolder('DELETE', id))
+	const moveWorklist = async (worklist: StudioWorklist, personalFolderId: string | null) => {
+		setLibraryBusy(true)
+		setError('')
+		try {
+			const response = await fetch(`/api/studio/worklists/${worklist.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ personalFolderId }) })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось переместить конспект.'))
+			const moved = normalizeWorklist(unwrap(await response.json()) as WorklistsResponse['worklists'][number])
+			setWorklists(current => current.map(value => value.id === moved.id ? moved : value))
+			setDraft(current => current.id === moved.id ? { ...current, personalFolderId: moved.personalFolderId } : current)
+			return true
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Не удалось переместить конспект.')
+			return false
+		} finally { setLibraryBusy(false) }
+	}
+	const deleteWorklist = async (worklist: StudioWorklist) => {
+		setLibraryBusy(true)
+		setError('')
+		try {
+			const response = await fetch(`/api/studio/worklists/${worklist.id}`, { method: 'DELETE' })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось удалить конспект.'))
+			setWorklists(current => current.filter(value => value.id !== worklist.id))
+			if (draft.id === worklist.id) {
+				setDraft(initialDraft())
+				setSelectedItemId(null)
+				setSaveState('clean')
+			}
+			return true
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Не удалось удалить конспект.')
+			return false
+		} finally { setLibraryBusy(false) }
+	}
+	const currentFolderName = folders.find(folder => folder.id === draft.personalFolderId)?.name
+	const statusText = saveState === 'saving' ? 'Сохраняем…'
+		: saveState === 'dirty' ? 'Есть несохранённые изменения'
+			: saveState === 'saved' ? currentFolderName ? `Сохранено в «${currentFolderName}»` : 'Сохранено без папки'
+				: draft.id ? currentFolderName ? `Открыт из «${currentFolderName}»` : 'Открыт без папки' : 'Новый конспект'
+	const busy = saveState === 'saving' || uploading || foldersBusy || libraryBusy
+
+	return <main className={styles.studio}>
+		<Head><title>Конструктор занятия — Lab Studio</title></Head>
+		<header className={styles.topbar}>
+			<Link className={styles.brand} href="/" aria-label="LabStudio — на главную"><Image src="/logo.png" width={42} height={42} alt="LabStudio" priority /></Link>
+			<div><span className={styles.eyebrow}>Рабочий кабинет</span><h1>Конструктор занятия</h1></div>
+			<div className={styles.actions}>
+				<div className={styles.accountActions}><Link href="/lk" target="_blank" rel="noreferrer">Кабинет ↗</Link>{session && session !== 'loading' && session.scopes.includes('admin') && <Link href="/adm">Администрирование</Link>}<button type="button" className={styles.textButton} onClick={() => { if (saveState === 'dirty' && !window.confirm('Выйти без сохранения изменений?')) return; void signOut({ callbackUrl: '/studio/auth' }) }} disabled={saveState === 'saving'}>Выйти</button></div>
+				<span className={`${styles.status} ${saveState === 'dirty' ? styles.dirty : ''}`} aria-live="polite">{statusText}</span>
+				<div className={styles.documentActions}>
+					<button type="button" className={styles.secondary} onClick={() => setLibraryOpen(true)} disabled={loading}><Files size={17} />Мои конспекты</button>
+					<button type="button" className={styles.secondary} onClick={() => setExportDialogOpen(true)}><DownloadSimple size={17} />Скачать PDF</button>
+					<button type="button" className={styles.secondary} onClick={() => window.print()} disabled={!printable || uploading} title={!printable ? 'Дождитесь загрузки изображений и устраните предупреждения в предпросмотре' : undefined}><Printer size={17} />Печать</button>
+					<button type="button" className={styles.primary} onClick={requestSave} disabled={busy || loading}><FloppyDisk size={17} />Сохранить</button>
+				</div>
+			</div>
+		</header>
+
+		<fieldset disabled={busy} className={styles.editable}>
+			{error && <div className={styles.alert} role="alert">{error}<button type="button" onClick={() => setError('')}>Закрыть</button></div>}
+			{loading ? <div className={styles.loading} aria-label="Загружаем каталог и конспекты"><span /><span /><span /></div> : <div className={styles.layout}>
+				<CatalogBrowser courses={courses} activeCourse={activeCourse} onCourseChange={setActiveCourse} onAdd={addTask} onRefresh={() => void refreshCatalog()} refreshing={refreshing} refreshStatus={refreshStatus} />
+
+				<section className={styles.builder} aria-label="Состав занятия">
+					<div className={styles.builderHead}><div><label htmlFor="worklist-name" className={styles.eyebrow}>Название конспекта</label><input id="worklist-name" value={draft.name} onChange={changeName} /><p className={styles.draftLocation}>{draft.personalFolderId ? `Мои конспекты → ${currentFolderName || 'папка'}` : 'Мои конспекты → Без папки'}</p></div><button type="button" className={styles.secondary} onClick={() => { if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Создать новый конспект?')) return; setDraft(initialDraft()); setSelectedItemId(null); setSaveState('clean') }}>Новый</button></div>
+					<div className={styles.sheetChooser} role="group" aria-label="Редактируемый лист"><button type="button" className={activeSheet === 'teacherSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('teacherSheet')}>Лист педагога <span>{draft.teacherSheet.data.items.length}</span></button><button type="button" className={activeSheet === 'studentSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('studentSheet')}>Лист ученика <span>{draft.studentSheet.data.items.length}</span></button></div>
+					<p className={styles.sheetHelp}>{activeSheet === 'teacherSheet' ? 'Лист педагога — план занятия и ваши инструкции.' : 'Лист ученика — материалы, которые вы даёте ребёнку.'} Упражнения добавляются только в выбранный лист; сохранение сохраняет оба листа.</p>
+					<div className={styles.insertBar} aria-label="Свои материалы">
+						<label className={styles.secondary} aria-disabled={uploading}><ImageSquare size={17} />{uploading ? 'Загружаем…' : 'Своё изображение'}<input type="file" accept="image/png,image/jpeg" onChange={event => void addOwnImage(event)} disabled={uploading} /></label>
+						<button type="button" className={styles.secondary} onClick={() => addItem(blankItem('text'))}><TextT size={17} />Добавить текст</button>
+						<button type="button" className={styles.secondary} onClick={() => addItem(blankItem('spacer'))}><Plus size={17} />Свободное место</button>
+					</div>
+					<SheetSettings settings={draft[activeSheet].data.settings} onChange={updateSettings} onCopy={copySettings} canEditFooter={canEditFooter} />
+					{activeItems.length ? <ol className={styles.taskList}>{activeItems.map((item, index) => <li key={item.instanceId} draggable onDragStart={() => setDragId(item.instanceId)} onDragOver={event => event.preventDefault()} onDrop={event => handleDrop(event, item.instanceId)} className={selectedItemId === item.instanceId ? styles.selected : ''}>
+						<button type="button" className={styles.taskSelect} onClick={() => setSelectedItemId(item.instanceId)}><span className={styles.order}>{index + 1}</span>{item.image && <img src={item.image} alt="" />}<span><strong>{item.kind === 'spacer' ? `Свободное место — ${item.spacerHeightMm} мм` : item.name}</strong><small>{item.kind === 'spacer' ? 'Пустая область на печатном листе' : item.instruction || item.description || 'Текст не заполнен'}</small></span></button>
+						{item.companion && <button type="button" className={`${styles.taskSelect} ${selectedItemId === item.companion.instanceId ? styles.selectedColumn : ''}`} onClick={() => setSelectedItemId(item.companion!.instanceId)}><span className={styles.order}>↔</span>{item.companion.image && <img src={item.companion.image} alt="" />}<span><strong>{item.companion.name}</strong><small>Правая колонка · Изменить</small></span></button>}
+						<div className={styles.rowActions}>{item.kind !== 'spacer' && <button type="button" onClick={() => { setSelectedItemId(item.instanceId); document.querySelector('[aria-label="Параметры элемента"]')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }}>Редактировать</button>}{item.companion ? <><button type="button" onClick={() => replaceActiveItems(swapSheetPair(activeItems, item.instanceId))}>Поменять колонки местами</button><button type="button" onClick={() => replaceActiveItems(unpairSheetItems(activeItems, item.instanceId))}>Разделить колонки</button></> : item.kind !== 'spacer' && activeItems[index + 1] && activeItems[index + 1]?.kind !== 'spacer' && !activeItems[index + 1]?.companion && <button type="button" onClick={() => replaceActiveItems(pairSheetItems(activeItems, item.instanceId))}>Разместить со следующим рядом</button>}</div>
+						<div className={styles.itemActions}><button type="button" onClick={() => moveItem(item.instanceId, -1)} disabled={index === 0} aria-label={`Поднять «${item.name || 'свободное место'}»`}>Выше</button><button type="button" onClick={() => moveItem(item.instanceId, 1)} disabled={index === activeItems.length - 1} aria-label={`Опустить «${item.name || 'свободное место'}»`}>Ниже</button><button type="button" onClick={() => removeItem(item.instanceId)} aria-label={`Удалить «${item.name || 'свободное место'}»`}>Удалить</button></div>
+					</li>)}</ol> : <div className={styles.empty}><h2>Добавьте материалы на {activeSheet === 'teacherSheet' ? 'лист педагога' : 'лист ученика'}</h2><p>Откройте папку каталога, просмотрите упражнение и добавьте его в текущий лист.</p></div>}
+				</section>
+
+				<aside className={styles.inspector} aria-label="Параметры элемента">
+					<div className={styles.panelHead}><div><span className={styles.eyebrow}>Настройки выбранного задания</span><h2>{selectedItem ? selectedItem.kind === 'spacer' ? 'Свободное место' : selectedItem.name : 'Выберите элемент'}</h2></div></div>
+					{selectedItem ? <div className={styles.form}>
+						{selectedItem.kind === 'spacer' ? <label>Высота, мм<input type="number" min="1" value={selectedItem.spacerHeightMm} onChange={event => updateItem('spacerHeightMm', Number(event.target.value))} /></label> : <>
+							<label>Название<input value={selectedItem.name} onChange={event => updateItem('name', event.target.value)} /></label>
+							<label>Описание<textarea value={selectedItem.description} onChange={event => updateItem('description', event.target.value)} /></label>
+							<label>Инструкция / текст<textarea value={selectedItem.instruction} onChange={event => updateItem('instruction', event.target.value)} /></label>
+							<label className={styles.checkField}><input type="checkbox" checked={selectedItem.showDescription} onChange={event => updateItem('showDescription', event.target.checked)} /> Показывать описание</label>
+							<label className={styles.checkField}><input type="checkbox" checked={selectedItem.showInstruction} onChange={event => updateItem('showInstruction', event.target.checked)} /> Показывать инструкцию</label>
+							<label>Шрифт задания<select value={selectedItem.fontFamily ?? ''} onChange={event => updateItem('fontFamily', (event.target.value || undefined) as StudioFontFamily | undefined)}><option value="">Как на листе</option><option value="inherit">LabStudio</option><option value="Arial">Arial</option></select></label>
+							<label>Размер текста задания, пт<input type="number" min="1" step="0.5" placeholder="Как на листе" value={selectedItem.fontSizePt ?? ''} onChange={event => updateItem('fontSizePt', event.target.value ? Number(event.target.value) : undefined)} /></label>
+							<label>Выравнивание текста<select value={selectedItem.textAlignment ?? 'left'} onChange={event => updateItem('textAlignment', event.target.value as StudioImageAlignment)}><option value="left">Слева</option><option value="center">По центру</option><option value="right">Справа</option></select></label>
+							{selectedItem.image && <><label>Ширина изображения, %<input type="number" min="1" max="100" value={selectedItem.imageWidthPercent} onChange={event => updateItem('imageWidthPercent', Number(event.target.value))} /></label><label>Выравнивание<select aria-label="Выравнивание" value={selectedItem.imageAlignment} onChange={event => updateItem('imageAlignment', event.target.value as StudioImageAlignment)}><option value="left">Слева</option><option value="center">По центру</option><option value="right">Справа</option></select></label></>}
+							<label className={styles.uploadReplacement}>{selectedItem.image ? 'Заменить изображение' : 'Добавить изображение'}<input type="file" accept="image/png,image/jpeg" onChange={event => void replaceImage(event)} disabled={uploading} /></label>
+							{selectedItem.image && <img className={styles.previewImage} src={selectedItem.image} alt="Предпросмотр задания" />}
+						</>}
+					</div> : <p className={styles.empty}>Нажмите на добавленный элемент, чтобы скорректировать его копию. Каталог при этом не изменится.</p>}
+				</aside>
+			</div>}
+		</fieldset>
+		<section className={styles.manuals} aria-label="Руководства"><span>Нужна инструкция к материалам?</span><Link href="/docs" target="_blank" rel="noreferrer">Открыть руководства ↗</Link></section>
+		<SheetPreview sheet={draft[activeSheet]} title={draft.name} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} onPrintable={setPrintable} onResize={saveState === 'saving' || uploading ? undefined : (id, width) => { replaceActiveItems(updateSheetItem(activeItems, id, { imageWidthPercent: width })); setSelectedItemId(id) }} />
+		<nav className={styles.mobileDock} aria-label="Действия с конспектом">
+			<button type="button" onClick={() => setLibraryOpen(true)} disabled={loading} aria-label="Мои конспекты"><Files size={19} /><span>Мои</span></button>
+			<button type="button" onClick={requestSave} disabled={busy || loading} aria-label="Сохранить"><FloppyDisk size={19} /><span>Сохранить</span></button>
+			<button type="button" onClick={() => setExportDialogOpen(true)} aria-label="Скачать PDF"><DownloadSimple size={19} /><span>PDF</span></button>
+			<button type="button" onClick={() => window.print()} disabled={!printable || uploading} aria-label="Печать"><Printer size={19} /><span>Печать</span></button>
+		</nav>
+		<WorklistLibrary open={libraryOpen} folders={folders} worklists={worklists} currentId={draft.id} onClose={() => setLibraryOpen(false)} onOpen={reopen} onCreate={createFolder} onRename={renameFolder} onDeleteFolder={deleteFolder} onMove={moveWorklist} onDeleteWorklist={deleteWorklist} busy={foldersBusy || libraryBusy || saveState === 'saving'} error={error} onClearError={() => setError('')} />
+		<SaveWorklistDialog open={saveDialogOpen} initialName={draft.name} initialFolderId={draft.personalFolderId ?? null} folders={folders} busy={saveState === 'saving' || foldersBusy} error={error} onClose={() => setSaveDialogOpen(false)} onSave={(name, personalFolderId) => save({ name, personalFolderId })} onCreateFolder={createFolder} onClearError={() => setError('')} />
+		<ExportDialog open={exportDialogOpen} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} printable={printable && !uploading} onClose={() => setExportDialogOpen(false)} />
+	</main>
+}

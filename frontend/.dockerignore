@@ -1,6 +1,9 @@
 # compiled output
 /dist
 /node_modules
+/.next
+/test-results
+/playwright-report
 
 # Logs
 logs
@@ -34,8 +37,9 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-#dotenv
-.env
+# dotenv
+.env*
+!.env.*.in
 
 # Docker
 Dockerfile

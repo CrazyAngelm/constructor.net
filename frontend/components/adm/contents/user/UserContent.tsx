@@ -17,15 +17,16 @@ const UserContent = () => {
 	return (
 		<article className={styles.content}>
 			<section className={styles.list}>
+				{!data && <p role="status">{error || 'Загружаем пользователей…'}</p>}
 				{data
 					&& <List name="Пользователи"
 						length={data.length}
 						rows={[ {
-							header: 'id',
-							value: i => data[i]?.id as string,
-						}, {
-							header: 'name',
+							header: 'Имя',
 							value: i => data[i]?.name as string,
+						}, {
+							header: 'Email',
+							value: i => data[i]?.email as string,
 						} ]}
 						callback={i => setUserId(data[i]?.id)}
 						selected={data.findIndex(p => p.id === userId)} />
@@ -33,6 +34,7 @@ const UserContent = () => {
 				<ButtonsList />
 			</section>
 			<section className={styles.editor}>
+				{!userId && <p className={styles.empty}>Выберите пользователя в списке, чтобы открыть его профиль.</p>}
 				{userId && <UserEditor callbackUpdate={update} id={userId} />}
 			</section>
 		</article >

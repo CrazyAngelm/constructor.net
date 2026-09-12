@@ -1,0 +1,24 @@
+[Unit]
+Description=LabStudio independent web preview
+After=network.target labstudio-preview-db.service
+Requires=labstudio-preview-db.service
+
+[Service]
+Type=simple
+User=labstudio-preview
+Group=labstudio-preview
+WorkingDirectory=/srv/labstudio-preview/current
+EnvironmentFile=/srv/labstudio-preview/preview.env
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=18080
+ExecStart=/srv/labstudio-preview/current/node /srv/labstudio-preview/current/server.js
+Restart=on-failure
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/labstudio-preview/shared /srv/labstudio-preview/current/.next/cache
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -10,7 +10,7 @@ type YooWidgetCtor = new (args: {
 export const YooCheckoutWidget = (token: string, returnUrl?: string,
 	errorCallback?: (error: unknown) => void) => {
 
-	const checkout = new (window as { YooMoneyCheckoutWidget: YooWidgetCtor }).YooMoneyCheckoutWidget({
+	const checkout = new (window as unknown as { YooMoneyCheckoutWidget: YooWidgetCtor }).YooMoneyCheckoutWidget({
 		confirmation_token: token,
 		return_url: returnUrl,
 		customization: {

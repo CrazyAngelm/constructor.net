@@ -1,4 +1,5 @@
 import styles from '@/styles/controls/TextArea.module.scss'
+import { useId } from 'react'
 
 export interface Props {
 	className?:string
@@ -11,14 +12,15 @@ export interface Props {
 }
 
 const TextArea = ({className, label, value, placeholder, onChange, isReadonly, isFixedSize }: Props) => {
+	const id = useId()
 	return (
 		<section className={`${className} ${styles.textArea}`}>
 			<div className={styles.fieldLabel}>
-				<label>{label}</label>
+				<label htmlFor={id}>{label}</label>
 			</div>
 			<div className={styles.fieldBody}>
 				<div>
-					<textarea className={`${isReadonly ? styles.static : ''}
+					<textarea id={id} className={`${isReadonly ? styles.static : ''}
 					${isFixedSize ? styles.fixed : ''}`}
 					value={value?value:''}
 					readOnly={isReadonly}

@@ -81,9 +81,9 @@ const CardTarif = ({ license, img }: Props) => {
 				<h3>{license.name}</h3>
 				<p className={styles.description}>
 					{license.description?.split('-')
-						.map(p => p !== '' && <div className={styles.block}>
+						.map((p, index) => p !== '' && <div className={styles.block} key={`${license.id}-${index}`}>
 							<div>
-								<Image src={ok} objectFit="contain" layout="fill" />
+								<Image src={ok} alt="" objectFit="contain" layout="fill" />
 							</div>
 							<span>
 								{p}

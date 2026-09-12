@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response } from '@/lib/api/response'
+import { response, responseAdmin } from '@/lib/api/response'
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
 import { TaskCategoryDto, TaskDto } from '@/lib/dto/tasks'
 import { getPrisma } from '@/lib/api/database'
@@ -27,7 +27,7 @@ handler.get(response(async (req, res) => {
 	dto.categories = task?.CategoryToTask.map(p => p.category.id)
 	return { response: dto }
 }))
-handler.post(response(async (req, res) => {
+handler.post(responseAdmin(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	const data = req.body as TaskDto
@@ -63,7 +63,7 @@ handler.post(response(async (req, res) => {
 	}
 	return { response: upset as TaskDto }
 }))
-handler.put(response(async (req, res) => {
+handler.put(responseAdmin(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	await prisma.task.update({

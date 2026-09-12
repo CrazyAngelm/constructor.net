@@ -1,11 +1,11 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response } from '@/lib/api/response'
+import { responseAdmin } from '@/lib/api/response'
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
 import { getPrisma } from '@/lib/api/database'
 import { CreateWorklistInFolderDto, FolderDto } from '@/lib/dto/worklist'
 const prisma = getPrisma()
 const handler = getDefaultHandler()
-handler.post(response(async (req, res) => {
+handler.post(responseAdmin(async (req, res) => {
 	const data = req.body as CreateWorklistInFolderDto
 	const isWorklistName = await prisma.folderToWorklist.findFirst({
 		where: {

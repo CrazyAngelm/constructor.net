@@ -1,0 +1,14 @@
+FROM node:22-bullseye AS build
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY frontend/package*.json ./
+RUN npm ci --ignore-scripts
+COPY frontend/prisma ./prisma
+RUN npx prisma generate
+COPY common /common
+COPY frontend .
+RUN npm run build
+# Standalone bundle can run with its own Node binary on Debian 10+.
+RUN mkdir -p .next/standalone/.next && cp -a .next/static .next/standalone/.next/ && cp -a public .next/standalone/ && cp -a /usr/local/bin/node .next/standalone/node
+FROM scratch AS artifact
+COPY --from=build /app/.next/standalone /bundle

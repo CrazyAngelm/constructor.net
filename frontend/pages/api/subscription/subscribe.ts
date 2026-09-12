@@ -1,28 +1,31 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response } from '@/lib/api/response'
+import { responseAuth } from '@/lib/api/response'
+import { readJsonBody } from '@/lib/api/body'
 import { getPrisma } from '@/lib/api/database'
 import { checkout, ICreatePayment } from '@/lib/yookassa/checkout'
 import { SubscribeReq, SubscribeRes } from '@/lib/dto/subscription'
 import { ScopeEnum } from '@/lib/dto/users'
 import { Prisma } from '@prisma/client'
+import { previewExternalFlowError, previewExternalFlowsRestricted } from '@/lib/preview'
 const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.post(
-	response(async (req, _res) => {
-		const body = JSON.parse(req.body) as SubscribeReq
-		if (!body.userId || !body.licenseId) {
+	responseAuth(async (req, _res, userId) => {
+		if (previewExternalFlowsRestricted()) return { error: previewExternalFlowError }
+		const body = readJsonBody<SubscribeReq>(req.body)
+		if (!body?.licenseId) {
 			return { error: { code: 400, message: 'Invalid request' } }
 		}
 		const result = await prisma
 			.$transaction(async (tx: Prisma.TransactionClient) => {
 				const existed = await tx.subscription.findFirst({
-					where: { userId: body.userId, canceled: false },
+					where: { userId, canceled: false },
 				})
 				if (existed && existed.licenseId !== 1) {
 					throw { code: 412, message: 'Active subscription already exists' }
 				}
 				const user = await tx.user.findUnique({
-					where: { id: body.userId },
+					where: { id: userId },
 					include: { scopes: { include: { scope: true } } },
 				})
 				if (!user) throw { code: 400, message: 'User not found' }
@@ -47,6 +50,8 @@ handler.post(
 					payload,
 					checkout.generateKey()
 				)
+				const confirmationToken = payment.confirmation?.confirmation_token
+				if (!confirmationToken) throw { code: 502, message: 'Payment confirmation is unavailable' }
 				await tx.payment.create({
 					data: {
 						id: payment.id,
@@ -57,7 +62,7 @@ handler.post(
 				})
 				return {
 					licenseId: license.id,
-					confirmationToken: payment.confirmation.confirmation_token,
+					confirmationToken,
 					returnUrl: process.env.YOOCHECKOUT_REDIRECT_URL,
 				} as SubscribeRes
 			})

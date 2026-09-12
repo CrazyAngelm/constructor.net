@@ -1,15 +1,13 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response } from '@/lib/api/response'
+import { responseAuth } from '@/lib/api/response'
 import { getPrisma } from '@/lib/api/database'
 import { Subscription } from '@/lib/dto/subscription'
 const prisma = getPrisma()
 const handler = getDefaultHandler()
-handler.post(response(async (req, res) => {
-	const { id } = JSON.parse(req.body)
-	if (!id) return { response: [] as Subscription[] }
+handler.post(responseAuth(async (_req, _res, userId) => {
 	const data = await prisma.subscription.findMany({
 		where: {
-			userId: id,
+			userId,
 			canceled: false,
 		},
 	}) as Subscription[]

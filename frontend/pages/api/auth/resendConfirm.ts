@@ -2,26 +2,26 @@ import { getDefaultHandler } from '@/lib/api/apiHandler'
 import { response } from '@/lib/api/response'
 import { getPrisma } from '@/lib/api/database'
 import { compare } from 'bcryptjs'
+import { isEmail, isNonEmptyString, isObject, issueVerificationToken } from '@/lib/auth/verificationTokens'
 import { getRegistrationHtml } from '@/lib/mailer/registration'
 import { optionsWithFrom, sendMail } from '@/lib/mailer/mailer'
+import { previewExternalFlowError, previewExternalFlowsRestricted } from '@/lib/preview'
 const prisma = getPrisma()
 const handler = getDefaultHandler()
 handler.post(response(async (req, res) => {
-	const { email, password } = req.body
-	if (!email || !password) return { error: { code: 422, message: 'email or password not found' } }
+	if (previewExternalFlowsRestricted()) return { error: previewExternalFlowError }
+	const { email, password } = isObject(req.body) ? req.body : {}
+	if (!isEmail(email) || !isNonEmptyString(password)) return { error: { code: 422, message: 'Invalid credentials' } }
 	const user = await prisma.user.findUnique({
 		where: {
 			email,
 		},
 	})
-	if (!user) return { error: { code: 422, message: 'Пользователя не сущетсвует' } }
+	if (!user) return { error: { code: 422, message: 'Invalid credentials' } }
 	const checkPassword = await compare(password, user.password ?? '')
-	if (!checkPassword) return { error: { code: 422, message: 'Неверный пароль' } }
-	const token = Buffer.from(JSON.stringify({
-		id: user.id,
-		email: user.email,
-		pass: password,
-	}), 'binary').toString('base64')
+	if (!checkPassword) return { error: { code: 422, message: 'Invalid credentials' } }
+	if (user.emailVerified) return { response: { status: 'Если подтверждение требуется, письмо отправлено' } }
+	const token = await issueVerificationToken(prisma, 'confirm-email', user.id)
 	const mailOptions = optionsWithFrom({
 		to: email,
 		subject: 'Регистрация',
@@ -32,7 +32,7 @@ handler.post(response(async (req, res) => {
 			cid: 'logo@nodemailer.com',
 		} ],
 	})
-	sendMail(mailOptions)
-	return { response: { status: 'User created' } }
+	await sendMail(mailOptions)
+	return { response: { status: 'Если подтверждение требуется, письмо отправлено' } }
 }))
 export default handler

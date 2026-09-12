@@ -1,0 +1,1 @@
+ALTER TABLE `TaskCategory` ADD COLUMN `visible` BOOLEAN NOT NULL DEFAULT true;
