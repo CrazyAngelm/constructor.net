@@ -94,13 +94,17 @@ test('resize reflow, two columns, typography, personal folders and text previews
 		await savedCard.getByLabel(`Папка для «${saved.name}»`).selectOption(folder.id)
 		await savedCard.getByRole('button', { name: 'Переместить', exact: true }).click()
 		await library.getByRole('button', { name: 'Закрыть мои конспекты' }).click()
+		await page.route('**/api/studio/catalog/sync', route => route.fulfill({ status: 200, json: { tasks: 4958, removedTasks: 6 } }))
+		const syncRequest = page.waitForRequest(request => request.url().endsWith('/api/studio/catalog/sync') && request.method() === 'POST')
 		await page.getByRole('button', { name: 'Обновить каталог', exact: true }).click()
-		await expect(page.getByText('Каталог обновлён. Черновик не изменён.')).toBeVisible()
-		await page.route('**/api/studio/catalog', route => route.fulfill({ status: 503, json: { message: 'Тест: каталог временно недоступен' } }))
+		await syncRequest
+		await expect(page.getByText('Каталог синхронизирован: 4958 заданий, удалено из списка: 6. Черновик не изменён.')).toBeVisible()
+		await page.unroute('**/api/studio/catalog/sync')
+		await page.route('**/api/studio/catalog/sync', route => route.fulfill({ status: 503, json: { message: 'Тест: основной каталог временно недоступен' } }))
 		await page.getByRole('button', { name: 'Обновить каталог', exact: true }).click()
-		await expect(page.getByText('Тест: каталог временно недоступен')).toBeVisible()
+		await expect(page.getByText('Тест: основной каталог временно недоступен')).toBeVisible()
 		await expect(page.getByRole('complementary', { name: 'Каталог заданий' }).getByLabel('Курс', { exact: true }).locator('option')).toHaveCount(catalog.courses.length)
-		await page.unroute('**/api/studio/catalog')
+		await page.unroute('**/api/studio/catalog/sync')
 		await expect(page.getByLabel('Название конспекта')).toHaveValue(saved.name)
 		await page.getByRole('button', { name: 'Сохранить', exact: true }).click()
 		await expect(page.getByText(`Сохранено в «${folderName}»`, { exact: true })).toBeVisible()
@@ -165,11 +169,11 @@ test('resize reflow, two columns, typography, personal folders and text previews
 		const panel = page.getByRole('complementary', { name: 'Каталог заданий' })
 		await panel.getByLabel('Курс', { exact: true }).selectOption(String(textCourse.id))
 		// Root section preview includes all descendant tasks, including text-only exercises.
-		const root = textCourse.categoryTree.find(root => categories([root]).some(category => category.id === textCategory.id))!
+		const root = textCourse.categoryTree.find(root => categories([ root ]).some(category => category.id === textCategory.id))!
 		await panel.getByRole('button', { name: `Посмотреть упражнения раздела «${root.name}»`, exact: true }).click()
 		const dialog = page.getByRole('dialog', { name: root.name })
 		await expect(dialog.getByText('Читать полностью', { exact: true }).first()).toBeVisible()
-		const textTask = categories([root]).flatMap(category => category.tasks).find(task => !task.image && task.instruction.trim())!
+		const textTask = categories([ root ]).flatMap(category => category.tasks).find(task => !task.image && task.instruction.trim())!
 		const card = dialog.getByRole('button', { name: `Открыть «${textTask.name}»`, exact: true }).first()
 		await expect(card).toContainText(textTask.instruction.trim())
 		const categoryScroller = dialog.locator('[class*="categoryPreviewGrid"]')

@@ -45,7 +45,7 @@ function SheetImage({ item, onResize }: { item: StudioSheetItem; onResize?: Resi
 		marginRight: item.imageAlignment === 'right' ? 0 : 'auto',
 	}}>
 		<img src={item.image!} alt={item.name} onLoad={event => setRatio(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)} />
-		{onResize && <button type="button" className={styles.imageResize} aria-label={`Изменить размер изображения «${item.name}»`} title="Потяните вправо или влево. Клавиши ← и → тоже меняют размер."
+		{onResize && <button type="button" className={styles.imageResize} data-pdf-ignore="true" aria-label={`Изменить размер изображения «${item.name}»`} title="Потяните вправо или влево. Клавиши ← и → тоже меняют размер."
 			onPointerDown={start} onPointerMove={move} onPointerUp={finish} onPointerCancel={() => { drag.current = undefined; setDraggingWidth(undefined) }}
 			onKeyDown={event => { if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); onResize(item.instanceId, clampWidth(item.imageWidthPercent + (event.key === 'ArrowRight' ? 1 : -1))) } }}><span aria-hidden="true">↔</span></button>}
 	</div>
@@ -90,7 +90,7 @@ function Page({ items, allItems, settings, title, pageNumber, pageCount, measure
 	items: StudioSheetItem[]; allItems: StudioSheetItem[]; settings: StudioPageSettings; title: string
 	pageNumber: number; pageCount: number; measure?: boolean; onResize?: Resize; scale?: number
 }) {
-	return <article className={`${styles.previewPage} ${measure ? styles.measurePage : ''}`} style={{ ...variablesFor(settings), ...(scale === undefined ? {} : { transform: `scale(${scale})` }) }} aria-label={measure ? undefined : `Страница ${pageNumber} из ${pageCount}`}>
+	return <article className={`${styles.previewPage} ${measure ? styles.measurePage : ''}`} data-pdf-page={measure ? undefined : pageNumber} style={{ ...variablesFor(settings), ...(scale === undefined ? {} : { transform: `scale(${scale})` }) }} aria-label={measure ? undefined : `Страница ${pageNumber} из ${pageCount}`}>
 		<header className={styles.pageHeader}><small>LabStudio</small><h2>{title || 'Без названия'}</h2></header>
 		<div className={styles.pageBody} data-page-capacity={measure ? 'true' : undefined}>
 			{items.map(item => <ItemContent key={item.instanceId} item={item} settings={settings} number={allItems.findIndex(value => value.instanceId === item.instanceId) + 1} onResize={onResize} />)}

@@ -29,6 +29,7 @@ import SheetSettings from './SheetSettings'
 import SaveWorklistDialog from './SaveWorklistDialog'
 import WorklistLibrary from './WorklistLibrary'
 import { pairSheetItems, swapSheetPair, unpairSheetItems, updateSheetItem } from '@/lib/studio/items'
+import { downloadStudioPdf } from '@/lib/studio/pdf'
 import styles from '@/styles/studio.module.scss'
 
 export type { StudioCategory, StudioCourse, StudioTask } from '@/lib/studio/types'
@@ -36,6 +37,7 @@ export type { StudioCategory, StudioCourse, StudioTask } from '@/lib/studio/type
 type SheetName = 'teacherSheet' | 'studentSheet'
 type WorklistsResponse = { worklists: Array<Omit<StudioWorklist, 'teacherSheet' | 'studentSheet'> & { teacherSheet: unknown; studentSheet: unknown }> }
 type CatalogResponse = { courses: StudioCourse[]; canEditFooter: boolean }
+type CatalogSyncResponse = { tasks: number; removedTasks: number }
 
 const initialDraft = (): StudioWorklist => ({
 	id: '',
@@ -81,14 +83,15 @@ const readApiError = async (response: Response, fallback: string) => {
 	}
 }
 
-function ExportDialog({ open, label, printable, onClose }: { open: boolean; label: string; printable: boolean; onClose: () => void }) {
+function ExportDialog({ open, label, printable, busy, error, onClose, onDownload }: { open: boolean; label: string; printable: boolean; busy: boolean; error: string; onClose: () => void; onDownload: () => void }) {
 	if (!open) return null
 	return createPortal(<div className={styles.modalBackdrop} role="presentation">
 		<section className={styles.exportDialog} role="dialog" aria-modal="true" aria-labelledby="export-dialog-title">
-			<header><div><span className={styles.eyebrow}>Активный лист: {label.toLocaleLowerCase('ru')}</span><h2 id="export-dialog-title">Скачать PDF</h2></div><button type="button" className={styles.iconButton} onClick={onClose} aria-label="Закрыть экспорт"><X size={20} /></button></header>
-			<div><p>Браузер откроет окно печати. В поле принтера выберите <strong>«Сохранить как PDF»</strong>, затем укажите папку на устройстве.</p><p>PDF — отдельный файл. Редактируемый конспект хранится в разделе «Мои конспекты» после нажатия «Сохранить».</p></div>
-			<footer><button type="button" className={styles.secondary} onClick={onClose}>Отмена</button><button type="button" className={styles.primary} disabled={!printable} onClick={() => { onClose(); window.setTimeout(() => window.print(), 0) }}><DownloadSimple size={17} />Открыть сохранение PDF</button></footer>
+			<header><div><span className={styles.eyebrow}>Активный лист: {label.toLocaleLowerCase('ru')}</span><h2 id="export-dialog-title">Скачать PDF</h2></div><button type="button" className={styles.iconButton} onClick={onClose} disabled={busy} aria-label="Закрыть экспорт"><X size={20} /></button></header>
+			<div><p>Скачаем готовый PDF без адреса сайта и даты браузера. В файл попадут только рассчитанные страницы активного листа.</p><p>Для обычного принтера используйте отдельную кнопку «Печать». Редактируемый конспект хранится в разделе «Мои конспекты» после нажатия «Сохранить».</p></div>
+			<footer><button type="button" className={styles.secondary} onClick={onClose} disabled={busy}>Отмена</button><button type="button" className={styles.primary} disabled={!printable || busy} onClick={onDownload}><DownloadSimple size={17} />{busy ? 'Готовим PDF…' : 'Скачать PDF'}</button></footer>
 			{!printable && <p className={styles.dialogError} role="alert">Дождитесь загрузки изображений и устраните предупреждения в предпросмотре.</p>}
+			{error && <p className={styles.dialogError} role="alert">{error}</p>}
 		</section>
 	</div>, document.body)
 }
@@ -115,6 +118,8 @@ export default function StudioWorkspace() {
 	const [ libraryOpen, setLibraryOpen ] = useState(false)
 	const [ saveDialogOpen, setSaveDialogOpen ] = useState(false)
 	const [ exportDialogOpen, setExportDialogOpen ] = useState(false)
+	const [ exportingPdf, setExportingPdf ] = useState(false)
+	const [ exportError, setExportError ] = useState('')
 	const [ libraryBusy, setLibraryBusy ] = useState(false)
 
 	useEffect(() => {
@@ -295,6 +300,9 @@ export default function StudioWorkspace() {
 		setRefreshing(true)
 		setRefreshStatus('')
 		try {
+			const syncResponse = await fetch('/api/studio/catalog/sync', { method: 'POST' })
+			if (!syncResponse.ok) throw new Error(await readApiError(syncResponse, 'Не удалось обновить каталог. Текущий каталог и черновик сохранены.'))
+			const sync = unwrap(await syncResponse.json()) as CatalogSyncResponse
 			const response = await fetch('/api/studio/catalog', { cache: 'no-store' })
 			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось обновить каталог. Текущий каталог и черновик сохранены.'))
 			const payload = unwrap(await response.json()) as CatalogResponse
@@ -302,10 +310,24 @@ export default function StudioWorkspace() {
 			setCanEditFooter(payload.canEditFooter)
 			setCourses(next)
 			setActiveCourse(current => next.some(course => course.id === current) ? current : next[0]?.id ?? null)
-			setRefreshStatus('Каталог обновлён. Черновик не изменён.')
+			setRefreshStatus(`Каталог синхронизирован: ${sync.tasks} заданий, удалено из списка: ${sync.removedTasks}. Черновик не изменён.`)
 		} catch (cause) {
 			setRefreshStatus(cause instanceof Error ? cause.message : 'Не удалось обновить каталог. Черновик не изменён.')
 		} finally { setRefreshing(false) }
+	}
+	const openExport = () => { setExportError(''); setExportDialogOpen(true) }
+	const downloadPdf = async () => {
+		setExportingPdf(true)
+		setExportError('')
+		try {
+			const preview = document.querySelector<HTMLElement>('[aria-label="Предпросмотр листа"]')
+			if (!preview) throw new Error('Предпросмотр листа не найден.')
+			const label = activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'
+			await downloadStudioPdf(preview, draft.name, label, draft[activeSheet].data.settings.format)
+			setExportDialogOpen(false)
+		} catch (cause) {
+			setExportError(cause instanceof Error ? cause.message : 'Не удалось подготовить PDF.')
+		} finally { setExportingPdf(false) }
 	}
 	const mutateFolder = async (method: 'POST' | 'PUT' | 'DELETE', id?: string, name?: string): Promise<StudioFolder | true | false> => {
 		setFoldersBusy(true)
@@ -384,7 +406,7 @@ export default function StudioWorkspace() {
 				<span className={`${styles.status} ${saveState === 'dirty' ? styles.dirty : ''}`} aria-live="polite">{statusText}</span>
 				<div className={styles.documentActions}>
 					<button type="button" className={styles.secondary} onClick={() => setLibraryOpen(true)} disabled={loading}><Files size={17} />Мои конспекты</button>
-					<button type="button" className={styles.secondary} onClick={() => setExportDialogOpen(true)}><DownloadSimple size={17} />Скачать PDF</button>
+					<button type="button" className={styles.secondary} onClick={openExport}><DownloadSimple size={17} />Скачать PDF</button>
 					<button type="button" className={styles.secondary} onClick={() => window.print()} disabled={!printable || uploading} title={!printable ? 'Дождитесь загрузки изображений и устраните предупреждения в предпросмотре' : undefined}><Printer size={17} />Печать</button>
 					<button type="button" className={styles.primary} onClick={requestSave} disabled={busy || loading}><FloppyDisk size={17} />Сохранить</button>
 				</div>
@@ -439,11 +461,11 @@ export default function StudioWorkspace() {
 		<nav className={styles.mobileDock} aria-label="Действия с конспектом">
 			<button type="button" onClick={() => setLibraryOpen(true)} disabled={loading} aria-label="Мои конспекты"><Files size={19} /><span>Мои</span></button>
 			<button type="button" onClick={requestSave} disabled={busy || loading} aria-label="Сохранить"><FloppyDisk size={19} /><span>Сохранить</span></button>
-			<button type="button" onClick={() => setExportDialogOpen(true)} aria-label="Скачать PDF"><DownloadSimple size={19} /><span>PDF</span></button>
+			<button type="button" onClick={openExport} aria-label="Скачать PDF"><DownloadSimple size={19} /><span>PDF</span></button>
 			<button type="button" onClick={() => window.print()} disabled={!printable || uploading} aria-label="Печать"><Printer size={19} /><span>Печать</span></button>
 		</nav>
 		<WorklistLibrary open={libraryOpen} folders={folders} worklists={worklists} currentId={draft.id} onClose={() => setLibraryOpen(false)} onOpen={reopen} onCreate={createFolder} onRename={renameFolder} onDeleteFolder={deleteFolder} onMove={moveWorklist} onDeleteWorklist={deleteWorklist} busy={foldersBusy || libraryBusy || saveState === 'saving'} error={error} onClearError={() => setError('')} />
 		<SaveWorklistDialog open={saveDialogOpen} initialName={draft.name} initialFolderId={draft.personalFolderId ?? null} folders={folders} busy={saveState === 'saving' || foldersBusy} error={error} onClose={() => setSaveDialogOpen(false)} onSave={(name, personalFolderId) => save({ name, personalFolderId })} onCreateFolder={createFolder} onClearError={() => setError('')} />
-		<ExportDialog open={exportDialogOpen} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} printable={printable && !uploading} onClose={() => setExportDialogOpen(false)} />
+		<ExportDialog open={exportDialogOpen} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} printable={printable && !uploading} busy={exportingPdf} error={exportError} onClose={() => setExportDialogOpen(false)} onDownload={() => void downloadPdf()} />
 	</main>
 }

@@ -1,4 +1,5 @@
 import { expect, test, APIRequestContext } from '@playwright/test'
+import { readFile } from 'node:fs/promises'
 
 async function login(request: APIRequestContext) {
 	const csrf = await (await request.get('/api/auth/csrf')).json()
@@ -58,12 +59,15 @@ test('mobile save stays reachable and the personal library supports folder, move
 		expect(actualFrame!.width).toBeGreaterThan(page.viewportSize()!.width)
 		await preview.getByRole('button', { name: 'По ширине', exact: true }).click()
 
-		await page.evaluate(() => { window.print = () => { document.body.dataset.printRequested = 'true' } })
 		await page.getByRole('button', { name: 'Скачать PDF', exact: true }).click()
 		const exportDialog = page.getByRole('dialog', { name: 'Скачать PDF' })
-		await expect(exportDialog.getByText('Сохранить как PDF', { exact: false })).toBeVisible()
-		await exportDialog.getByRole('button', { name: 'Открыть сохранение PDF', exact: true }).click()
-		await expect.poll(() => page.locator('body').getAttribute('data-print-requested')).toBe('true')
+		await expect(exportDialog.getByText('без адреса сайта и даты браузера', { exact: false })).toBeVisible()
+		const downloadPromise = page.waitForEvent('download')
+		await exportDialog.getByRole('button', { name: 'Скачать PDF', exact: true }).click()
+		const download = await downloadPromise
+		expect(download.suggestedFilename()).toMatch(/\.pdf$/)
+		const bytes = await readFile(await download.path() as string)
+		expect(bytes.subarray(0, 4).toString()).toBe('%PDF')
 
 		await page.getByRole('button', { name: 'Мои конспекты', exact: true }).click()
 		const library = page.getByRole('dialog', { name: 'Мои конспекты' })

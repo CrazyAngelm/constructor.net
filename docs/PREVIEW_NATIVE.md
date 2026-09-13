@@ -22,7 +22,7 @@ docker build -f frontend/Dockerfile.bundle --target artifact --output type=local
 
 `bundle/` содержит Linux Node, Prisma engine, сервер, `.next/static` и публичные файлы. Секреты и каталог `public/uploads` исключены из контекста. Переносите сборку как новый каталог в `releases/`, не поверх запущенного релиза. Публичные изображения находятся отдельно в `shared/uploads/task` и подключаются ссылкой `public/uploads`.
 
-Конфигурация `/srv/labstudio-preview/preview.env` принадлежит root с правами 0600; systemd передаёт её процессу. В ней задаются собственные `DATABASE_URL`, `NEXTAUTH_SECRET`, публичный `NEXTAUTH_URL`, режим изоляции и `UPLOAD_IMAGE_TASK=/srv/labstudio-preview/shared/uploads/task`. Пароли не сохраняются в Git. Шаблоны systemd находятся в `ops/native/`.
+Конфигурация `/srv/labstudio-preview/preview.env` принадлежит root с правами 0600; systemd передаёт её процессу. В ней задаются собственные `DATABASE_URL`, `NEXTAUTH_SECRET`, публичный `NEXTAUTH_URL`, режим изоляции, `UPLOAD_IMAGE_TASK=/srv/labstudio-preview/shared/uploads/task` и `CATALOG_SOURCE_URL=http://127.0.0.1:3000`. Последний адрес даёт одностороннюю синхронизацию только через публичные API каталога основного сайта; доступ к production-БД preview-процессу не передаётся. Пароли не сохраняются в Git. Шаблоны systemd находятся в `ops/native/`.
 
 ## Данные и обновление
 
