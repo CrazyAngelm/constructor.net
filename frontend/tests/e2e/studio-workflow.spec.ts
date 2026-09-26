@@ -220,12 +220,13 @@ test('hierarchical catalog, editable sheets, uploads, pagination, persistence an
 		await adminPage.getByRole('button', { name: 'Видимость каталога', exact: true }).click()
 		await expect(adminPage.getByRole('heading', { name: 'Папки заданий', exact: true })).toBeVisible()
 		const courseRow = adminPage.getByRole('row').filter({ has: adminPage.getByRole('cell', { name: course.name, exact: true }) }).first()
-		await courseRow.getByRole('button', { name: 'Скрыть', exact: true }).click()
+		adminPage.on('dialog', dialog => dialog.accept())
 		try {
-			await expect(courseRow.getByRole('button', { name: 'Показать', exact: true })).toBeVisible()
+			await courseRow.getByRole('button', { name: 'Снять с публикации', exact: true }).click()
+			await expect(courseRow.getByRole('button', { name: 'Опубликовать', exact: true })).toBeVisible()
 			expect((await (await second.request.get('/api/studio/catalog')).json()).courses.some((item: StudioCourse) => item.id === course.id)).toBe(false)
-			await courseRow.getByRole('button', { name: 'Показать', exact: true }).click()
-			await expect(courseRow.getByRole('button', { name: 'Скрыть', exact: true })).toBeVisible()
+			await courseRow.getByRole('button', { name: 'Опубликовать', exact: true }).click()
+			await expect(courseRow.getByRole('button', { name: 'Снять с публикации', exact: true })).toBeVisible()
 		} finally {
 			await admin.request.patch(`/api/admin/visibility/course/${course.id}`, { data: { visible: true } })
 		}

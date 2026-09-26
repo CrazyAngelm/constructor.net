@@ -25,10 +25,14 @@ test('seeded preview account signs in through the visible form', async ({ page }
 	await page.goto('/studio/auth')
 	await page.getByLabel('Email').fill(process.env.PREVIEW_DEMO_EMAIL!)
 	await page.getByLabel('Пароль').fill(process.env.PREVIEW_DEMO_PASSWORD!)
+	const catalogResponse = page.waitForResponse(response => response.url().endsWith('/api/studio/catalog') && response.request().method() === 'GET')
 	await page.getByRole('button', { name: 'Войти в веб-версию' }).click()
 	await expect(page).toHaveURL(/\/studio$/)
+	expect((await catalogResponse).ok()).toBeTruthy()
 	await expect(page.getByRole('heading', { level: 1, name: 'Конструктор занятия' })).toBeVisible()
-	await expect(page.getByRole('complementary', { name: 'Каталог заданий' }).getByRole('combobox')).toBeVisible()
+	const courseSelector = page.getByRole('complementary', { name: 'Каталог заданий' }).getByRole('combobox')
+	await courseSelector.waitFor({ state: 'visible' })
+	await expect(courseSelector).toBeVisible()
 })
 
 test('isolated preview rejects account and payment side effects before database access', async ({ request }) => {
