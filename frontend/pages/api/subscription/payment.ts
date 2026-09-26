@@ -120,7 +120,7 @@ async function getCourses(
 	const lic = await tx.license.findUnique({ where: { id: licenseId } })
 	const excluded = lic?.courses ? (JSON.parse(lic.courses) as number[]) : []
 	const courses = await tx.course.findMany({
-		where: { id: { notIn: excluded }, deleted: false },
+		where: { id: { notIn: excluded }, deleted: false, visible: true },
 	})
 	return JSON.stringify(
 		courses.slice(0, lic?.freeCourses ?? 0).map(c => c.id)

@@ -1,5 +1,6 @@
 import type {
 	StudioImageAlignment,
+	StudioImageLayout,
 	StudioFontFamily,
 	StudioItemKind,
 	StudioPageFormat,
@@ -32,7 +33,7 @@ export type ValidationResult<T> = { value: T } | { error: string }
 const isObject = (value: unknown): value is Record<string, unknown> =>
 	typeof value === 'object' && value !== null && !Array.isArray(value)
 const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
-const validFont = (value: unknown) => value === undefined || value === 'inherit' || value === 'Arial'
+const validFont = (value: unknown) => value === undefined || [ 'inherit', 'Arial', 'Times New Roman', 'Evolventa' ].includes(String(value))
 const validSize = (value: unknown) => value === undefined || (isFiniteNumber(value) && value > 0)
 
 const parseLegacyTask = (value: unknown): ValidationResult<StudioTask> => {
@@ -92,6 +93,7 @@ const parseSettings = (value: unknown): ValidationResult<StudioPageSettings> => 
 
 const itemKinds: StudioItemKind[] = [ 'task', 'image', 'text', 'spacer' ]
 const imageAlignments: StudioImageAlignment[] = [ 'left', 'center', 'right' ]
+const imageLayouts: StudioImageLayout[] = [ 'original', 'worksheet' ]
 
 const parseItem = (value: unknown, allowCompanion = false): ValidationResult<StudioSheetItem> => {
 	if (!isObject(value) || typeof value.instanceId !== 'string' || value.instanceId.length === 0
@@ -109,7 +111,8 @@ const parseItem = (value: unknown, allowCompanion = false): ValidationResult<Stu
 	}
 	if (value.kind === 'image' && !value.image) return { error: 'Для пользовательского изображения требуется файл' }
 	if (value.kind === 'spacer' && value.spacerHeightMm === 0) return { error: 'Высота свободного места должна быть больше нуля' }
-	if (!validFont(value.fontFamily) || !validSize(value.fontSizePt) || (value.textAlignment !== undefined && !imageAlignments.includes(value.textAlignment as StudioImageAlignment))) return { error: 'Некорректное оформление задания' }
+	if (!validFont(value.fontFamily) || !validSize(value.fontSizePt) || (value.textAlignment !== undefined && !imageAlignments.includes(value.textAlignment as StudioImageAlignment))
+		|| (value.imageLayout !== undefined && !imageLayouts.includes(value.imageLayout as StudioImageLayout))) return { error: 'Некорректное оформление задания' }
 	let companion: StudioSheetItem | undefined
 	if (value.companion !== undefined) {
 		if (!allowCompanion || value.kind === 'spacer') return { error: 'В строке могут быть только два элемента без вложенных строк' }
@@ -127,6 +130,7 @@ const parseItem = (value: unknown, allowCompanion = false): ValidationResult<Stu
 		instruction: value.instruction,
 		complexity: value.complexity as number | null,
 		image: value.image,
+		...(value.imageLayout === undefined ? {} : { imageLayout: value.imageLayout as StudioImageLayout }),
 		showDescription: value.showDescription,
 		showInstruction: value.showInstruction,
 		imageWidthPercent: value.imageWidthPercent,

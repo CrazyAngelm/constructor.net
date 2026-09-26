@@ -60,7 +60,7 @@ const Tarifs = () => {
 			<section className={styles.cards}>
 				<div className={styles.background} />
 				{
-					data?.map((p, index) => <CardTarif key={p.id ?? index} license={p} />)
+					data?.filter(p => p.published).map((p, index) => <CardTarif key={p.id ?? index} license={p} />)
 				}
 			</section>
 			<section className={styles.free} id="free">

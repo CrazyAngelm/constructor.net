@@ -25,11 +25,13 @@ const VisibilityGroup = ({
 	items,
 	togglingId,
 	onToggle,
+	publication = false,
 }: {
 	title: string
 	items: VisibilityItem[]
 	togglingId?: string
 	onToggle: (item: VisibilityItem) => void
+	publication?: boolean
 }) => {
 	return <section className={styles.group}>
 		<h2>{title}</h2>
@@ -49,10 +51,10 @@ const VisibilityGroup = ({
 						const isToggling = togglingId === itemId
 						return <tr key={itemId}>
 							<td>{item.name}</td>
-							<td><span className={item.visible ? styles.visible : styles.hidden}>{item.visible ? 'Показывается' : 'Скрыт'}</span></td>
+							<td><span className={item.visible ? styles.visible : styles.hidden}>{item.visible ? 'Опубликован' : publication ? 'Черновик' : 'Скрыт'}</span></td>
 							<td>
 								<button type="button" onClick={() => onToggle(item)} disabled={isToggling}>
-									{isToggling ? 'Сохранение…' : item.visible ? 'Скрыть' : 'Показать'}
+									{isToggling ? 'Сохранение…' : item.visible ? publication ? 'Снять с публикации' : 'Скрыть' : publication ? 'Опубликовать' : 'Показать'}
 								</button>
 							</td>
 						</tr>
@@ -85,6 +87,7 @@ const Visibility = () => {
 	}, [ load ])
 
 	const toggle = async (type: 'course' | 'folder' | 'category', item: VisibilityItem) => {
+		if (type === 'course' && !item.visible && !window.confirm(`Опубликовать курс «${item.name}» для пользователей?`)) return
 		const itemId = String(item.id)
 		setToggling(`${type}:${itemId}`)
 		setError(undefined)
@@ -117,11 +120,11 @@ const Visibility = () => {
 	return <article className={styles.page}>
 		<header>
 			<h1>Видимость каталога</h1>
-			<p>Скрытые записи не показываются в веб-каталоге. Удаление здесь недоступно.</p>
+			<p>Курс появляется у пользователей только после публикации. Новые курсы по умолчанию остаются черновиками. Удаление здесь недоступно.</p>
 		</header>
 		<label className={styles.search}>Поиск по названию<input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Курс или папка" /></label>
 		{error && <p role="alert">{error}</p>}
-		<VisibilityGroup title="Курсы" items={filtered(catalog.courses)}
+		<VisibilityGroup title="Курсы" publication items={filtered(catalog.courses)}
 			togglingId={toggling?.replace('course:', '')} onToggle={(item) => void toggle('course', item)} />
 		<VisibilityGroup title="Папки" items={filtered(catalog.folders)}
 			togglingId={toggling?.replace('folder:', '')} onToggle={(item) => void toggle('folder', item)} />

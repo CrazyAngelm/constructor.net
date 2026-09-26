@@ -41,6 +41,10 @@ export const getStudioCatalogAccess = async (
 		orderBy: { startDate: 'desc' },
 	})
 	if (!subscription) return null
+	if (subscription.license.unlimitedCourses) {
+		const published = await prisma.course.findMany({ where: { deleted: false, visible: true }, select: { id: true } })
+		return { isAdmin: false, courseIds: published.map(course => course.id), canEditFooter: licenseCanEditFooter(subscription.license) }
+	}
 	const selectedCourses = parseCourseIds(subscription.courses)
 	return { isAdmin: false, courseIds: [ ...new Set([...selectedCourses, ...parseCourseIds(subscription.license.courses)]) ], canEditFooter: licenseCanEditFooter(subscription.license) }
 }

@@ -17,6 +17,7 @@ handler.post(responseAuth(async (req, _res, userId) => {
 		include: { license: true },
 	})
 	if (!subscription) return { error: { code: 412, message: 'Нет активных подписок' } }
+	if (subscription.license.unlimitedCourses) return { error: { code: 400, message: 'Для безлимитного тарифа доступны все опубликованные курсы' } }
 	const excludedIds = subscription.license.courses
 		? JSON.parse(subscription.license.courses) as number[]
 		: []

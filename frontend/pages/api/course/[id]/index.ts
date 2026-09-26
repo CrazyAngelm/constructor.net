@@ -33,6 +33,7 @@ handler.post(responseAdmin(async (req, res) => {
 			name: data.name ? data.name : 'Новый курс',
 			description: data.description ? data.description : '',
 			date: new Date().toISOString(),
+			visible: false,
 		},
 	})
 	return { response: upset as CourseDto }

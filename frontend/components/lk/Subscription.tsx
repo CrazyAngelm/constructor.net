@@ -91,6 +91,7 @@ export const Item = ({ item, update }: PropsItem) => {
 	const license = data?.find(p => p.id === item.licenseId)
 
 	const getAvialableCourses = (): CourseDto[] => {
+		if (license?.unlimitedCourses) return courses ?? []
 		const licenseCourses = license?.courses ? JSON.parse(license?.courses) as number[] : []
 		const subscriptionCourses = item.courses ? JSON.parse(item.courses) as number[] : []
 
@@ -146,8 +147,8 @@ export const Item = ({ item, update }: PropsItem) => {
 					<td>
 						<section>
 							{getAvialableCourses().map(p => <div key={p.id}>{p.name}<br /></div>)}
-							<ChangeCourse subscription={item} license={license}
-								update={update} />
+							{!license?.unlimitedCourses && <ChangeCourse subscription={item} license={license}
+								update={update} />}
 						</section>
 					</td>
 				</tr>

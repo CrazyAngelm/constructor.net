@@ -1,8 +1,14 @@
 export type StudioPageFormat = 'A5' | 'A4' | 'A3'
 export type StudioItemKind = 'task' | 'image' | 'text' | 'spacer'
 export type StudioImageAlignment = 'left' | 'center' | 'right'
-export type StudioFontFamily = 'inherit' | 'Arial'
-export const studioFontCss = (font?: StudioFontFamily) => font === 'Arial' ? 'Arial, sans-serif' : 'var(--font-ui)'
+export type StudioImageLayout = 'original' | 'worksheet'
+export type StudioFontFamily = 'inherit' | 'Arial' | 'Times New Roman' | 'Evolventa'
+export const studioFontCss = (font?: StudioFontFamily) => {
+	if (font === 'Arial') return 'Arial, sans-serif'
+	if (font === 'Times New Roman') return '"Times New Roman", Times, serif'
+	if (font === 'Evolventa') return 'Evolventa, sans-serif'
+	return 'var(--font-ui)'
+}
 
 export interface StudioTask {
 	id: number
@@ -11,6 +17,7 @@ export interface StudioTask {
 	instruction: string
 	complexity: number | null
 	image: string | null
+	imageLayout?: StudioImageLayout
 }
 
 export interface StudioCategory {
@@ -51,6 +58,7 @@ export interface StudioSheetItem {
 	instruction: string
 	complexity: number | null
 	image: string | null
+	imageLayout?: StudioImageLayout
 	showDescription: boolean
 	showInstruction: boolean
 	imageWidthPercent: number
@@ -118,6 +126,7 @@ export const catalogTaskToSheetItem = (task: StudioTask, instanceId: string): St
 	instruction: task.instruction,
 	complexity: task.complexity,
 	image: task.image,
+	...(task.imageLayout ? { imageLayout: task.imageLayout } : {}),
 	showDescription: true,
 	showInstruction: true,
 	imageWidthPercent: 100,
@@ -125,12 +134,23 @@ export const catalogTaskToSheetItem = (task: StudioTask, instanceId: string): St
 	spacerHeightMm: 0,
 })
 
+// These four source-catalog tasks predate the layout setting. Keep previously
+// saved worksheets wide when opened again, without changing custom image items.
+const legacyGuideTaskIds = new Set([ 106, 107, 108, 109 ])
+const upgradeSheetItem = (item: StudioSheetItem): StudioSheetItem => ({
+	...item,
+	...(item.imageLayout || !item.sourceTaskId || !legacyGuideTaskIds.has(item.sourceTaskId)
+		? {}
+		: { imageLayout: 'worksheet' as const }),
+	...(item.companion ? { companion: upgradeSheetItem(item.companion) } : {}),
+})
+
 export const upgradeStudioSheet = (sheet?: StudioSheet): StudioSheetV3 => {
 	if ((sheet?.version === 2 || sheet?.version === 3) && Array.isArray(sheet.data?.items)) {
 		return {
 			version: 3,
 			data: {
-				items: sheet.data.items,
+				items: sheet.data.items.map(upgradeSheetItem),
 				settings: sheet.data.settings || defaultPageSettings(),
 			},
 		}

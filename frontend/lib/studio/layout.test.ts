@@ -40,6 +40,13 @@ describe('editable print layout', () => {
 		expect(upgraded.data.items[0]).toMatchObject(image)
 		expect(previous.version).toBe(2)
 	})
+	it('opens saved line guides wide while retaining explicit image layout choices', () => {
+		const guide = { ...image, sourceTaskId: 106 }
+		const previous = { version: 3 as const, data: { items: [ guide, { ...guide, instanceId: 'custom', imageLayout: 'original' as const } ], settings: defaultPageSettings() } }
+		const upgraded = upgradeStudioSheet(previous)
+		expect(upgraded.data.items.map(item => item.imageLayout)).toEqual([ 'worksheet', 'original' ])
+		expect(previous.data.items[0]).not.toHaveProperty('imageLayout')
+	})
 	it('reflows a reduced image to the preceding page without changing order or spacers', () => {
 		const items = [ { instanceId: 'text' }, { instanceId: 'first-image' }, { instanceId: 'second-image' } ]
 		const heights = new Map([ [ 'text', 30 ], [ 'first-image', 35 ], [ 'second-image', 40 ] ])

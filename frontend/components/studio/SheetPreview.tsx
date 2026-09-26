@@ -40,11 +40,16 @@ function SheetImage({ item, onResize }: { item: StudioSheetItem; onResize?: Resi
 	return <div ref={frame} className={styles.sheetImage} style={{
 		width: `${draggingWidth ?? item.imageWidthPercent}%`,
 		// Keep the existing maximum image height, but constrain width proportionally too.
-		maxWidth: ratio ? `calc(var(--image-max-height) * ${ratio})` : undefined,
+		maxWidth: ratio && !(item.imageLayout === 'worksheet' && ratio < 1.4) ? `calc(var(--image-max-height) * ${ratio})` : undefined,
 		marginLeft: item.imageAlignment === 'left' ? 0 : 'auto',
 		marginRight: item.imageAlignment === 'right' ? 0 : 'auto',
 	}}>
-		<img src={item.image!} alt={item.name} onLoad={event => setRatio(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)} />
+		{item.imageLayout === 'worksheet' && ratio !== undefined && ratio < 1.4
+			? <div className={styles.sheetImageStrip}>
+				{/* Legacy catalog guides are nearly square; three tiles cover a 2.5:1 worksheet strip. */}
+				{Array.from({ length: 3 }, (_, index) => <img key={index} src={item.image!} alt={index === 0 ? item.name : ''} />)}
+			</div>
+			: <img src={item.image!} alt={item.name} onLoad={event => setRatio(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)} />}
 		{onResize && <button type="button" className={styles.imageResize} data-pdf-ignore="true" aria-label={`Изменить размер изображения «${item.name}»`} title="Потяните вправо или влево. Клавиши ← и → тоже меняют размер."
 			onPointerDown={start} onPointerMove={move} onPointerUp={finish} onPointerCancel={() => { drag.current = undefined; setDraggingWidth(undefined) }}
 			onKeyDown={event => { if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); onResize(item.instanceId, clampWidth(item.imageWidthPercent + (event.key === 'ArrowRight' ? 1 : -1))) } }}><span aria-hidden="true">↔</span></button>}

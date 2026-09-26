@@ -147,19 +147,19 @@ const Landing = () => {
 			<div className={styles.sectionIntro}>
 				<p className={styles.eyebrow}>Стоимость</p>
 				<h2>Актуальные тарифы</h2>
-				<p>Стоимость и условия загружаются из текущего каталога тарифов.</p>
+				<p>Стоимость за 30 дней. Выберите нужное число курсов; незавершённые курсы не публикуются.</p>
 			</div>
 			{!licenses && !error && <div className={styles.priceSkeleton} aria-label="Загрузка тарифов"><i /><i /><i /></div>}
 			{error && <div className={styles.priceError} role="alert"><p>Не удалось загрузить тарифы.</p><button type="button" onClick={update}>Повторить</button></div>}
 			{licenses && <div className={styles.priceGrid}>
-				{licenses.map((license) => <article key={license.id ?? license.name}>
+				{licenses.filter(license => license.published).map((license) => <article key={license.id ?? license.name}>
 					<h3>{license.name}</h3>
 				{license.description && <p className={styles.priceDescription}>{license.description}</p>}
 					<strong>{typeof license.price === 'number' ? `${new Intl.NumberFormat('ru-RU').format(license.price)} ₽` : 'Стоимость уточняется'}</strong>
 					{license.duration && <span>на {license.duration} дн.</span>}
 					<Link href="/studio/auth">Открыть веб-версию <ArrowRight size={17} weight="bold" aria-hidden="true" /></Link>
 				</article>)}
-				{licenses.length === 0 && <p className={styles.noPrices}>Тарифы пока не опубликованы.</p>}
+				{licenses.every(license => !license.published) && <p className={styles.noPrices}>Тарифы пока не опубликованы.</p>}
 			</div>}
 		</section>
 
@@ -184,8 +184,8 @@ const Landing = () => {
 
 		<footer className={styles.footer}>
 			<div className={styles.footerBrand}><Image className={styles.brandMark} src="/logo.png" width={34} height={34} alt="" /><strong>Lab Studio</strong></div>
-			<div><h2>Контакты</h2><a href="mailto:bestlaboratory@mail.ru">bestlaboratory@mail.ru</a><a href="tel:+79229800770">8-922-9800770</a><span>РФ, г. Киров</span></div>
-			<div><h2>Полезные ссылки</h2><Link href="/docs">Руководства</Link><Link href="/license">Лицензионное соглашение</Link><a href="https://vk.com/studiolab">ВКонтакте</a></div>
+			<div><h2>Контакты</h2><a href="mailto:bestlaboratory@mail.ru">bestlaboratory@mail.ru</a><a href="tel:+79229801477">+7 922 980-14-77 — администраторы</a><span>РФ, г. Киров</span></div>
+			<div><h2>Поддержка и соцсети</h2><a href="https://t.me/labstudio_support_bot" target="_blank" rel="noreferrer">Чат поддержки</a><a href="https://t.me/labstudio" target="_blank" rel="noreferrer">Telegram</a><a href="https://vk.com/studiolab" target="_blank" rel="noreferrer">ВКонтакте</a><Link href="/docs">Руководства</Link><Link href="/license">Лицензионное соглашение</Link></div>
 			<div className={styles.legal}>Индивидуальный предприниматель Калашникова Виктория Владимировна<br />ОГРНИП 319435000027099<br />ИНН 434510331832</div>
 		</footer>
 	</main>

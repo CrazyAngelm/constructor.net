@@ -32,7 +32,7 @@ handler.post(
 				const license = await tx.license.findUnique({
 					where: { id: body.licenseId },
 				})
-				if (!license) throw { code: 400, message: 'License not found' }
+				if (!license || !license.published || license.price <= 0) throw { code: 400, message: 'Тариф недоступен для нового оформления' }
 				const isDev = ScopeEnum.Contains(
 					ScopeEnum.developer,
 					user.scopes.map(p => p.scope.value)

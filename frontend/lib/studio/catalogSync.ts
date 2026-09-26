@@ -241,8 +241,18 @@ const existsAsFile = async (path: string): Promise<boolean> => {
 	}
 }
 
-const copyMissingImages = async (snapshot: CatalogSnapshot, baseValue: string, destination: string): Promise<number> => {
+export const fetchCatalogImage = async (baseValue: string, imagePath: string, fetcher: typeof fetch = fetch): Promise<Response> => {
 	const base = sourceUrl(baseValue)
+	// The main site's nginx may serve uploads directly, without forwarding them to
+	// the loopback Next.js server used for the catalog API. Keep the API private,
+	// but retry missing assets through the same site's public HTTPS listener.
+	const publicAssets = new URL('https://labstudio-inc.ru/')
+	let response = await fetcher(new URL(imagePath, base))
+	if (!response.ok) response = await fetcher(new URL(imagePath, publicAssets))
+	return response
+}
+
+const copyMissingImages = async (snapshot: CatalogSnapshot, baseValue: string, destination: string): Promise<number> => {
 	const names = new Map<string, number>()
 	for (const task of snapshot.tasks) {
 		const fileName = imageFileName(task.image, task.id)
@@ -253,7 +263,8 @@ const copyMissingImages = async (snapshot: CatalogSnapshot, baseValue: string, d
 	for (const [ fileName, taskId ] of names) {
 		const target = join(destination, fileName)
 		if (await existsAsFile(target)) continue
-		const response = await fetch(new URL(`/uploads/task/${encodeURIComponent(fileName)}`, base))
+		const imagePath = `/uploads/task/${encodeURIComponent(fileName)}`
+		const response = await fetchCatalogImage(baseValue, imagePath)
 		if (!response.ok) throw new Error(`Catalog image for task ${taskId} is unavailable: HTTP ${response.status}`)
 		const temporary = `${target}.${process.pid}.catalog-sync`
 		await writeFile(temporary, Buffer.from(await response.arrayBuffer()))
@@ -288,7 +299,7 @@ export const synchronizeCatalog = async (prisma: PrismaClient): Promise<CatalogS
 	]
 	for (const course of snapshot.courses) operations.push(prisma.course.upsert({
 		where: { id: course.id },
-		create: { id: course.id, name: course.name, description: course.description, date: course.date ? new Date(course.date) : null, deleted: false, visible: course.visible ?? true },
+		create: { id: course.id, name: course.name, description: course.description, date: course.date ? new Date(course.date) : null, deleted: false, visible: false },
 		update: { name: course.name, description: course.description, date: course.date ? new Date(course.date) : null, deleted: false },
 	}))
 	if (current.folders.length) operations.push(prisma.folder.updateMany({ where: { id: { in: current.folders.map(({ id }) => id) } }, data: { deleted: true } }))

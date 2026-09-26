@@ -55,6 +55,7 @@ const getCourses = async (
 				notIn: licenseCourses,
 			},
 			deleted: false,
+			visible: true,
 		},
 	})
 	return JSON.stringify(

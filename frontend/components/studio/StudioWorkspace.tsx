@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- user uploads and catalog thumbnails are authenticated dynamic resources */
-import { ChangeEvent, DragEvent, useEffect, useState } from 'react'
+import { ChangeEvent, DragEvent, useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -18,6 +18,7 @@ import type {
 	StudioFolder,
 	StudioFontFamily,
 	StudioImageAlignment,
+	StudioImageLayout,
 	StudioPageSettings,
 	StudioSheetItem,
 	StudioTask,
@@ -107,6 +108,7 @@ export default function StudioWorkspace() {
 	const [ printable, setPrintable ] = useState(false)
 	const [ canEditFooter, setCanEditFooter ] = useState(false)
 	const [ draft, setDraft ] = useState<StudioWorklist>(initialDraft)
+	const [ history, setHistory ] = useState<{ past: StudioWorklist[]; future: StudioWorklist[] }>({ past: [], future: [] })
 	const [ selectedItemId, setSelectedItemId ] = useState<string | null>(null)
 	const [ activeCourse, setActiveCourse ] = useState<number | null>(null)
 	const [ loading, setLoading ] = useState(true)
@@ -165,9 +167,42 @@ export default function StudioWorkspace() {
 	const selectedRow = activeItems.find(item => item.instanceId === selectedItemId || item.companion?.instanceId === selectedItemId)
 	const markDirty = (next: StudioWorklist) => {
 		if (saveState === 'saving') return
+		setHistory(current => ({ past: [ ...current.past, draft ], future: [] }))
 		setDraft(next)
 		setSaveState('dirty')
 	}
+	const undo = useCallback(() => {
+		if (saveState === 'saving' || history.past.length === 0) return
+		const previous = history.past[history.past.length - 1]!
+		setHistory({ past: history.past.slice(0, -1), future: [ draft, ...history.future ] })
+		setDraft(previous)
+		setSelectedItemId(null)
+		setSaveState('dirty')
+	}, [ history, draft, saveState ])
+	const redo = useCallback(() => {
+		if (saveState === 'saving' || history.future.length === 0) return
+		const next = history.future[0]!
+		setHistory({ past: [ ...history.past, draft ], future: history.future.slice(1) })
+		setDraft(next)
+		setSelectedItemId(null)
+		setSaveState('dirty')
+	}, [ history, draft, saveState ])
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (!(event.ctrlKey || event.metaKey) || event.altKey) return
+			if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]')) return
+			if (event.key.toLowerCase() === 'z') {
+				event.preventDefault()
+				if (event.shiftKey) redo()
+				else undo()
+			} else if (event.key.toLowerCase() === 'y') {
+				event.preventDefault()
+				redo()
+			}
+		}
+		window.addEventListener('keydown', onKeyDown)
+		return () => window.removeEventListener('keydown', onKeyDown)
+	}, [ undo, redo ])
 	const replaceActiveItems = (items: StudioSheetItem[]) => markDirty({
 		...draft,
 		[activeSheet]: { ...draft[activeSheet], data: { ...draft[activeSheet].data, items } },
@@ -271,6 +306,7 @@ export default function StudioWorkspace() {
 			if (!response.ok) throw new Error(await readApiError(response, 'Сохранение не выполнено.'))
 			const saved = normalizeWorklist(unwrap(await response.json()) as WorklistsResponse['worklists'][number])
 			setDraft(saved)
+			setHistory({ past: [], future: [] })
 			setWorklists(current => [ saved, ...current.filter(worklist => worklist.id !== saved.id) ])
 			setSaveState('saved')
 			setSaveDialogOpen(false)
@@ -286,6 +322,7 @@ export default function StudioWorkspace() {
 		if (saveState === 'saving') return
 		if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Открыть другой конспект?')) return
 		setDraft(worklist)
+		setHistory({ past: [], future: [] })
 		setActiveCourse(worklist.courseId ?? activeCourse)
 		setSelectedItemId(worklist[activeSheet].data.items[0]?.instanceId || null)
 		setSaveState('clean')
@@ -380,6 +417,7 @@ export default function StudioWorkspace() {
 			setWorklists(current => current.filter(value => value.id !== worklist.id))
 			if (draft.id === worklist.id) {
 				setDraft(initialDraft())
+				setHistory({ past: [], future: [] })
 				setSelectedItemId(null)
 				setSaveState('clean')
 			}
@@ -419,7 +457,7 @@ export default function StudioWorkspace() {
 				<CatalogBrowser courses={courses} activeCourse={activeCourse} onCourseChange={setActiveCourse} onAdd={addTask} onRefresh={() => void refreshCatalog()} refreshing={refreshing} refreshStatus={refreshStatus} />
 
 				<section className={styles.builder} aria-label="Состав занятия">
-					<div className={styles.builderHead}><div><label htmlFor="worklist-name" className={styles.eyebrow}>Название конспекта</label><input id="worklist-name" value={draft.name} onChange={changeName} /><p className={styles.draftLocation}>{draft.personalFolderId ? `Мои конспекты → ${currentFolderName || 'папка'}` : 'Мои конспекты → Без папки'}</p></div><button type="button" className={styles.secondary} onClick={() => { if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Создать новый конспект?')) return; setDraft(initialDraft()); setSelectedItemId(null); setSaveState('clean') }}>Новый</button></div>
+					<div className={styles.builderHead}><div><label htmlFor="worklist-name" className={styles.eyebrow}>Название конспекта</label><input id="worklist-name" value={draft.name} onChange={changeName} /><p className={styles.draftLocation}>{draft.personalFolderId ? `Мои конспекты → ${currentFolderName || 'папка'}` : 'Мои конспекты → Без папки'}</p></div><div className={styles.historyActions}><button type="button" className={styles.secondary} onClick={undo} disabled={history.past.length === 0} title="Отменить последнее изменение (Ctrl+Z)">↶ Отменить</button><button type="button" className={styles.secondary} onClick={redo} disabled={history.future.length === 0} title="Повторить изменение (Ctrl+Shift+Z)">↷ Повторить</button><button type="button" className={styles.secondary} onClick={() => { if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Создать новый конспект?')) return; setDraft(initialDraft()); setHistory({ past: [], future: [] }); setSelectedItemId(null); setSaveState('clean') }}>Новый</button></div></div>
 					<div className={styles.sheetChooser} role="group" aria-label="Редактируемый лист"><button type="button" className={activeSheet === 'teacherSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('teacherSheet')}>Лист педагога <span>{draft.teacherSheet.data.items.length}</span></button><button type="button" className={activeSheet === 'studentSheet' ? styles.activeTab : ''} onClick={() => chooseSheet('studentSheet')}>Лист ученика <span>{draft.studentSheet.data.items.length}</span></button></div>
 					<p className={styles.sheetHelp}>{activeSheet === 'teacherSheet' ? 'Лист педагога — план занятия и ваши инструкции.' : 'Лист ученика — материалы, которые вы даёте ребёнку.'} Упражнения добавляются только в выбранный лист; сохранение сохраняет оба листа.</p>
 					<div className={styles.insertBar} aria-label="Свои материалы">
@@ -445,10 +483,10 @@ export default function StudioWorkspace() {
 							<label>Инструкция / текст<textarea value={selectedItem.instruction} onChange={event => updateItem('instruction', event.target.value)} /></label>
 							<label className={styles.checkField}><input type="checkbox" checked={selectedItem.showDescription} onChange={event => updateItem('showDescription', event.target.checked)} /> Показывать описание</label>
 							<label className={styles.checkField}><input type="checkbox" checked={selectedItem.showInstruction} onChange={event => updateItem('showInstruction', event.target.checked)} /> Показывать инструкцию</label>
-							<label>Шрифт задания<select value={selectedItem.fontFamily ?? ''} onChange={event => updateItem('fontFamily', (event.target.value || undefined) as StudioFontFamily | undefined)}><option value="">Как на листе</option><option value="inherit">LabStudio</option><option value="Arial">Arial</option></select></label>
+							<label>Шрифт задания<select value={selectedItem.fontFamily ?? ''} onChange={event => updateItem('fontFamily', (event.target.value || undefined) as StudioFontFamily | undefined)}><option value="">Как на листе</option><option value="inherit">LabStudio</option><option value="Arial">Arial</option><option value="Times New Roman">Times New Roman</option><option value="Evolventa">Evolventa</option></select></label>
 							<label>Размер текста задания, пт<input type="number" min="1" step="0.5" placeholder="Как на листе" value={selectedItem.fontSizePt ?? ''} onChange={event => updateItem('fontSizePt', event.target.value ? Number(event.target.value) : undefined)} /></label>
 							<label>Выравнивание текста<select value={selectedItem.textAlignment ?? 'left'} onChange={event => updateItem('textAlignment', event.target.value as StudioImageAlignment)}><option value="left">Слева</option><option value="center">По центру</option><option value="right">Справа</option></select></label>
-							{selectedItem.image && <><label>Ширина изображения, %<input type="number" min="1" max="100" value={selectedItem.imageWidthPercent} onChange={event => updateItem('imageWidthPercent', Number(event.target.value))} /></label><label>Выравнивание<select aria-label="Выравнивание" value={selectedItem.imageAlignment} onChange={event => updateItem('imageAlignment', event.target.value as StudioImageAlignment)}><option value="left">Слева</option><option value="center">По центру</option><option value="right">Справа</option></select></label></>}
+							{selectedItem.image && <><label>Ширина изображения, %<input type="number" min="1" max="100" value={selectedItem.imageWidthPercent} onChange={event => updateItem('imageWidthPercent', Number(event.target.value))} /></label><label>Выравнивание<select aria-label="Выравнивание" value={selectedItem.imageAlignment} onChange={event => updateItem('imageAlignment', event.target.value as StudioImageAlignment)}><option value="left">Слева</option><option value="center">По центру</option><option value="right">Справа</option></select></label><label>Размещение разлиновки<select value={selectedItem.imageLayout ?? 'original'} onChange={event => updateItem('imageLayout', event.target.value as StudioImageLayout)}><option value="original">Исходное изображение</option><option value="worksheet">По ширине листа</option></select></label></>}
 							<label className={styles.uploadReplacement}>{selectedItem.image ? 'Заменить изображение' : 'Добавить изображение'}<input type="file" accept="image/png,image/jpeg" onChange={event => void replaceImage(event)} disabled={uploading} /></label>
 							{selectedItem.image && <img className={styles.previewImage} src={selectedItem.image} alt="Предпросмотр задания" />}
 						</>}

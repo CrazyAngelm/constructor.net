@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { StudioSheetItem } from './types'
+import type { StudioPageSettings, StudioSheetItem } from './types'
 
 import { parseCreateStudioWorklist, parseUpdateStudioWorklist, parseVisibility } from './validation'
 
@@ -13,7 +13,7 @@ const task = {
 }
 
 const sheet = (items = [ task ]) => ({ version: 1, data: { items } })
-const settings = {
+const settings: StudioPageSettings = {
 	format: 'A4', margins: { top: 12, right: 12, bottom: 12, left: 12 }, footer: 'Для Алисы',
 	showPageNumbers: true, showItemNumbers: true, fontSizePt: 10, itemGapMm: 5,
 }
@@ -23,7 +23,7 @@ const settings = {
 	showDescription: true, showInstruction: true, imageWidthPercent: 75,
 	imageAlignment: 'center', spacerHeightMm: 0,
 }
-const sheetV2 = (items = [ richItem ], pageSettings = settings) => ({
+const sheetV2 = (items = [ richItem ], pageSettings: StudioPageSettings = settings) => ({
 	version: 2, data: { items, settings: pageSettings },
 })
 
@@ -63,6 +63,14 @@ describe('studio worklist validation', () => {
 			teacherSheet: sheetV2([ richItem, { ...richItem, instanceId: 'copy-2' }, {
 				...richItem, instanceId: 'custom', sourceTaskId: null, kind: 'image', image: '/api/studio/files/custom.png',
 			} ]),
+			studentSheet: sheetV2([]),
+		})
+		expect(result).toHaveProperty('value')
+	})
+	it('accepts worksheet layout and the requested print fonts', () => {
+		const result = parseCreateStudioWorklist({
+			name: 'Разлиновка',
+			teacherSheet: sheetV2([ { ...richItem, imageLayout: 'worksheet', fontFamily: 'Evolventa' } ], { ...settings, fontFamily: 'Times New Roman' }),
 			studentSheet: sheetV2([]),
 		})
 		expect(result).toHaveProperty('value')

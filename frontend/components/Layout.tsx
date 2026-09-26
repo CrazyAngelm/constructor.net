@@ -18,7 +18,10 @@ export default function Layout({ children, title, navbar = true, footer = true }
   {footer && <footer className={styles.footer}>
    <span>Lab Studio · материалы для занятий</span>
    <a href="mailto:bestlaboratory@mail.ru">bestlaboratory@mail.ru</a>
+   <a href="tel:+79229801477">+7 922 980-14-77 — администраторы</a>
+   <a href="https://t.me/labstudio_support_bot" target="_blank" rel="noreferrer">Написать в поддержку</a>
    <Link href="/license">Лицензионное соглашение</Link>
+   <span>ИП Калашникова Виктория Владимировна · ОГРНИП 319435000027099 · ИНН 434510331832</span>
   </footer>}
  </div>
 }

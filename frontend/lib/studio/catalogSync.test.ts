@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildCatalogSyncPlan, fetchCatalogSnapshot } from './catalogSync'
+import { buildCatalogSyncPlan, fetchCatalogImage, fetchCatalogSnapshot } from './catalogSync'
 
 describe('catalog synchronization', () => {
 	it('marks preview records missing from the active source as stale', () => {
@@ -51,5 +51,19 @@ describe('catalog synchronization', () => {
 
 	it('refuses a non-loopback source URL', async () => {
 		await expect(fetchCatalogSnapshot('https://example.com', fetch)).rejects.toThrow('loopback')
+	})
+
+	it('loads a newly added image through the main HTTPS listener when loopback does not serve uploads', async () => {
+		const requested: string[] = []
+		const fetcher = async (input: string | URL | Request) => {
+			requested.push(String(input))
+			return new Response('image', { status: requested.length === 1 ? 404 : 200 })
+		}
+		const response = await fetchCatalogImage('http://127.0.0.1:3000', '/uploads/task/new.png', fetcher as typeof fetch)
+		expect(response.status).toBe(200)
+		expect(requested).toEqual([
+			'http://127.0.0.1:3000/uploads/task/new.png',
+			'https://labstudio-inc.ru/uploads/task/new.png',
+		])
 	})
 })

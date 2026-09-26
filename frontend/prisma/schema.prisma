@@ -80,7 +80,7 @@ model Course {
   description      String             @db.LongText
   date             DateTime?
   deleted          Boolean            @default(false)
-  visible          Boolean            @default(true)
+  visible          Boolean            @default(false)
   taskCategories   TaskCategory[]
   CourseToCategory CourseToCategory[]
   CourseToWorklist CourseToWorklist[]
@@ -179,6 +179,8 @@ model License {
   duration    Int
   freeCourses Int
   courses     String?        @db.LongText
+  published   Boolean        @default(true)
+  unlimitedCourses Boolean   @default(false)
   Subcription Subscription[]
 }
 

@@ -6,6 +6,10 @@ import { buildCategoryForest, selectRootCategoryIds } from '@/lib/studio/catalog
 
 const prisma = getPrisma()
 const handler = getDefaultHandler()
+// The source catalog's handwriting guides are short repeating patterns, not
+// page-shaped pictures. Mark this category so the sheet can extend them across
+// the printable width without distorting the line spacing.
+const handwritingGuideCategoryId = 400
 
 handler.get(responseAuth(async (_req, _res, userId) => {
 	const access = await getStudioCatalogAccess(prisma, userId)
@@ -13,8 +17,7 @@ handler.get(responseAuth(async (_req, _res, userId) => {
 	const courses = await prisma.course.findMany({
 		where: {
 			deleted: false,
-			visible: true,
-			...(access.isAdmin ? {} : { id: { in: access.courseIds } }),
+			...(access.isAdmin ? {} : { visible: true, id: { in: access.courseIds } }),
 		},
 		select: {
 			id: true,
@@ -66,7 +69,7 @@ handler.get(responseAuth(async (_req, _res, userId) => {
 		name: category.name,
 		description: category.description,
 		childrenIds: category.CategoryParent.map(relation => relation.childrenId),
-		tasks: category.CategoryToTask.map(({ task }) => task),
+		tasks: category.CategoryToTask.map(({ task }) => ({ ...task, ...(category.id === handwritingGuideCategoryId ? { imageLayout: 'worksheet' as const } : {}) })),
 	}))
 	return {
 		response: {
