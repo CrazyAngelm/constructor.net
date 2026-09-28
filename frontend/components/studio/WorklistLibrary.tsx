@@ -13,11 +13,11 @@ const changedAt = (worklist: StudioWorklist) => worklist.updatedAt
 	: 'Дата сохранения не указана'
 
 export default function WorklistLibrary({
-	open, folders, worklists, currentId, onClose, onOpen, onCreate, onRename, onDeleteFolder,
+	open, folders, worklists, currentId, onClose, onOpen, onDuplicate, onCreate, onRename, onDeleteFolder,
 	onMove, onDeleteWorklist, busy, error, onClearError,
 }: {
 	open: boolean; folders: StudioFolder[]; worklists: StudioWorklist[]; currentId: string
-	onClose: () => void; onOpen: (worklist: StudioWorklist) => void
+	onClose: () => void; onOpen: (worklist: StudioWorklist) => void; onDuplicate: (worklist: StudioWorklist) => Promise<boolean>
 	onCreate: (name: string) => Promise<StudioFolder | null>; onRename: (id: string, name: string) => Promise<boolean>
 	onDeleteFolder: (id: string) => Promise<boolean>; onMove: (worklist: StudioWorklist, folderId: string | null) => Promise<boolean>
 	onDeleteWorklist: (worklist: StudioWorklist) => Promise<boolean>; busy: boolean; error: string; onClearError: () => void
@@ -46,7 +46,7 @@ export default function WorklistLibrary({
 	return createPortal(<div className={styles.modalBackdrop} role="presentation" onMouseDown={event => { if (event.target === event.currentTarget && !busy) onClose() }}>
 		<section className={styles.libraryDialog} role="dialog" aria-modal="true" aria-labelledby="worklist-library-title">
 			<header className={styles.libraryHeader}>
-				<div><span className={styles.eyebrow}>Хранятся в вашем аккаунте</span><h2 id="worklist-library-title">Мои конспекты</h2><p>Выберите папку, затем откройте, переместите или удалите конспект.</p></div>
+				<div><span className={styles.eyebrow}>Хранятся в вашем аккаунте</span><h2 id="worklist-library-title">Мои конспекты</h2><p>Выберите папку, затем откройте, скопируйте, переместите или удалите конспект. Копия сохранится в той же папке и откроется для редактирования.</p></div>
 				<button type="button" className={styles.iconButton} onClick={onClose} disabled={busy} aria-label="Закрыть мои конспекты"><X size={20} /></button>
 			</header>
 			{error && <div className={styles.libraryError} role="alert">{error}<button type="button" onClick={onClearError}>Закрыть</button></div>}
@@ -86,6 +86,7 @@ export default function WorklistLibrary({
 								<div className={styles.worklistMeta}><div><h4>{worklist.name}</h4>{currentId === worklist.id && <span className={styles.currentBadge}>Открыт сейчас</span>}</div><p>{folderFor(folders, worklist.personalFolderId)} · {changedAt(worklist)}</p></div>
 								<div className={styles.worklistActions}>
 									<button type="button" className={styles.primary} disabled={busy} onClick={() => onOpen(worklist)}>Открыть</button>
+									<button type="button" className={styles.secondary} disabled={busy} onClick={() => void onDuplicate(worklist)}>Создать копию</button>
 									<label>Переместить<select aria-label={`Папка для «${worklist.name}»`} value={moveValue} disabled={busy} onChange={event => setMoveChoices(current => ({ ...current, [worklist.id]: event.target.value }))}><option value="">Без папки</option>{folders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}</select></label>
 									<button type="button" className={styles.secondary} disabled={busy || moveValue === (worklist.personalFolderId || '')} onClick={() => void onMove(worklist, moveValue || null)}>Переместить</button>
 									{!deleting && <button type="button" className={styles.dangerLink} disabled={busy} onClick={() => setDeleteWorklistId(worklist.id)}>Удалить</button>}

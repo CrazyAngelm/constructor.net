@@ -318,15 +318,18 @@ export default function StudioWorkspace() {
 		}
 	}
 	const requestSave = () => draft.id ? void save() : setSaveDialogOpen(true)
-	const reopen = (worklist: StudioWorklist) => {
-		if (saveState === 'saving') return
-		if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Открыть другой конспект?')) return
+	const openSavedWorklist = (worklist: StudioWorklist) => {
 		setDraft(worklist)
 		setHistory({ past: [], future: [] })
 		setActiveCourse(worklist.courseId ?? activeCourse)
 		setSelectedItemId(worklist[activeSheet].data.items[0]?.instanceId || null)
 		setSaveState('clean')
 		setLibraryOpen(false)
+	}
+	const reopen = (worklist: StudioWorklist) => {
+		if (saveState === 'saving') return
+		if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Открыть другой конспект?')) return
+		openSavedWorklist(worklist)
 	}
 	const chooseSheet = (sheet: SheetName) => {
 		setActiveSheet(sheet)
@@ -405,6 +408,22 @@ export default function StudioWorkspace() {
 			return true
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : 'Не удалось переместить конспект.')
+			return false
+		} finally { setLibraryBusy(false) }
+	}
+	const duplicateWorklist = async (worklist: StudioWorklist) => {
+		if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Создать копию последней сохранённой версии и открыть её?')) return false
+		setLibraryBusy(true)
+		setError('')
+		try {
+			const response = await fetch(`/api/studio/worklists/${worklist.id}/duplicate`, { method: 'POST' })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось скопировать конспект.'))
+			const copy = normalizeWorklist(unwrap(await response.json()) as WorklistsResponse['worklists'][number])
+			setWorklists(current => [ copy, ...current ])
+			openSavedWorklist(copy)
+			return true
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Не удалось скопировать конспект.')
 			return false
 		} finally { setLibraryBusy(false) }
 	}
@@ -502,7 +521,7 @@ export default function StudioWorkspace() {
 			<button type="button" onClick={openExport} aria-label="Скачать PDF"><DownloadSimple size={19} /><span>PDF</span></button>
 			<button type="button" onClick={() => window.print()} disabled={!printable || uploading} aria-label="Печать"><Printer size={19} /><span>Печать</span></button>
 		</nav>
-		<WorklistLibrary open={libraryOpen} folders={folders} worklists={worklists} currentId={draft.id} onClose={() => setLibraryOpen(false)} onOpen={reopen} onCreate={createFolder} onRename={renameFolder} onDeleteFolder={deleteFolder} onMove={moveWorklist} onDeleteWorklist={deleteWorklist} busy={foldersBusy || libraryBusy || saveState === 'saving'} error={error} onClearError={() => setError('')} />
+		<WorklistLibrary open={libraryOpen} folders={folders} worklists={worklists} currentId={draft.id} onClose={() => setLibraryOpen(false)} onOpen={reopen} onDuplicate={duplicateWorklist} onCreate={createFolder} onRename={renameFolder} onDeleteFolder={deleteFolder} onMove={moveWorklist} onDeleteWorklist={deleteWorklist} busy={foldersBusy || libraryBusy || saveState === 'saving'} error={error} onClearError={() => setError('')} />
 		<SaveWorklistDialog open={saveDialogOpen} initialName={draft.name} initialFolderId={draft.personalFolderId ?? null} folders={folders} busy={saveState === 'saving' || foldersBusy} error={error} onClose={() => setSaveDialogOpen(false)} onSave={(name, personalFolderId) => save({ name, personalFolderId })} onCreateFolder={createFolder} onClearError={() => setError('')} />
 		<ExportDialog open={exportDialogOpen} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} printable={printable && !uploading} busy={exportingPdf} error={exportError} onClose={() => setExportDialogOpen(false)} onDownload={() => void downloadPdf()} />
 	</main>

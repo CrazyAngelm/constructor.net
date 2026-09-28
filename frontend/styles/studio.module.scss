@@ -184,7 +184,7 @@
 .worklistMeta h4 { color:var(--ink); font-size:14px; }
 .worklistMeta p { margin-top:5px!important; color:var(--muted); font-size:11px; }
 .currentBadge { padding:3px 6px; border-radius:4px; color:#523b8f; background:#ece6fb; font-size:10px; }
-.worklistActions { display:grid; grid-template-columns:auto minmax(150px,1fr) auto auto; align-items:end; gap:8px; }
+.worklistActions { display:grid; grid-template-columns:auto auto minmax(150px,1fr) auto auto; align-items:end; gap:8px; }
 .worklistActions > button { min-height:36px; margin:0; padding:7px 10px; }
 .inlineConfirm { padding:10px 12px; border-left:3px solid #ad6269; background:#fff5f4; color:#6b3c41; font-size:12px; }
 .inlineConfirm p { line-height:1.5; }
