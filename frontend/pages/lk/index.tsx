@@ -25,6 +25,7 @@ export default function AccountPage({ preview }: { preview: boolean }) {
     <dt>Email</dt><dd>{session.user?.email}</dd>
     <dt>Тип доступа</dt><dd>{session.scopes.includes('admin') ? 'Администратор' : 'Пользователь'}</dd>
    </dl><Link className={styles.primary} href="/studio">Открыть конструктор</Link>
+   <p><a className={styles.secondary} href="https://labstudio-inc.ru/boundles/labstudio_hub_installer.exe">Скачать приложение для Windows</a></p>
    {session.scopes.includes('admin') && <p><Link className={styles.secondary} href="/adm">Панель администрирования</Link></p>}</> : <p role="status">Загружаем профиль…</p>}
   </section> : preview ? <PreviewAccess /> : <section className={styles.card}><h2>Подписки</h2><Subscriptions /></section>}
  </main></Layout>

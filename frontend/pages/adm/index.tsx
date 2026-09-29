@@ -26,7 +26,7 @@ const Adm: NextPage = () => {
 				label: 'Курсы',
 				callback: () => setType(TypeContent.HierarchyContent),
 			}, {
-				label: 'Видимость каталога',
+				label: 'Публикация курсов',
 				callback: () => setType(TypeContent.Visibility),
 			}, {
 				label: 'Методички',
@@ -44,7 +44,7 @@ const Adm: NextPage = () => {
 	return (
 		<Layout title="Администрирование" footer={false} >
 			<article className={styles.adm}>
-				<Menu categories={categories} activeLabel={{ [TypeContent.Users]: 'Пользователи', [TypeContent.HierarchyContent]: 'Курсы', [TypeContent.Visibility]: 'Видимость каталога', [TypeContent.Manual]: 'Методички', [TypeContent.Versions]: 'Версии', [TypeContent.Worklists]: 'Конспекты' }[typeContent]} />
+				<Menu categories={categories} activeLabel={{ [TypeContent.Users]: 'Пользователи', [TypeContent.HierarchyContent]: 'Курсы', [TypeContent.Visibility]: 'Публикация курсов', [TypeContent.Manual]: 'Методички', [TypeContent.Versions]: 'Версии', [TypeContent.Worklists]: 'Конспекты' }[typeContent]} />
 				<div className={styles.content}>
 					<Content type={typeContent} />
 				</div>

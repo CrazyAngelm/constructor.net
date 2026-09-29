@@ -22,6 +22,7 @@ handler.get(responseAuth(async (_req, _res, userId) => {
 		select: {
 			id: true,
 			name: true,
+			visible: true,
 			description: true,
 			CourseToCategory: {
 				select: { categoryId: true },
@@ -80,6 +81,7 @@ handler.get(responseAuth(async (_req, _res, userId) => {
 				return {
 				id: course.id,
 				name: course.name,
+				visible: course.visible,
 				description: course.description,
 				folders: course.FolderToCourse.map(({ folder }) => ({ id: folder.id, name: folder.name })),
 				categoryTree: buildCategoryForest(rootIds, categoryData),

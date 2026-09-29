@@ -1,5 +1,6 @@
 export interface CourseDto {
 	id: number
+	visible?: boolean
 	name?: string
 	description?: string
 }

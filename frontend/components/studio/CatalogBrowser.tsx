@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { CaretRight, Eye, Plus, X } from '@phosphor-icons/react'
 
 import type { StudioCategory, StudioCourse, StudioTask } from '@/lib/studio/types'
+import Link from 'next/link'
 import styles from '@/styles/studio.module.scss'
 
 interface TaskWithPath { task: StudioTask; path: string[] }
@@ -168,7 +169,8 @@ export default function CatalogBrowser({ courses, activeCourse, onCourseChange, 
 		<div className={styles.panelHead}><div><span className={styles.eyebrow}>База заданий</span><h2>Каталог</h2></div><button type="button" className={styles.secondary} onClick={onRefresh} disabled={refreshing}>{refreshing ? 'Обновляем…' : 'Обновить каталог'}</button></div>
 		{refreshStatus && <p className={styles.catalogStatus} role="status">{refreshStatus}</p>}
 		<label className={styles.search}><span className="sr-only">Поиск заданий</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Найти задание" /></label>
-		<label className={styles.courseSelect}>Курс<select aria-label="Курс" value={course?.id ?? ''} onChange={event => onCourseChange(Number(event.target.value))}>{courses.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
+		<label className={styles.courseSelect}>Курс<select aria-label="Курс" value={course?.id ?? ''} onChange={event => onCourseChange(Number(event.target.value))}>{courses.map(item => <option value={item.id} key={item.id}>{item.name}{item.visible === false ? ' — черновик' : ''}</option>)}</select></label>
+		{course?.visible === false && <p className={styles.catalogStatus} role="status">Черновик курса — виден только администратору. Пользователи получат доступ после публикации в <Link href="/adm">управлении курсами</Link>.</p>}
 		<div className={styles.catalogList}>
 			{query.trim() ? <section className={styles.searchResults}><h3>Результаты поиска</h3>{matches.length ? matches.map(({ task, path }) => <TaskRow key={`${path.join('-')}-${task.id}`} task={task} path={path} onPreview={setPreviewTask} onAdd={onAdd} />) : <p className={styles.empty}>Ничего не найдено.</p>}</section> : <>
 				<nav className={styles.categoryTree} aria-label="Папки курса"><ul>{roots.map(root => <CategoryNode key={root.id} node={root} level={0} selectedId={selectedCategoryId} openIds={openIds} previewableIds={previewableIds} onSelect={choose} onToggle={toggle} onPreview={setPreviewCategory} />)}</ul></nav>

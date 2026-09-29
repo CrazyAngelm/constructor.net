@@ -1,7 +1,7 @@
 import { Course, PrismaClient } from '@prisma/client'
 import { CourseDto } from '@/lib/dto/tasks'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response, responseAdmin } from '@/lib/api/response'
+import { response, responseAdmin, getAuthenticatedApiUser } from '@/lib/api/response'
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
 import { getPrisma } from '@/lib/api/database'
 const prisma = getPrisma()
@@ -12,8 +12,9 @@ interface Query extends NextParsedUrlQuery {
 handler.get(response(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
-	const data = await prisma.course.findUnique({
-		where: { id },
+	const user = await getAuthenticatedApiUser(req)
+	const data = await prisma.course.findFirst({
+		where: { id, deleted: false, ...(user?.scopes.includes('admin') ? {} : { visible: true }) },
 	}) as CourseDto
 	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
 	return { response: data }

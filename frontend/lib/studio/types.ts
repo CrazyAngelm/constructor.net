@@ -30,6 +30,7 @@ export interface StudioCategory {
 
 export interface StudioCourse {
 	id: number
+	visible?: boolean
 	name: string
 	description?: string
 	categoryTree: StudioCategory[]
