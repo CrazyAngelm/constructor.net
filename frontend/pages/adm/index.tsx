@@ -45,7 +45,7 @@ const Adm: NextPage = () => {
 		<Layout title="Администрирование" footer={false} >
 			<article className={styles.adm}>
 				<Menu categories={categories} activeLabel={{ [TypeContent.Users]: 'Пользователи', [TypeContent.HierarchyContent]: 'Курсы', [TypeContent.Visibility]: 'Публикация курсов', [TypeContent.Manual]: 'Методички', [TypeContent.Versions]: 'Версии', [TypeContent.Worklists]: 'Конспекты' }[typeContent]} />
-				<div className={styles.content}>
+				<div className={styles.content} data-admin-content>
 					<Content type={typeContent} />
 				</div>
 			</article>

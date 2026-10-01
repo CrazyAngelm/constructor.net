@@ -11,6 +11,36 @@ async function login(request: APIRequestContext, email: string, password: string
 	expect((await (await request.get('/api/auth/session')).json()).user).toBeTruthy()
 }
 
+test('old programs are retained but are not automatically published in the new library', async ({ page }) => {
+	test.slow() // Authentication and database checks use the isolated remote preview.
+	test.skip(!process.env.PUBLICATION_E2E_DATABASE_URL || !process.env.PREVIEW_ADMIN_EMAIL, 'Requires isolated preview database')
+	const prisma = new PrismaClient({ datasourceUrl: process.env.PUBLICATION_E2E_DATABASE_URL! })
+	let courseId = 0, legacyId = ''
+	try {
+		await assertPreviewDatabase(prisma)
+		await login(page.request, process.env.PREVIEW_ADMIN_EMAIL!, process.env.PREVIEW_ADMIN_PASSWORD!)
+		const course = await prisma.course.create({ data: { name: `Архивная программа ${randomUUID()}`, description: '', visible: true } })
+		courseId = course.id
+		const original = await prisma.worklist.create({ data: { name: course.name, json: '{}' } })
+		legacyId = original.id
+		await prisma.courseToWorklist.create({ data: { courseId, worklistId: legacyId } })
+		const response = await page.request.get('/api/studio/programs')
+		expect(response.ok()).toBeTruthy()
+		const { programs } = await response.json() as { programs: Array<{ id: string }> }
+		expect(programs.some(item => item.id === `legacy:${legacyId}`)).toBe(false)
+		expect(await prisma.worklist.findUnique({ where: { id: legacyId } })).toEqual(original)
+		// Compatibility with the old application remains available to authorized users.
+		expect((await page.request.get(`/api/worklist/${legacyId}`)).status()).toBe(200)
+	} finally {
+		if (legacyId) {
+			await prisma.courseToWorklist.deleteMany({ where: { worklistId: legacyId } })
+			await prisma.worklist.delete({ where: { id: legacyId } })
+		}
+		if (courseId) await prisma.course.delete({ where: { id: courseId } })
+		await prisma.$disconnect()
+	}
+})
+
 test('published program is entitled, editable only as a copy, and retains its uploaded image after unpublishing', async ({ page, playwright }) => {
 	// Browser/API/SSH round trips take longer than Playwright's default 30s.
 	test.slow()
