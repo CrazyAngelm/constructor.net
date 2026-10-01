@@ -99,8 +99,17 @@ export interface StudioWorklist {
 	courseId?: number | null
 	folderId?: string | null
 	position?: number
+	published?: boolean
 	createdAt?: string
 	updatedAt?: string
+}
+
+export interface StudioProgram {
+	id: string
+	name: string
+	courseId: number
+	courseName: string
+	folderName?: string
 }
 
 export const defaultPageSettings = (): StudioPageSettings => ({

@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client'
 import { TaskCategoryDto } from '@/lib/dto/tasks'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response, responseAdmin } from '@/lib/api/response'
+import { responseAuth, responseAdmin } from '@/lib/api/response'
+import { getStudioCatalogAccess } from '@/lib/studio/access'
+import { accessibleLegacyPrograms } from '@/lib/studio/programs'
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
 import { getPrisma } from '@/lib/api/database'
 import { WorklistDto } from '@/lib/dto/worklist'
@@ -10,9 +12,11 @@ const handler = getDefaultHandler()
 interface Query extends NextParsedUrlQuery {
 	id?: string
 }
-handler.get(response(async (req, res) => {
+handler.get(responseAuth(async (req, res, userId) => {
 	const id = (req.query as Query).id
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
+	const access = await getStudioCatalogAccess(prisma, userId)
+	if (!access || (!access.isAdmin && !(await accessibleLegacyPrograms(prisma, access)).has(id))) return { error: { code: 404, message: 'Программа не найдена или недоступна' } }
 	const data = await prisma.worklist.findUnique({
 		where: { id },
 	})

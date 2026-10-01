@@ -20,6 +20,7 @@ import type {
 	StudioImageAlignment,
 	StudioImageLayout,
 	StudioPageSettings,
+	StudioProgram,
 	StudioSheetItem,
 	StudioTask,
 	StudioWorklist,
@@ -29,6 +30,7 @@ import SheetPreview from './SheetPreview'
 import SheetSettings from './SheetSettings'
 import SaveWorklistDialog from './SaveWorklistDialog'
 import WorklistLibrary from './WorklistLibrary'
+import ProgramLibrary from './ProgramLibrary'
 import { pairSheetItems, swapSheetPair, unpairSheetItems, updateSheetItem } from '@/lib/studio/items'
 import { downloadStudioPdf } from '@/lib/studio/pdf'
 import styles from '@/styles/studio.module.scss'
@@ -118,11 +120,13 @@ export default function StudioWorkspace() {
 	const [ dragId, setDragId ] = useState<string | null>(null)
 	const [ uploading, setUploading ] = useState(false)
 	const [ libraryOpen, setLibraryOpen ] = useState(false)
+	const [ programsOpen, setProgramsOpen ] = useState(false)
 	const [ saveDialogOpen, setSaveDialogOpen ] = useState(false)
 	const [ exportDialogOpen, setExportDialogOpen ] = useState(false)
 	const [ exportingPdf, setExportingPdf ] = useState(false)
 	const [ exportError, setExportError ] = useState('')
 	const [ libraryBusy, setLibraryBusy ] = useState(false)
+	const isAdmin = !!session && session !== 'loading' && session.scopes.includes('admin')
 
 	useEffect(() => {
 		let active = true
@@ -411,7 +415,7 @@ export default function StudioWorkspace() {
 			return false
 		} finally { setLibraryBusy(false) }
 	}
-	const duplicateWorklist = async (worklist: StudioWorklist) => {
+	const duplicateWorklist = async (worklist: Pick<StudioWorklist, 'id'>) => {
 		if (saveState === 'dirty' && !window.confirm('Несохранённые изменения будут потеряны. Создать копию последней сохранённой версии и открыть её?')) return false
 		setLibraryBusy(true)
 		setError('')
@@ -421,11 +425,24 @@ export default function StudioWorkspace() {
 			const copy = normalizeWorklist(unwrap(await response.json()) as WorklistsResponse['worklists'][number])
 			setWorklists(current => [ copy, ...current ])
 			openSavedWorklist(copy)
+			setProgramsOpen(false)
 			return true
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : 'Не удалось скопировать конспект.')
 			return false
 		} finally { setLibraryBusy(false) }
+	}
+	const publishWorklist = async (worklist: StudioWorklist) => {
+		if (!window.confirm(worklist.published ? 'Скрыть программу от пользователей? Их сохранённые копии останутся.' : 'Опубликовать сохранённую версию конспекта для пользователей его курса? Дальнейшее сохранение изменений обновит авторский оригинал.')) return false
+		setLibraryBusy(true); setError('')
+		try {
+			const response = await fetch(`/api/studio/worklists/${worklist.id}/publication`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ published: !worklist.published }) })
+			if (!response.ok) throw new Error(await readApiError(response, 'Не удалось изменить публикацию.'))
+			const updated = normalizeWorklist(unwrap(await response.json()) as WorklistsResponse['worklists'][number])
+			setWorklists(current => current.map(item => item.id === updated.id ? updated : item))
+			setDraft(current => current.id === updated.id ? { ...current, published: updated.published } : current)
+			return true
+		} catch (cause) { setError(cause instanceof Error ? cause.message : 'Не удалось изменить публикацию.'); return false } finally { setLibraryBusy(false) }
 	}
 	const deleteWorklist = async (worklist: StudioWorklist) => {
 		setLibraryBusy(true)
@@ -463,6 +480,8 @@ export default function StudioWorkspace() {
 				<span className={`${styles.status} ${saveState === 'dirty' ? styles.dirty : ''}`} aria-live="polite">{statusText}</span>
 				<div className={styles.documentActions}>
 					<button type="button" className={styles.secondary} onClick={() => setLibraryOpen(true)} disabled={loading}><Files size={17} />Мои конспекты</button>
+					<button type="button" className={styles.secondary} onClick={() => setProgramsOpen(true)} disabled={loading || busy}>Программы LabStudio</button>
+					{isAdmin && <button type="button" className={styles.secondary} onClick={() => void publishWorklist(draft)} disabled={!draft.id || saveState === 'dirty' || busy || loading} title={!draft.id || saveState === 'dirty' ? 'Сначала сохраните конспект в нужном курсе' : undefined}>{draft.published ? 'Снять конспект с публикации' : 'Опубликовать конспект'}</button>}
 					<button type="button" className={styles.secondary} onClick={openExport}><DownloadSimple size={17} />Скачать PDF</button>
 					<button type="button" className={styles.secondary} onClick={() => window.print()} disabled={!printable || uploading} title={!printable ? 'Дождитесь загрузки изображений и устраните предупреждения в предпросмотре' : undefined}><Printer size={17} />Печать</button>
 					<button type="button" className={styles.primary} onClick={requestSave} disabled={busy || loading}><FloppyDisk size={17} />Сохранить</button>
@@ -514,6 +533,7 @@ export default function StudioWorkspace() {
 			</div>}
 		</fieldset>
 		<section className={styles.manuals} aria-label="Руководства"><span>Нужна инструкция к материалам?</span><Link href="/docs" target="_blank" rel="noreferrer">Открыть руководства ↗</Link></section>
+		<div className={styles.mobilePrograms}><button type="button" className={styles.secondary} onClick={() => setProgramsOpen(true)} disabled={loading || busy}>Программы LabStudio</button>{isAdmin && <button type="button" className={styles.secondary} disabled={!draft.id || saveState === 'dirty' || busy} onClick={() => void publishWorklist(draft)}>{draft.published ? 'Снять конспект с публикации' : 'Опубликовать конспект'}</button>}</div>
 		<SheetPreview sheet={draft[activeSheet]} title={draft.name} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} onPrintable={setPrintable} onResize={saveState === 'saving' || uploading ? undefined : (id, width) => { replaceActiveItems(updateSheetItem(activeItems, id, { imageWidthPercent: width })); setSelectedItemId(id) }} />
 		<nav className={styles.mobileDock} aria-label="Действия с конспектом">
 			<button type="button" onClick={() => setLibraryOpen(true)} disabled={loading} aria-label="Мои конспекты"><Files size={19} /><span>Мои</span></button>
@@ -521,7 +541,8 @@ export default function StudioWorkspace() {
 			<button type="button" onClick={openExport} aria-label="Скачать PDF"><DownloadSimple size={19} /><span>PDF</span></button>
 			<button type="button" onClick={() => window.print()} disabled={!printable || uploading} aria-label="Печать"><Printer size={19} /><span>Печать</span></button>
 		</nav>
-		<WorklistLibrary open={libraryOpen} folders={folders} worklists={worklists} currentId={draft.id} onClose={() => setLibraryOpen(false)} onOpen={reopen} onDuplicate={duplicateWorklist} onCreate={createFolder} onRename={renameFolder} onDeleteFolder={deleteFolder} onMove={moveWorklist} onDeleteWorklist={deleteWorklist} busy={foldersBusy || libraryBusy || saveState === 'saving'} error={error} onClearError={() => setError('')} />
+		<WorklistLibrary open={libraryOpen} folders={folders} worklists={worklists} currentId={draft.id} onClose={() => setLibraryOpen(false)} onOpen={reopen} onDuplicate={duplicateWorklist} onCreate={createFolder} onRename={renameFolder} onDeleteFolder={deleteFolder} onMove={moveWorklist} onDeleteWorklist={deleteWorklist} onPublish={isAdmin ? publishWorklist : undefined} busy={foldersBusy || libraryBusy || saveState === 'saving'} error={error} onClearError={() => setError('')} />
+		<ProgramLibrary open={programsOpen} onClose={() => setProgramsOpen(false)} onUse={(program: StudioProgram) => duplicateWorklist(program)} busy={libraryBusy} />
 		<SaveWorklistDialog open={saveDialogOpen} initialName={draft.name} initialFolderId={draft.personalFolderId ?? null} folders={folders} busy={saveState === 'saving' || foldersBusy} error={error} onClose={() => setSaveDialogOpen(false)} onSave={(name, personalFolderId) => save({ name, personalFolderId })} onCreateFolder={createFolder} onClearError={() => setError('')} />
 		<ExportDialog open={exportDialogOpen} label={activeSheet === 'teacherSheet' ? 'Лист педагога' : 'Лист ученика'} printable={printable && !uploading} busy={exportingPdf} error={exportError} onClose={() => setExportDialogOpen(false)} onDownload={() => void downloadPdf()} />
 	</main>

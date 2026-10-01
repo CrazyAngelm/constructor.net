@@ -285,6 +285,7 @@ model StudioWorklist {
   teacherSheet String   @db.LongText
   studentSheet String   @db.LongText
   position     Int
+  published    Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -297,6 +298,7 @@ model StudioWorklist {
   @@index([courseId])
   @@index([folderId])
   @@index([personalFolderId])
+  @@index([published, courseId])
 }
 
 model StudioFolder {

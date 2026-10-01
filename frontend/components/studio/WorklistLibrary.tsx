@@ -14,13 +14,14 @@ const changedAt = (worklist: StudioWorklist) => worklist.updatedAt
 
 export default function WorklistLibrary({
 	open, folders, worklists, currentId, onClose, onOpen, onDuplicate, onCreate, onRename, onDeleteFolder,
-	onMove, onDeleteWorklist, busy, error, onClearError,
+	onMove, onDeleteWorklist, onPublish, busy, error, onClearError,
 }: {
 	open: boolean; folders: StudioFolder[]; worklists: StudioWorklist[]; currentId: string
 	onClose: () => void; onOpen: (worklist: StudioWorklist) => void; onDuplicate: (worklist: StudioWorklist) => Promise<boolean>
 	onCreate: (name: string) => Promise<StudioFolder | null>; onRename: (id: string, name: string) => Promise<boolean>
 	onDeleteFolder: (id: string) => Promise<boolean>; onMove: (worklist: StudioWorklist, folderId: string | null) => Promise<boolean>
 	onDeleteWorklist: (worklist: StudioWorklist) => Promise<boolean>; busy: boolean; error: string; onClearError: () => void
+	onPublish?: (worklist: StudioWorklist) => Promise<boolean>
 }) {
 	const [ filter, setFilter ] = useState<Filter>('all')
 	const [ name, setName ] = useState('')
@@ -83,7 +84,8 @@ export default function WorklistLibrary({
 							const requestedMoveValue = moveChoices[worklist.id] ?? worklist.personalFolderId ?? ''
 							const moveValue = requestedMoveValue && folders.some(folder => folder.id === requestedMoveValue) ? requestedMoveValue : ''
 							return <article className={`${styles.worklistCard} ${currentId === worklist.id ? styles.currentWorklist : ''}`} key={worklist.id}>
-								<div className={styles.worklistMeta}><div><h4>{worklist.name}</h4>{currentId === worklist.id && <span className={styles.currentBadge}>Открыт сейчас</span>}</div><p>{folderFor(folders, worklist.personalFolderId)} · {changedAt(worklist)}</p></div>
+								<div className={styles.worklistMeta}><div><h4>{worklist.name}</h4>{currentId === worklist.id && <span className={styles.currentBadge}>Открыт сейчас</span>}{worklist.published && <span className={styles.currentBadge}>Опубликован</span>}</div><p>{folderFor(folders, worklist.personalFolderId)} · {changedAt(worklist)}</p></div>
+								{onPublish && <button type="button" className={styles.textButton} disabled={busy} onClick={() => void onPublish(worklist)}>{worklist.published ? 'Снять конспект с публикации' : 'Опубликовать конспект'}</button>}
 								<div className={styles.worklistActions}>
 									<button type="button" className={styles.primary} disabled={busy} onClick={() => onOpen(worklist)}>Открыть</button>
 									<button type="button" className={styles.secondary} disabled={busy} onClick={() => void onDuplicate(worklist)}>Создать копию</button>

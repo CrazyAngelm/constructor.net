@@ -202,6 +202,13 @@
 .quickFolder { display:grid; grid-template-columns:1fr auto; align-items:end; gap:8px; padding-top:14px; border-top:1px solid var(--line); }
 .exportDialog > .dialogError { margin:0; border-top:1px solid #efc8bd; border-bottom:0; }
 .mobileDock { display:none; }
+.mobilePrograms { display:none; }
+.programDialog { width:min(840px,100%); max-height:calc(100dvh - 48px); display:flex; flex-direction:column; overflow:hidden; border:1px solid #d9cdd8; border-radius:15px; background:#fff; box-shadow:0 22px 70px rgba(39,24,47,.24); }
+.programDialog .worklistList { min-height:0; }
+.programDialog .primary { justify-self:start; }
+.programFilter { padding:14px 24px; border-bottom:1px solid var(--line); }
+.programFilter label { display:grid; gap:6px; color:var(--muted); font-size:12px; }
+.programFilter select { padding:9px 10px; border:1px solid #d7cad5; border-radius:7px; background:white; color:var(--ink); }
 
 .previewScale { display:flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--line); border-radius:8px; background:#fff; }
 .previewScale button { padding:7px 9px; border:0; border-radius:5px; color:var(--muted); background:transparent; font-size:11px; }
@@ -212,6 +219,7 @@
 	.studio { padding-bottom:72px; }
 	.topbar { position:relative; }
 	.documentActions { display:none; }
+	.mobilePrograms { display:flex; flex-wrap:wrap; gap:8px; padding:12px; }
 	.actions { justify-items:start; }
 	.accountActions { justify-content:flex-start; }
 	.actions .status { text-align:left; }
