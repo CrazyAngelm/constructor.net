@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { TaskCategoryDto } from '@/lib/dto/tasks'
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response } from '@/lib/api/response'
+import { response, responseAdmin } from '@/lib/api/response'
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta'
 import { getPrisma } from '@/lib/api/database'
 const prisma = getPrisma()
@@ -23,7 +23,7 @@ handler.get(response(async (req, res) => {
 	if (!data) return { error: { code: 400, message: 'Записи не существует' } }
 	return { response: data }
 }))
-handler.post(response(async (req, res) => {
+handler.post(responseAdmin(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	const data = req.body as TaskCategoryDto
@@ -42,7 +42,7 @@ handler.post(response(async (req, res) => {
 	})
 	return { response: upset as TaskCategoryDto }
 }))
-handler.put(response(async (req, res) => {
+handler.put(responseAdmin(async (req, res) => {
 	const id = Number.parseInt((req.query as Query).id as string)
 	if (!id) return { error: { code: 400, message: 'Неверный индекс' } }
 	await prisma.taskCategory.delete({

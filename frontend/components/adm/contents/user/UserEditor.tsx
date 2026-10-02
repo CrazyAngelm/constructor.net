@@ -108,7 +108,7 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 				</Modal>
 				<article>
 					<section>
-						<img className={styles.avatar} src={user.image} />
+						{user.image && <img className={styles.avatar} src={user.image} alt="Фото пользователя" />}
 						<div>
 							<Field isHorizontal={true} label="id" type="text" value={user.id} isReadonly />
 							<Field onChange={changeHandler('name')}
@@ -118,10 +118,10 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 						</div>
 					</section>
 					<section>
-						<Checkbox isHorizontal label="admin"
+						<Checkbox isHorizontal label="Администратор"
 							value={ScopeEnum.Contains(ScopeEnum.admin, user.scopes)}
 							onChange={onChangeScope(ScopeEnum.admin)} />
-						<Checkbox isHorizontal label="editor"
+						<Checkbox isHorizontal label="Редактор"
 							value={ScopeEnum.Contains(ScopeEnum.editor, user.scopes)}
 							onChange={onChangeScope(ScopeEnum.editor)} />
 					</section>
@@ -148,7 +148,7 @@ const UserEditor = ({ id, callbackUpdate }: Props) => {
 			</article>
 		</EditorTemplate>
 		: <article className={editorStyles.error}>
-			{error && 'Какая то ошибка'}
+			{error || 'Загружаем профиль…'}
 		</article>
 }
 

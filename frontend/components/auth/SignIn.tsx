@@ -115,7 +115,7 @@ const SignIn = ({ onSucess, onError, registration }: Props) => {
 					<section className={styles.body}>
 						<section className={styles.close}>
 							<div onClick={() => setResetPass(false)}>
-								<Image src={close} layout="fill" objectFit="contain" />
+								<Image src={close} alt="" layout="fill" objectFit="contain" />
 							</div>
 						</section>
 						<section className={styles.content}>

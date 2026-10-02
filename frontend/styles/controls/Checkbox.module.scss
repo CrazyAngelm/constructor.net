@@ -21,3 +21,5 @@
 		}
 	}
 }
+
+.checkBox,.checkBox.isHorizontal { display:inline-flex; align-items:center; gap:10px; font-size:13px; line-height:1.5; }.checkBox > input { order:-1; width:17px; height:17px; accent-color:var(--accent); }

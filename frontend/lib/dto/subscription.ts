@@ -5,6 +5,8 @@ export interface LicenseDto {
 	price?: number,
 	duration?: number,
 	freeCourses?: number
+	published?: boolean
+	unlimitedCourses?: boolean
 	courses?: string
 }
 

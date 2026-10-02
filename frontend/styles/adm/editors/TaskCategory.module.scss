@@ -1,6 +1,17 @@
 @import "bulma/sass/utilities/_all.sass";
 @import "bulma/sass/elements/_all.sass";
 
+.publication {
+	padding: 16px;
+	margin-bottom: 20px;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	background: var(--surface, #faf8ff);
+	p { margin: 8px 0 12px; }
+	button { padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+	button:disabled { cursor: wait; opacity: .6; }
+}
+
 .editor {
 	display: grid;
 	gap: 2vw;
@@ -21,3 +32,5 @@
 		height: 50vh;
 	}
 }
+
+.editor,.editor.withList { grid-template-columns:1fr; height:auto; gap:24px; }.editor .list { height:auto; min-width:0; border:1px solid var(--line); box-shadow:none; padding:16px; }.editor .description { height:auto; min-height:120px; }

@@ -31,7 +31,8 @@ handler.get(responseAuth(async (req, res, userId) => {
 	const data = await prisma.course.findMany({
 		where: {
 			deleted: false,
-			id: { in: courses },
+			visible: true,
+			...(subscription.license.unlimitedCourses ? {} : { id: { in: courses } }),
 		},
 	})
 	return { response: data }

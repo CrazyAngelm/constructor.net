@@ -108,7 +108,7 @@ const About = () => {
 				</div>
 				<section>
 					<div>
-						<Image src={image1} layout="responsive" objectFit="contain" />
+						<Image src={image1} alt="" layout="responsive" objectFit="contain" />
 					</div>
 				</section>
 			</section>

@@ -1,4 +1,5 @@
 import styles from '@/styles/controls/Field.module.scss'
+import { useId } from 'react'
 
 export interface Props {
 	label?: string
@@ -11,13 +12,14 @@ export interface Props {
 }
 
 const Field = ({ label, value, type, placeholder, isReadonly, onChange, isHorizontal }: Props) => {
+	const id = useId()
 	return <section className={`${isHorizontal ? styles.isHorizontal : ''} ${styles.classField}`}>
 		<div className={styles.fieldLabel}>
-			<label>{label}</label>
+			<label htmlFor={id}>{label}</label>
 		</div>
 		<div className={styles.fieldBody}>
 			<div>
-				<input className={isReadonly ? styles.static : ''}
+				<input id={id} className={isReadonly ? styles.static : ''}
 					type={type}
 					value={value?value:''}
 					readOnly={isReadonly}

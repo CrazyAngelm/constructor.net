@@ -16,7 +16,7 @@ const Modal = ({ closeCallback, children, visible }: Props) => {
 				<section className={styles.body}>
 					<section className={styles.close}>
 						<div onClick={closeCallback}>
-							<Image src={close} layout="fill" objectFit="contain" />
+							<Image src={close} alt="" layout="fill" objectFit="contain" />
 						</div>
 					</section>
 					<section className={styles.not}>
