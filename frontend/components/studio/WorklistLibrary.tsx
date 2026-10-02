@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { FolderSimple, Plus, X } from '@phosphor-icons/react'
 
@@ -25,6 +25,10 @@ export default function WorklistLibrary({
 }) {
 	const [ filter, setFilter ] = useState<Filter>('all')
 	const [ name, setName ] = useState('')
+	const [ nameError, setNameError ] = useState('')
+	const nameInput = useRef<HTMLInputElement>(null)
+	const nameHintId = useId()
+	const nameErrorId = useId()
 	const [ editingId, setEditingId ] = useState<string | null>(null)
 	const [ deleteFolderId, setDeleteFolderId ] = useState<string | null>(null)
 	const [ deleteWorklistId, setDeleteWorklistId ] = useState<string | null>(null)
@@ -58,20 +62,31 @@ export default function WorklistLibrary({
 						<button type="button" aria-label="Без папки" className={filter === 'unfiled' ? styles.folderSelected : ''} aria-pressed={filter === 'unfiled'} onClick={() => setFilter('unfiled')}><span>Без папки</span><small>{countFor('unfiled')}</small></button>
 						{folders.map(folder => <button type="button" aria-label={folder.name} key={folder.id} className={filter === folder.id ? styles.folderSelected : ''} aria-pressed={filter === folder.id} onClick={() => setFilter(folder.id)}><span><FolderSimple size={16} />{folder.name}</span><small>{countFor(folder.id)}</small></button>)}
 					</nav>
-					<div className={styles.folderEditor}>
-						<label>{editingId ? 'Новое название папки' : 'Новая папка'}<input maxLength={191} value={name} onChange={event => setName(event.target.value)} placeholder="Например: Анна" /></label>
-						<button type="button" className={styles.secondary} disabled={busy || !name.trim()} onClick={async () => {
+					<form className={styles.folderEditor} onSubmit={async event => {
+						event.preventDefault()
+						if (busy) return
+						const trimmedName = name.trim()
+						if (!trimmedName) {
+							setNameError('Введите название папки.')
+							nameInput.current?.focus()
+							return
+						}
+						setNameError('')
 							if (editingId) {
-								if (await onRename(editingId, name)) { setName(''); setEditingId(null) }
+								if (await onRename(editingId, trimmedName)) { setName(''); setEditingId(null) }
 							} else {
-								const folder = await onCreate(name)
+								const folder = await onCreate(trimmedName)
 								if (folder) setName('')
 							}
-						}}>{editingId ? 'Сохранить название' : <><Plus size={15} />Создать папку</>}</button>
-						{editingId && <button type="button" className={styles.textButton} onClick={() => { setEditingId(null); setName('') }}>Отмена</button>}
-					</div>
+					}}>
+						<label>{editingId ? 'Новое название папки' : 'Новая папка'}<input ref={nameInput} maxLength={191} value={name} aria-invalid={nameError ? true : undefined} aria-describedby={nameError ? nameErrorId : nameHintId} onChange={event => { setName(event.target.value); setNameError('') }} placeholder="Например: Анна" /></label>
+						<p id={nameHintId} className={styles.folderHint}>{editingId ? 'Введите новое название и сохраните его.' : 'Введите название и нажмите «Создать папку» или Enter.'}</p>
+						{nameError && <p id={nameErrorId} className={styles.folderValidation} role="alert">{nameError}</p>}
+						<button type="submit" className={styles.secondary} disabled={busy}>{editingId ? 'Сохранить название' : <><Plus size={15} />Создать папку</>}</button>
+						{editingId && <button type="button" className={styles.textButton} onClick={() => { setEditingId(null); setName(''); setNameError('') }}>Отмена</button>}
+					</form>
 					{selectedFolder && <div className={styles.folderManage}>
-						<button type="button" className={styles.textButton} disabled={busy} onClick={() => { setEditingId(selectedFolder.id); setName(selectedFolder.name); setDeleteFolderId(null) }}>Переименовать папку</button>
+						<button type="button" className={styles.textButton} disabled={busy} onClick={() => { setEditingId(selectedFolder.id); setName(selectedFolder.name); setNameError(''); setDeleteFolderId(null) }}>Переименовать папку</button>
 						{deleteFolderId !== selectedFolder.id ? <button type="button" className={styles.dangerLink} disabled={busy} onClick={() => setDeleteFolderId(selectedFolder.id)}>Удалить папку</button> : <div className={styles.inlineConfirm} role="alert"><p>Конспекты останутся и перейдут в «Без папки».</p><div><button type="button" className={styles.dangerButton} disabled={busy} onClick={async () => { if (await onDeleteFolder(selectedFolder.id)) { setFilter('unfiled'); setDeleteFolderId(null) } }}>Удалить папку</button><button type="button" className={styles.textButton} onClick={() => setDeleteFolderId(null)}>Отмена</button></div></div>}
 					</div>}
 				</aside>

@@ -170,6 +170,9 @@
 .folderPane nav > button:hover { background:#f1ebf5; }
 .folderPane nav > .folderSelected { border-color:#d9cae2; background:var(--accent-soft); color:#513a9a; }
 .folderEditor { margin-top:20px; padding-top:16px; display:grid; gap:8px; border-top:1px solid var(--line); }
+.folderHint,.folderValidation { grid-column:1 / -1; margin:0; font-size:12px; line-height:1.5; }
+.folderHint { color:var(--muted); }
+.folderValidation { color:#6f3228; }
 .folderEditor label,.saveDialog label,.worklistActions label { display:grid; gap:6px; color:var(--muted); font-size:11px; font-weight:600; }
 .folderEditor input,.saveDialog input,.saveDialog select,.worklistActions select { width:100%; min-width:0; padding:9px 10px; border:1px solid #d7cad5; border-radius:7px; color:var(--ink); background:#fff; }
 .folderManage { margin-top:14px; display:grid; justify-items:start; gap:8px; }

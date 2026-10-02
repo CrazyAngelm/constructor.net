@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Plus, X } from '@phosphor-icons/react'
 
@@ -13,13 +13,29 @@ export default function SaveWorklistDialog({ open, initialName, initialFolderId,
 	const [ name, setName ] = useState(initialName)
 	const [ folderId, setFolderId ] = useState(initialFolderId || '')
 	const [ folderName, setFolderName ] = useState('')
-	useEffect(() => { if (open) { setName(initialName); setFolderId(initialFolderId || ''); setFolderName('') } }, [ initialFolderId, initialName, open ])
+	const [ folderNameError, setFolderNameError ] = useState('')
+	const folderNameInput = useRef<HTMLInputElement>(null)
+	const folderHintId = useId()
+	const folderErrorId = useId()
+	useEffect(() => { if (open) { setName(initialName); setFolderId(initialFolderId || ''); setFolderName(''); setFolderNameError('') } }, [ initialFolderId, initialName, open ])
 	useEffect(() => {
 		if (!open) return
 		const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape' && !busy) onClose() }
 		document.addEventListener('keydown', closeOnEscape)
 		return () => document.removeEventListener('keydown', closeOnEscape)
 	}, [ busy, onClose, open ])
+	const createFolder = async () => {
+		if (busy) return
+		const trimmedName = folderName.trim()
+		if (!trimmedName) {
+			setFolderNameError('Введите название папки.')
+			folderNameInput.current?.focus()
+			return
+		}
+		setFolderNameError('')
+		const folder = await onCreateFolder(trimmedName)
+		if (folder) { setFolderId(folder.id); setFolderName('') }
+	}
 	if (!open) return null
 	return createPortal(<div className={styles.modalBackdrop} role="presentation">
 		<form className={styles.saveDialog} role="dialog" aria-modal="true" aria-labelledby="save-dialog-title" onSubmit={event => { event.preventDefault(); void onSave(name, folderId || null) }}>
@@ -28,7 +44,10 @@ export default function SaveWorklistDialog({ open, initialName, initialFolderId,
 				<p>Конспект сохранится в вашем аккаунте вместе с обоими листами.</p>
 				<label>Название конспекта<input autoFocus maxLength={191} value={name} onChange={event => setName(event.target.value)} /></label>
 				<label>Папка<select value={folderId} onChange={event => setFolderId(event.target.value)}><option value="">Без папки</option>{folders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}</select></label>
-				<div className={styles.quickFolder}><label>Или создайте новую папку<input maxLength={191} value={folderName} onChange={event => setFolderName(event.target.value)} placeholder="Например: Анна" /></label><button type="button" className={styles.secondary} disabled={busy || !folderName.trim()} onClick={async () => { const folder = await onCreateFolder(folderName); if (folder) { setFolderId(folder.id); setFolderName('') } }}><Plus size={15} />Создать</button></div>
+				<div className={styles.quickFolder}><label>Или создайте новую папку<input ref={folderNameInput} maxLength={191} value={folderName} aria-invalid={folderNameError ? true : undefined} aria-describedby={folderNameError ? folderErrorId : folderHintId} onChange={event => { setFolderName(event.target.value); setFolderNameError('') }} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); void createFolder() } }} placeholder="Например: Анна" /></label><button type="button" className={styles.secondary} disabled={busy} onClick={() => void createFolder()}><Plus size={15} />Создать</button>
+					<p id={folderHintId} className={styles.folderHint}>Введите название и нажмите «Создать» или Enter.</p>
+					{folderNameError && <p id={folderErrorId} className={styles.folderValidation} role="alert">{folderNameError}</p>}
+				</div>
 				{error && <div className={styles.dialogError} role="alert">{error}<button type="button" onClick={onClearError}>Закрыть</button></div>}
 			</div>
 			<footer><button type="button" className={styles.secondary} onClick={onClose} disabled={busy}>Отмена</button><button type="submit" className={styles.primary} disabled={busy || !name.trim()}>{busy ? 'Сохраняем…' : 'Сохранить конспект'}</button></footer>
