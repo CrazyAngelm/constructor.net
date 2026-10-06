@@ -1,11 +1,5 @@
-import dynamic from 'next/dynamic'
-import 'react-quill/dist/quill.snow.css'
-import ReactQuill from 'react-quill'
-
-const modules = {
-	toolbar: null,
-}
-//#endregion
+import styles from '@/styles/controls/ManualHtml.module.scss'
+import { sanitizeManualHtml } from '@/lib/manuals/sanitize'
 
 
 export interface Props {
@@ -14,14 +8,14 @@ export interface Props {
 
 const QuillEditorReadonly = ({ value }: Props) => {
 	return (
-		<article>
-			<ReactQuill
-				modules={modules} theme={undefined} value={value}
-				readOnly={true} />
+		<article
+			className={styles.manualHtml}
+			dangerouslySetInnerHTML={{ __html: sanitizeManualHtml(value ?? '') }}
+		>
 		</article>
 	)
 }
 
-export default dynamic(() => Promise.resolve(QuillEditorReadonly), { ssr: false })
+export default QuillEditorReadonly
 
 

@@ -14,7 +14,7 @@ const Comment = ({ image, name, status, title, comment }: Props) => {
 	return (
 		<article className={styles.comment}>
 			<section className={styles.text}>
-				<div><Image src={quotes} /></div>
+				<div><Image src={quotes} alt="" /></div>
 				<header>«{title}»</header>
 				<p>«{comment}»</p>
 			</section>

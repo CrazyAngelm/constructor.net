@@ -1,17 +1,19 @@
 import { getDefaultHandler } from '@/lib/api/apiHandler'
-import { response } from '@/lib/api/response'
+import { responseAuth } from '@/lib/api/response'
+import { readJsonBody } from '@/lib/api/body'
 import { getPrisma } from '@/lib/api/database'
-import { ChangePaymentMethodReq, ChangePaymentMethodRes, Subscription } from '@/lib/dto/subscription'
-import { ICreatePayment, YooCheckout } from '@a2seven/yoo-checkout'
-import { v4 } from 'uuid'
+import { ChangePaymentMethodReq } from '@/lib/dto/subscription'
+import { previewExternalFlowError, previewExternalFlowsRestricted } from '@/lib/preview'
 const prisma = getPrisma()
 const handler = getDefaultHandler()
-handler.post(response(async (req, res) => {
-	const body = JSON.parse(req.body) as ChangePaymentMethodReq
-	if (!body.userId || !body.subscriptionId) return { error: { code: 400 } }
-	const user = await prisma.user.findUnique({ where: { id: body.userId } })
-	const subscription = await prisma.subscription.findUnique({ where: { id: body.subscriptionId } })
-	if (!user || !subscription) return { error: { code: 400 } }
+handler.post(responseAuth(async (req, _res, userId) => {
+	if (previewExternalFlowsRestricted()) return { error: previewExternalFlowError }
+	const body = readJsonBody<ChangePaymentMethodReq>(req.body)
+	if (!body?.subscriptionId) return { error: { code: 400 } }
+	const subscription = await prisma.subscription.findFirst({
+		where: { id: body.subscriptionId, userId },
+	})
+	if (!subscription) return { error: { code: 404, message: 'Subscription not found' } }
 	await prisma.subscription.update({
 		where: { id: subscription.id },
 		data: {

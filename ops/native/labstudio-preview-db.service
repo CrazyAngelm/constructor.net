@@ -1,0 +1,18 @@
+[Unit]
+Description=LabStudio isolated preview database (not production MariaDB)
+After=network.target
+
+[Service]
+Type=simple
+User=labstudio-preview-db
+Group=labstudio-preview-db
+ExecStart=/usr/sbin/mysqld --no-defaults --datadir=/srv/labstudio-preview/database --socket=/srv/labstudio-preview/database/mysql.sock --pid-file=/srv/labstudio-preview/database/mysql.pid --port=13307 --bind-address=127.0.0.1 --skip-name-resolve --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+Restart=on-failure
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/labstudio-preview/database
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

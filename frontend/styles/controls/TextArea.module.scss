@@ -37,3 +37,5 @@
 		}
 	}
 }
+
+.textArea .fieldLabel { margin:0; }.textArea .fieldLabel > label { font-size:13px; color:var(--muted); margin-bottom:8px; font-weight:600; }.textArea .fieldBody > div > textarea { border:1px solid var(--line); border-radius:7px; box-shadow:none; font-size:14px; line-height:1.6; min-height:120px; padding:12px; }

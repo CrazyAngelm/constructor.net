@@ -20,7 +20,39 @@
 		}
 	}
 
-	.quillEditor{
-		height: 60vh;
+	.manualEditorLabel {
+		display: grid;
+		gap: .5rem;
+		margin-top: 1rem;
+		font-weight: 600;
+	}
+
+	.manualHtmlEditor {
+		width: 100%;
+		min-height: 18rem;
+		resize: vertical;
+		padding: .9rem;
+		border: 1px solid #c8c8c8;
+		border-radius: .4rem;
+		font: 400 .9rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+	}
+
+	.manualPreview {
+		margin-top: 1rem;
+		padding: 1.25rem;
+		border: 1px solid #e1e1e1;
+		border-radius: .4rem;
+		background: #fff;
+		line-height: 1.6;
+		word-break: break-word;
+
+		img,
+		video {
+			max-width: 100%;
+			height: auto;
+		}
 	}
 }
+
+.editor .row { display:grid; grid-template-columns:1fr; gap:20px; }.editor .row > section { width:100%; min-width:0; }.editor .manualPreview { overflow-wrap:anywhere; }.editor .manualPreview table { display:block; max-width:100%; overflow:auto; }
+.editor .manualPreview { max-height:60dvh; overflow:auto; }.sourceEditor summary { cursor:pointer; color:var(--accent); font-size:13px; padding:12px 0; }.editor .row button { padding:9px 12px; margin:8px 0 16px; border:1px solid var(--line); border-radius:7px; color:var(--accent); background:white; cursor:pointer; font-size:12px; }

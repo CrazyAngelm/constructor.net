@@ -29,16 +29,16 @@ interface PropsWarningDelete {
 
 export const WarningDelete = ({ callbackRemove, cancel }: PropsWarningDelete) => {
 	return (
-		<div className={`${styles.modalWindow} ${styles.isActive}`}>
+		<div className={`${styles.modalWindow} ${styles.isActive}`} role="dialog" aria-modal="true" aria-label="Подтверждение удаления">
 			<div className={styles.modalBackground}></div>
 			<div className={styles.modalContent}>
 				<section className={styles.window}>
-					<div>Вы уверены что хотите удалить эелемнт?
-						Действие необратимо
+					<div>Удалить выбранную запись?
+						 Это действие нельзя отменить.
 					</div>
 					<section className={styles.buttons}>
 						<button className={styles.danger}
-							onClick={() => callbackRemove && callbackRemove()}>Да</button>
+							onClick={() => callbackRemove && callbackRemove()}>Удалить</button>
 						<button onClick={() => cancel && cancel()}>Отмена</button>
 					</section>
 				</section>
@@ -52,8 +52,7 @@ const EditorTemplate = ({ children, error, notification, ...callbacks }: Props) 
 
 	return (
 		<article className={styles.editor}>
-			<div onClick={callbacks.callbackBack} className={`${callbacks.callbackBack ? styles.back : styles.hide}`}>
-			</div>
+			{callbacks.callbackBack && <button type="button" onClick={callbacks.callbackBack} className={styles.back}>← Назад к списку</button>}
 			{modal && <WarningDelete callbackRemove={callbacks.callbackRemove} cancel={() => setModal(false)} />}
 			<section className={styles.individualEditor}>
 				{children}
@@ -63,13 +62,13 @@ const EditorTemplate = ({ children, error, notification, ...callbacks }: Props) 
 			</section>
 			{error
 				&& <section className={styles.error}>
-					<span>Error: </span>
+					<span>Ошибка: </span>
 					{error}
 				</section>
 			}
 			<ButtonsEditor callbackSave={callbacks.callbackSave}
 				callbackUpdate={callbacks.callbackUpdate}
-				callbackRemove={() => setModal(true)} />
+				callbackRemove={callbacks.callbackRemove ? () => setModal(true) : undefined} />
 		</article>
 	)
 }

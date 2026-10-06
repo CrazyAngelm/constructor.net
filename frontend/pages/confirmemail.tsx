@@ -1,72 +1,19 @@
-import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next'
+import { GetServerSideProps } from 'next'
 import { useEffect, useState } from 'react'
-import { ParsedUrlQuery } from 'querystring'
+import StatusPage from '@/components/StatusPage'
 import { confirmEmail } from '@/lib/requests/auth'
 import { ApiError } from '@/lib/requests'
-import { useRouter } from 'next/router'
-import { signIn } from 'next-auth/react'
 
-interface Props {
-	token: string
+export default function ConfirmEmail({ token }: { token: string }) {
+ const [ status, setStatus ] = useState(token ? 'Проверяем ссылку…' : 'В ссылке отсутствует код подтверждения.')
+ const [ error, setError ] = useState(false)
+ useEffect(() => {
+  if (!token) return
+  let active = true
+  confirmEmail(token).then(() => { if (active) setStatus('Адрес электронной почты подтверждён. Теперь можно войти в аккаунт.') })
+   .catch((cause) => { if (active) { setError(true); setStatus(cause instanceof ApiError ? cause.message : 'Не удалось проверить ссылку. Попробуйте открыть её ещё раз.') } })
+  return () => { active = false }
+ }, [ token ])
+ return <StatusPage title="Подтверждение почты"><p role={error ? 'alert' : 'status'}>{status}</p>{error && <p>Проверьте, что открыли последнюю ссылку из письма.</p>}</StatusPage>
 }
-
-interface Token {
-	id?: string,
-	email?: string,
-	pass?: string
-}
-
-const ConfirmEmail: NextPage<Props> = ({ token }: Props) => {
-	const [ status, setStatus ] = useState('Loading...')
-	const [ error, setError ] = useState<string>()
-
-	const router  = useRouter()
-
-	useEffect(() => {
-		if(!router) return
-		console.log(token)
-		confirmEmail(token).then(async (p) =>  {
-			setStatus(`${p.status}. Redirect...`)
-			//Toodoo защитить пароль вход через бэкенд
-			const tok = JSON.parse(Buffer.from(token, 'base64').toString('binary')) as Token
-			const status = await signIn('credentials', {
-				redirect: true,
-				callbackUrl: '/',
-				email: tok.email,
-				password: tok.pass,
-			}) as any as {error:string}
-
-			if (status.error) {
-				setError(status.error)
-				return
-			}
-		}).catch((err) => {
-			if(err instanceof ApiError) setError(err.message)
-			console.log(err)
-		})
-	}, [ router ])
-
-	return (
-		<article>
-			{error ?? status}
-		</article>
-	)
-}
-
-interface QueryWithToken extends ParsedUrlQuery {
-	token: string | undefined
-}
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-	const { token } = context.query as QueryWithToken
-
-	if (!token) return { notFound: true }
-
-	return {
-		props: {
-			token,
-		},
-	}
-}
-
-export default ConfirmEmail
+export const getServerSideProps: GetServerSideProps = async ({ query }) => ({ props: { token: typeof query.token === 'string' ? query.token : '' } })

@@ -17,7 +17,7 @@ const TittlePanel = () => {
 					</a>
 				</div>
 				<section className={styles.image}>
-					<Image src={image} layout="fill" objectFit="contain"/>
+					<Image src={image} alt="" layout="fill" objectFit="contain"/>
 				</section>
 			</section>
 		</article>

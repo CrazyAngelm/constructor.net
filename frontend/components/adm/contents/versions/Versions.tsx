@@ -31,6 +31,7 @@ const Versions = () => {
 	return (
 		<article className={styles.content}>
 			<section className={styles.list}>
+				{!data && <p role="status">{error || 'Загружаем версии…'}</p>}
 				{data
 					&& <List name="Версии"
 						length={data.length}
@@ -47,6 +48,7 @@ const Versions = () => {
 				<ButtonsList callbackCreate={createVersion} />
 			</section>
 			<section className={styles.editor}>
+				{!versionId && <p className={styles.empty}>Здесь управляются выпуски настольного приложения. Выберите версию в списке для просмотра.</p>}
 				{versionId && <VersionEditor callbackUpdate={update} id={versionId} />}
 			</section>
 		</article >

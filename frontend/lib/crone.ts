@@ -1,18 +1,12 @@
-import { ICreatePayment, YooCheckout } from '@a2seven/yoo-checkout'
+import { checkout, ICreatePayment } from './yookassa/checkout'
 import { License, Subscription } from '@prisma/client'
 import { CronJob } from 'cron'
-import { v4 } from 'uuid'
 import { getPrisma } from './api/database'
 
 const prisma = getPrisma()
 
 const payment = async (license: License, userId: string, paymentId: string) => {
-	const checkout = new YooCheckout({
-		shopId: process.env.YOOCHECKOUT_SHOP_ID ?? '',
-		secretKey: process.env.YOOCHECKOUT_KEY ?? '',
-	})
-
-	const idempotentKey = v4()
+	const idempotentKey = checkout.generateKey()
 
 	const createPayload: ICreatePayment = {
 		amount: {

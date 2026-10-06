@@ -4,9 +4,9 @@ import { createManual, getManualById, getManuals, removeManual, updateManual } f
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import styles from '@/styles/adm/Content.module.scss'
-import 'react-quill/dist/quill.snow.css'
 import { WarningDelete } from '../EditorTemplate'
 import Image from 'next/image'
+import { FilePlus, Trash } from '@phosphor-icons/react'
 import arrow from '@/assets/back.svg'
 import menu from '@/assets/menu.png'
 import trash from '@/assets/trash.png'
@@ -26,7 +26,7 @@ interface PropsItem {
 
 const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 	const [ isDelete, setDelete ] = useState(false)
-	const [ open, setOpen ] = useState(false)
+	const [ open, setOpen ] = useState(id === -1)
 	const [ name, setName ] = useState(_name)
 	const [ modalDelete, setModalDelete ] = useState(false)
 
@@ -70,27 +70,27 @@ const Item = ({ id, parentId, name: _name, updater, ...setter }: PropsItem) => {
 		<div className={styles.item} >
 			{modalDelete && <WarningDelete callbackRemove={remove} cancel={() => setModalDelete(false)} />}
 			<header>
-				<div onClick={() => setOpen(p => !p)}>
+				<div role="button" tabIndex={0} aria-label={`Развернуть ${name}`} aria-expanded={open} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setOpen(value => !value) } }} onClick={() => setOpen(p => !p)}>
 					{isOpen()
 						&& <div className={`${styles.arrow} ${open && styles.open}`}>
-							<Image src={arrow} />
+							<Image src={arrow} alt="" />
 						</div>}
 				</div>
 				{id !== -1
-					? <span onClick={onClick}>{name}</span>
+					? <span role="button" tabIndex={0} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onClick() } }} onClick={onClick}>{name}</span>
 					: <span className={styles.uninteractable}>{name}</span>
 				}
 				<section className={styles.menu}>
 					<header>
-						<Image layout="fill" objectFit="contain" src={menu} />
+						<Image layout="fill" objectFit="contain" src={menu} alt="" />
 					</header>
 					<section>
-						<div onClick={clickCreate} className={styles.icon}>
-							<Image layout="fill" objectFit="contain" src={addFile} />
-						</div>
-						{id !== -1 && <div onClick={() => setModalDelete(true)} className={styles.icon}>
-							<Image layout="fill" objectFit="contain" src={trash} />
-						</div>}
+						<button type="button" title="Добавить руководство" aria-label={`Добавить руководство в ${name}`} onClick={clickCreate} className={styles.icon}>
+							<FilePlus size={18} aria-hidden="true" />
+						</button>
+						{id !== -1 && <button type="button" title="Удалить руководство" aria-label={`Удалить ${name}`} onClick={() => setModalDelete(true)} className={styles.icon}>
+							<Trash size={18} aria-hidden="true" />
+						</button>}
 					</section>
 				</section>
 			</header>
@@ -153,9 +153,10 @@ const Manual = () => {
 	return (
 		<article className={styles.content}>
 			<section className={styles.list}>
-				<Item id={-1} name="Manuals" setManualId={setManualId} updater={updater} />
+				<Item id={-1} name="Руководства" setManualId={setManualId} updater={updater} />
 			</section>
 			<section className={styles.editor}>
+				{!manualId && <p className={styles.empty}>Выберите руководство в списке, чтобы прочитать или изменить его.</p>}
 				{manualId
 					&& <ManualEditor id={manualId} callbackUpdate={() => updater.update(manualId)}
 						callbackBack={() => setManualId(undefined)} />}

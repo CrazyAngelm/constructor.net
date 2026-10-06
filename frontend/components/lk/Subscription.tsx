@@ -7,7 +7,6 @@ import { getCourses } from '@/lib/requests/tasks'
 import { useSession } from '@/lib/session/hooks'
 import { YooCheckoutWidget } from '@/lib/YooCheckoutWidget'
 import styles from '@/styles/lk/Subscription.module.scss'
-import Head from 'next/head'
 import Script from 'next/script'
 import { Fragment, useEffect, useState } from 'react'
 import Checkbox from '../controls/Checkbox'
@@ -92,6 +91,7 @@ export const Item = ({ item, update }: PropsItem) => {
 	const license = data?.find(p => p.id === item.licenseId)
 
 	const getAvialableCourses = (): CourseDto[] => {
+		if (license?.unlimitedCourses) return courses ?? []
 		const licenseCourses = license?.courses ? JSON.parse(license?.courses) as number[] : []
 		const subscriptionCourses = item.courses ? JSON.parse(item.courses) as number[] : []
 
@@ -147,8 +147,8 @@ export const Item = ({ item, update }: PropsItem) => {
 					<td>
 						<section>
 							{getAvialableCourses().map(p => <div key={p.id}>{p.name}<br /></div>)}
-							<ChangeCourse subscription={item} license={license}
-								update={update} />
+							{!license?.unlimitedCourses && <ChangeCourse subscription={item} license={license}
+								update={update} />}
 						</section>
 					</td>
 				</tr>
@@ -205,7 +205,6 @@ const Subscriptions = () => {
 	}
 	return (
 		<>
-			<Head />
 			<Script src="https://yookassa.ru/checkout-widget/v1/checkout-widget.js" strategy="afterInteractive" />
 			<Modal closeCallback={() => setNot(false)}
 				visible={not}>

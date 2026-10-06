@@ -11,7 +11,7 @@ import { useState } from 'react'
 
 
 const Adm: NextPage = () => {
-	const [ typeContent, setType ] = useState<TypeContent>()
+	const [ typeContent, setType ] = useState<TypeContent>(TypeContent.Visibility)
 
 	const categories = [
 		{
@@ -26,6 +26,9 @@ const Adm: NextPage = () => {
 				label: 'Курсы',
 				callback: () => setType(TypeContent.HierarchyContent),
 			}, {
+				label: 'Публикация курсов',
+				callback: () => setType(TypeContent.Visibility),
+			}, {
 				label: 'Методички',
 				callback: () => setType(TypeContent.Manual),
 			} ],
@@ -39,10 +42,10 @@ const Adm: NextPage = () => {
 	] as Categories[]
 
 	return (
-		<Layout navbar={false} footer={false} >
+		<Layout title="Администрирование" footer={false} >
 			<article className={styles.adm}>
-				<Menu categories={categories} />
-				<div className={styles.content}>
+				<Menu categories={categories} activeLabel={{ [TypeContent.Users]: 'Пользователи', [TypeContent.HierarchyContent]: 'Курсы', [TypeContent.Visibility]: 'Публикация курсов', [TypeContent.Manual]: 'Методички', [TypeContent.Versions]: 'Версии', [TypeContent.Worklists]: 'Конспекты' }[typeContent]} />
+				<div className={styles.content} data-admin-content>
 					<Content type={typeContent} />
 				</div>
 			</article>
@@ -53,7 +56,6 @@ const Adm: NextPage = () => {
 export default Adm
 
 export const getServerSideProps = withAdminSession((session) => {
-	console.log(session)
 	return {
 		props: {},
 	}

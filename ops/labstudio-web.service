@@ -1,0 +1,23 @@
+[Unit]
+Description=LabStudio web application
+After=network.target mariadb.service
+
+[Service]
+Type=simple
+User=labstudio-web
+Group=labstudio-web
+WorkingDirectory=/srv/labstudio-web/current
+EnvironmentFile=/srv/labstudio-web/production.env
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=18082
+ExecStart=/srv/labstudio-web/current/node /srv/labstudio-web/current/server.js
+Restart=on-failure
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/labstudio-web/shared /srv/labstudio-web/current/.next/cache /var/www/constructor.net/frontend/public/uploads
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

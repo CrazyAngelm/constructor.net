@@ -2,6 +2,7 @@
 .env.*
 !.env.in
 !.env.*.in
+!.env.preview.example
 
 docker-compose.override.yml
 docker-compose.*.override.yml

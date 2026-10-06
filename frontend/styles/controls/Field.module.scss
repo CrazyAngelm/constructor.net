@@ -28,3 +28,7 @@
 		}
 	}
 }
+
+.classField,.classField.isHorizontal { display:grid; grid-template-columns:1fr; gap:6px; margin-bottom:18px; }
+.classField .fieldLabel { text-align:left; margin:0; flex:none; }.classField .fieldLabel > label { font-size:13px; font-weight:600; color:var(--muted); }
+.classField .fieldBody { display:block; min-width:0; }.classField .fieldBody > div > input { font-size:14px; border-color:var(--line); border-radius:7px; box-shadow:none; height:auto; padding:10px 12px; }.classField .fieldBody .static { background:var(--surface-soft); color:var(--muted); border:1px solid var(--line); }
