@@ -249,7 +249,8 @@
 }
 
 @media print {
-	.mobileDock { display:none!important; }
+	/* Narrow print areas activate the mobile breakpoint: hide its program toolbar too. */
+	.mobileDock,.mobilePrograms { display:none!important; }
 	.pageFrame { width:auto!important; height:auto!important; position:static!important; }
 	.pageFrame > .previewPage { position:static!important; transform:none!important; }
 	.pageFrame + .pageFrame .previewPage { break-before:page; page-break-before:always; }
